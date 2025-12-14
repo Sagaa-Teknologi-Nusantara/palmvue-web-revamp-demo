@@ -17,9 +17,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PageHeader } from '@/components/layout';
-import { JsonEditor } from '@/components/entity-types';
 import { useEntityTypes, useWorkflows } from '@/hooks';
-import { ArrowLeft, Trash2, Edit, Plus, X } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/lib/code-generator';
 import {
@@ -29,6 +28,86 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import type { JSONSchema, PropertySchema } from '@/types';
+
+// Field type display configuration
+const FIELD_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
+  string: { label: 'Text', color: 'bg-blue-100 text-blue-800' },
+  number: { label: 'Number', color: 'bg-purple-100 text-purple-800' },
+  integer: { label: 'Integer', color: 'bg-indigo-100 text-indigo-800' },
+  boolean: { label: 'Boolean', color: 'bg-green-100 text-green-800' },
+  date: { label: 'Date', color: 'bg-orange-100 text-orange-800' },
+  dropdown: { label: 'Dropdown', color: 'bg-pink-100 text-pink-800' },
+};
+
+function getFieldType(prop: PropertySchema): string {
+  if (prop.enum) return 'dropdown';
+  if (prop.format === 'date') return 'date';
+  return prop.type || 'string';
+}
+
+function MetadataSchemaDisplay({ schema }: { schema: JSONSchema }) {
+  if (!schema.properties || Object.keys(schema.properties).length === 0) {
+    return (
+      <p className="text-sm text-gray-500">No metadata fields defined for this entity type.</p>
+    );
+  }
+
+  const requiredFields = schema.required || [];
+
+  return (
+    <div className="space-y-3">
+      {Object.entries(schema.properties).map(([fieldName, prop]) => {
+        const fieldType = getFieldType(prop);
+        const config = FIELD_TYPE_CONFIG[fieldType] || FIELD_TYPE_CONFIG.string;
+        const isRequired = requiredFields.includes(fieldName);
+
+        return (
+          <div
+            key={fieldName}
+            className="p-4 bg-gray-50 rounded-lg border border-gray-100"
+          >
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{prop.title || fieldName}</span>
+                  {isRequired && (
+                    <span className="text-red-500 text-sm">*</span>
+                  )}
+                </div>
+                <code className="text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
+                  {fieldName}
+                </code>
+              </div>
+              <Badge className={cn('text-xs', config.color)} variant="secondary">
+                {config.label}
+              </Badge>
+            </div>
+            {prop.description && (
+              <p className="mt-2 text-sm text-gray-600">{prop.description}</p>
+            )}
+            {prop.enum && prop.enum.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-medium text-gray-500 mb-1.5">Options:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {prop.enum.map((option) => (
+                    <span
+                      key={option}
+                      className="text-xs px-2 py-1 bg-white border border-gray-200 rounded"
+                    >
+                      {option}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function EntityTypeDetailPage({
   params,
@@ -126,18 +205,13 @@ export default function EntityTypeDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Metadata Schema</CardTitle>
+            <CardTitle>Metadata Fields</CardTitle>
             <CardDescription>
-              JSON schema defining the metadata structure for entities of this type
+              Fields available for entities of this type
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <JsonEditor
-              value={JSON.stringify(entityType.metadata_schema, null, 2)}
-              onChange={() => {}}
-              readOnly
-              height="250px"
-            />
+            <MetadataSchemaDisplay schema={entityType.metadata_schema} />
           </CardContent>
         </Card>
 

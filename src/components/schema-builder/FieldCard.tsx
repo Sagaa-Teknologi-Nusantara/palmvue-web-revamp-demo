@@ -44,6 +44,7 @@ export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
     >
       <div className="flex items-center gap-3">
         <button
+          type="button"
           {...attributes}
           {...listeners}
           className="cursor-grab hover:bg-gray-100 p-1 rounded"
@@ -74,10 +75,11 @@ export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={onEdit}>
+          <Button type="button" variant="ghost" size="icon" onClick={onEdit}>
             <Edit2 className="h-4 w-4" />
           </Button>
           <Button
+            type="button"
             variant="ghost"
             size="icon"
             onClick={onDelete}
