@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,24 +12,48 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { PageHeader } from '@/components/layout';
-import { EntityTable, EntityFilters } from '@/components/entities';
-import { useEntities, useEntityTypes } from '@/hooks';
-import { Plus } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/alert-dialog";
+import { PageHeader } from "@/components/layout";
+import { EntityCardList, EntityFilters } from "@/components/entities";
+import { useEntities, useEntityTypes, useWorkflowRecords } from "@/hooks";
+import { Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { WorkflowRecordStatus } from "@/types/workflow-record";
+
+function computeEntityStatus(
+  entityId: string,
+  workflowRecords: { entity_id: string; status: WorkflowRecordStatus }[]
+): WorkflowRecordStatus {
+  const records = workflowRecords.filter((r) => r.entity_id === entityId);
+  if (records.length === 0) return "not_started";
+
+  const statuses = new Set(records.map((r) => r.status));
+  if (statuses.size === 1) return records[0].status;
+
+  if (statuses.has("in_progress")) return "in_progress";
+  if (statuses.has("not_started")) return "in_progress";
+  return "completed";
+}
 
 export default function EntitiesPage() {
   const { entities, isLoaded, remove } = useEntities();
   const { entityTypes } = useEntityTypes();
+  const { workflowRecords } = useWorkflowRecords();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedParent, setSelectedParent] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedParent, setSelectedParent] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  const entitiesWithStatus = useMemo(() => {
+    return entities.map((entity) => ({
+      entity,
+      status: computeEntityStatus(entity.id, workflowRecords),
+    }));
+  }, [entities, workflowRecords]);
 
   const filteredEntities = useMemo(() => {
-    return entities.filter((entity) => {
-      // Search filter
+    return entitiesWithStatus.filter(({ entity, status }) => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         if (
@@ -40,26 +64,34 @@ export default function EntitiesPage() {
         }
       }
 
-      // Type filter
-      if (selectedType !== 'all' && entity.entity_type_id !== selectedType) {
+      if (selectedType !== "all" && entity.entity_type_id !== selectedType) {
         return false;
       }
 
-      // Parent filter
-      if (selectedParent === 'none' && entity.parent_id !== null) {
+      if (selectedParent === "none" && entity.parent_id !== null) {
         return false;
       }
       if (
-        selectedParent !== 'all' &&
-        selectedParent !== 'none' &&
+        selectedParent !== "all" &&
+        selectedParent !== "none" &&
         entity.parent_id !== selectedParent
       ) {
         return false;
       }
 
+      if (selectedStatus !== "all" && status !== selectedStatus) {
+        return false;
+      }
+
       return true;
     });
-  }, [entities, searchQuery, selectedType, selectedParent]);
+  }, [
+    entitiesWithStatus,
+    searchQuery,
+    selectedType,
+    selectedParent,
+    selectedStatus,
+  ]);
 
   const handleDelete = () => {
     if (deleteId) {
@@ -72,11 +104,10 @@ export default function EntitiesPage() {
     return (
       <div>
         <PageHeader title="Entities" description="Manage entity instances" />
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-xl" />
+          ))}
         </div>
       </div>
     );
@@ -104,11 +135,13 @@ export default function EntitiesPage() {
         onTypeChange={setSelectedType}
         selectedParent={selectedParent}
         onParentChange={setSelectedParent}
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
         entityTypes={entityTypes}
         entities={entities}
       />
 
-      <EntityTable entities={filteredEntities} onDelete={setDeleteId} />
+      <EntityCardList entities={filteredEntities} onDelete={setDeleteId} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

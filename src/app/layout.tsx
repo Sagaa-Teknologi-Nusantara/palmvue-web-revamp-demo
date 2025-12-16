@@ -27,14 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-gray-50 antialiased`}
       >
         <DatabaseProvider>
           <Sidebar />
-          <main className="pl-64 min-h-screen">
-            <div className="p-8">
-              {children}
-            </div>
+          <main className="min-h-screen pl-64">
+            <div className="mx-auto max-w-7xl p-8">{children}</div>
           </main>
         </DatabaseProvider>
       </body>
