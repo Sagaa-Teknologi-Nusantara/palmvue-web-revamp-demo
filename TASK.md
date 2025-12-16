@@ -1,11 +1,10 @@
-Build a form builder UI that allows users to create a JSON Schema visually instead of writing JSON manually.
+I want to refactor the entity types list page (src/app/entity-types/page.tsx) to use card list instead of table. You can refer to the entity list page (src/app/entities/page.tsx) for the card implementation. Each card should have these information as the minimum:
 
-Users should be able to:
-
-- Add new form fields dynamically
-- Set a field name (used as the JSON key)
-- Choose a field type from predefined options (text, number, date, dropdown, boolean, etc.)
-- Mark whether the field is required or optional
-- Configure additional options when relevant (e.g. dropdown options)
-
-After all fields are configured, the system should automatically generate a valid JSON Schema that represents the defined form structure.
+- Icon (with the background color and foreground color for the icon color), it should be based on the entity type name but for now just use dummy icon and same for all entity type
+- Name
+- Prefix
+- Description
+- Updated At
+- Schema properties (show the first 3 properties and can be expanded to show all properties)
+- Actions (edit)
+  You can add more information if you think it's necessary. The page also dont need pagination since it's not a lot of data. Please be concise and mindful in the implementation.

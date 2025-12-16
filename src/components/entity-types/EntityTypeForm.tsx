@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -15,25 +15,25 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from '@/components/ui/form';
-import { SchemaBuilder } from '@/components/schema-builder';
-import type { EntityType, CreateEntityTypeInput, JSONSchema } from '@/types';
+} from "@/components/ui/form";
+import { SchemaBuilder } from "@/components/schema-builder";
+import type { EntityType, CreateEntityTypeInput, JSONSchema } from "@/types";
 
 const defaultSchema: JSONSchema = {
-  type: 'object',
+  type: "object",
   properties: {},
   required: [],
 };
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
   prefix: z
     .string()
-    .min(1, 'Prefix is required')
-    .max(5, 'Prefix must be 5 characters or less')
+    .min(1, "Prefix is required")
+    .max(5, "Prefix must be 5 characters or less")
     .refine((val) => val === val.toUpperCase(), {
-      message: 'Prefix must be uppercase',
+      message: "Prefix must be uppercase",
     }),
 });
 
@@ -53,15 +53,15 @@ export function EntityTypeForm({
   isLoading,
 }: EntityTypeFormProps) {
   const [metadataSchema, setMetadataSchema] = useState<JSONSchema>(
-    entityType?.metadata_schema || defaultSchema
+    entityType?.metadata_schema || defaultSchema,
   );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: entityType?.name || '',
-      description: entityType?.description || '',
-      prefix: entityType?.prefix || '',
+      name: entityType?.name || "",
+      description: entityType?.description || "",
+      prefix: entityType?.prefix || "",
     },
   });
 
@@ -70,6 +70,9 @@ export function EntityTypeForm({
       name: values.name,
       description: values.description,
       prefix: values.prefix.toUpperCase(),
+      icon: entityType?.icon || "box",
+      bg_color: entityType?.bg_color || "#dbeafe",
+      fg_color: entityType?.fg_color || "#2563eb",
       metadata_schema: metadataSchema,
     });
   };
@@ -143,7 +146,7 @@ export function EntityTypeForm({
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Saving...' : entityType ? 'Update' : 'Create'}
+            {isLoading ? "Saving..." : entityType ? "Update" : "Create"}
           </Button>
         </div>
       </form>
