@@ -65,6 +65,16 @@ export default function WorkflowsPage() {
     });
   }, [workflows, searchQuery, selectedEntityType, entityTypeWorkflows]);
 
+  const workflowEntityTypeMap = useMemo(() => {
+    const map: Record<string, string> = {}; // WorkflowID -> EntityTypeID
+    Object.entries(entityTypeWorkflows).forEach(([etId, wfIds]) => {
+      wfIds.forEach((wfId) => {
+        map[wfId] = etId;
+      });
+    });
+    return map;
+  }, [entityTypeWorkflows]);
+
   const handleDelete = () => {
     if (deleteId) {
       remove(deleteId);
@@ -114,6 +124,8 @@ export default function WorkflowsPage() {
       <WorkflowCardList
         workflows={filteredWorkflows}
         workflowStats={workflowStats}
+        workflowEntityTypeMap={workflowEntityTypeMap}
+        entityTypes={entityTypes}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

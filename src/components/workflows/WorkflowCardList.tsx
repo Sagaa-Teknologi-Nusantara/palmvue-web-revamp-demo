@@ -5,16 +5,20 @@ import { Button } from "@/components/ui/button";
 import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Search } from "lucide-react";
 import { WorkflowCard } from "./WorkflowCard";
-import type { Workflow } from "@/types";
+import type { Workflow, EntityType } from "@/types";
 
 interface WorkflowCardListProps {
   workflows: Workflow[];
   workflowStats: Record<string, { assigned: number; active: number }>;
+  workflowEntityTypeMap: Record<string, string>;
+  entityTypes: EntityType[];
 }
 
 export function WorkflowCardList({
   workflows,
   workflowStats,
+  workflowEntityTypeMap,
+  entityTypes,
 }: WorkflowCardListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
@@ -46,15 +50,21 @@ export function WorkflowCardList({
           </p>
         </div>
       ) : (
-        <div className="grid auto-rows-[150px] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-          {paginatedWorkflows.map((workflow) => (
-            <WorkflowCard
-              key={workflow.id}
-              workflow={workflow}
-              assignedCount={workflowStats[workflow.id]?.assigned || 0}
-              activeCount={workflowStats[workflow.id]?.active || 0}
-            />
-          ))}
+        <div className="grid auto-rows-min grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+          {paginatedWorkflows.map((workflow) => {
+            const entityTypeId = workflowEntityTypeMap[workflow.id];
+            const entityType = entityTypes.find((et) => et.id === entityTypeId);
+
+            return (
+              <WorkflowCard
+                key={workflow.id}
+                workflow={workflow}
+                assignedCount={workflowStats[workflow.id]?.assigned || 0}
+                activeCount={workflowStats[workflow.id]?.active || 0}
+                entityType={entityType}
+              />
+            );
+          })}
         </div>
       )}
 
