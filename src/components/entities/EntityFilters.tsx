@@ -43,17 +43,17 @@ export function EntityFilters({
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row">
       <div className="relative flex-1">
-        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search by name or code..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="bg-white pl-9"
+          className="bg-background pl-9"
         />
       </div>
 
       <Select value={selectedType} onValueChange={onTypeChange}>
-        <SelectTrigger className="w-full bg-white sm:w-[180px]">
+        <SelectTrigger className="bg-background w-full sm:w-[180px]">
           <SelectValue placeholder="All Entity Types" />
         </SelectTrigger>
         <SelectContent>
@@ -67,7 +67,7 @@ export function EntityFilters({
       </Select>
 
       <Select value={selectedParent} onValueChange={onParentChange}>
-        <SelectTrigger className="w-full bg-white sm:w-[180px]">
+        <SelectTrigger className="bg-background w-full sm:w-[180px]">
           <SelectValue placeholder="All Parents" />
         </SelectTrigger>
         <SelectContent>
@@ -82,7 +82,7 @@ export function EntityFilters({
       </Select>
 
       <Select value={selectedStatus} onValueChange={onStatusChange}>
-        <SelectTrigger className="w-full bg-white sm:w-[150px]">
+        <SelectTrigger className="bg-background w-full sm:w-[150px]">
           <SelectValue placeholder="All Statuses" />
         </SelectTrigger>
         <SelectContent>

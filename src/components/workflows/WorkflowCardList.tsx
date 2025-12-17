@@ -34,14 +34,14 @@ export function WorkflowCardList({
   return (
     <div className="space-y-6">
       {workflows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <Search className="h-6 w-6 text-gray-400" />
+        <div className="border-border bg-muted/40 rounded-lg border border-dashed py-12 text-center">
+          <div className="bg-background mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+            <Search className="text-muted-foreground h-6 w-6" />
           </div>
-          <h3 className="mb-1 text-lg font-medium text-gray-900">
+          <h3 className="text-foreground mb-1 text-lg font-medium">
             No workflows found
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-muted-foreground text-sm">
             Try adjusting your filters or create your first workflow.
           </p>
         </div>

@@ -14,11 +14,27 @@ const statusConfig: Record<
     label: string;
     variant: "secondary" | "warning" | "success";
     Icon: typeof Circle;
+    borderClass: string;
   }
 > = {
-  not_started: { label: "Not Started", variant: "secondary", Icon: Circle },
-  in_progress: { label: "In Progress", variant: "warning", Icon: Loader2 },
-  completed: { label: "Completed", variant: "success", Icon: CheckCircle2 },
+  not_started: {
+    label: "Not Started",
+    variant: "secondary",
+    Icon: Circle,
+    borderClass: "border-secondary-foreground/20",
+  },
+  in_progress: {
+    label: "In Progress",
+    variant: "warning",
+    Icon: Loader2,
+    borderClass: "border-yellow-800/20",
+  },
+  completed: {
+    label: "Completed",
+    variant: "success",
+    Icon: CheckCircle2,
+    borderClass: "border-green-800/20",
+  },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
@@ -26,7 +42,10 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   const Icon = config.Icon;
 
   return (
-    <Badge variant={config.variant} className={cn("rounded-md", className)}>
+    <Badge
+      variant={config.variant}
+      className={cn("rounded-md", config.borderClass, className)}
+    >
       <Icon className="h-3 w-3" />
       {config.label}
     </Badge>

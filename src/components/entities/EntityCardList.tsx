@@ -36,11 +36,11 @@ export function EntityCardList({ entities, onDelete }: EntityCardListProps) {
 
   if (entities.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white py-12 text-center">
-        <h3 className="mb-2 text-lg font-medium text-gray-900">
+      <div className="border-border bg-card rounded-lg border py-12 text-center">
+        <h3 className="text-foreground mb-2 text-lg font-medium">
           No entities found
         </h3>
-        <p className="mb-4 text-gray-500">
+        <p className="text-muted-foreground mb-4">
           Get started by creating your first entity or adjust your filters.
         </p>
         <Button asChild>

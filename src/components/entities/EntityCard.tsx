@@ -36,7 +36,7 @@ export function EntityCard({ entity, status, onDelete }: EntityCardProps) {
       className="group relative cursor-pointer space-y-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-md"
       onClick={handleCardClick}
     >
-      <div className="px-6 pt-6 space-y-4">
+      <div className="space-y-4 px-6 pt-6">
         <div className="flex items-center justify-between">
           <div
             className="flex items-center gap-2 text-xs font-medium tracking-wider uppercase opacity-80"
@@ -47,8 +47,8 @@ export function EntityCard({ entity, status, onDelete }: EntityCardProps) {
               className="h-3.5 w-3.5"
             />
             <span>{typeName}</span>
-            <span className="text-gray-300">•</span>
-            <span className="text-gray-500">{entity.code}</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="text-muted-foreground">{entity.code}</span>
           </div>
 
           <DropdownMenu>
@@ -56,7 +56,7 @@ export function EntityCard({ entity, status, onDelete }: EntityCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="-mt-2 -mr-3 h-8 w-8 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100"
+                className="text-muted-foreground -mt-2 -mr-3 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
@@ -72,7 +72,7 @@ export function EntityCard({ entity, status, onDelete }: EntityCardProps) {
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
+                className="text-destructive focus:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(entity.id);
@@ -86,19 +86,19 @@ export function EntityCard({ entity, status, onDelete }: EntityCardProps) {
         </div>
 
         <div className="flex items-start justify-between gap-4">
-          <h3 className="line-clamp-2 text-lg leading-tight font-bold text-gray-900">
+          <h3 className="text-foreground line-clamp-2 text-lg leading-tight font-bold">
             {entity.name}
           </h3>
           <StatusBadge status={status} className="shrink-0" />
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50/70 px-6 py-4 text-xs text-gray-600">
+      <div className="border-border bg-primary-light/40 text-muted-foreground flex items-center justify-between border-t px-6 py-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <Calendar className="h-3.5 w-3.5 text-gray-400" />
+          <Calendar className="text-muted-foreground/70 h-3.5 w-3.5" />
           <span>Updated {formatDate(entity.updated_at)}</span>
         </div>
-        <ArrowRight className="h-4 w-4 text-gray-400 opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100" />
+        <ArrowRight className="text-muted-foreground/70 h-4 w-4 opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100" />
       </div>
     </Card>
   );

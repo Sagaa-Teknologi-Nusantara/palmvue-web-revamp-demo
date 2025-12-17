@@ -32,22 +32,22 @@ export function WorkflowCard({
       <div className="flex min-h-0 flex-1 flex-col gap-3 px-6 pt-6 pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="bg-primary-light text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
               <GitFork className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="line-clamp-1 font-semibold text-gray-900">
+              <h3 className="text-foreground line-clamp-1 font-semibold">
                 {workflow.name}
               </h3>
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="text-muted-foreground flex items-center gap-3 text-xs">
                 <span className="font-medium">
                   {workflow.steps.length} Steps
                 </span>
-                <span className="h-1 w-1 rounded-full bg-gray-300" />
+                <span className="bg-border h-1 w-1 rounded-full" />
                 <span>{assignedCount} Assigned</span>
                 {activeCount > 0 && (
                   <>
-                    <span className="h-1 w-1 rounded-full bg-gray-300" />
+                    <span className="bg-border h-1 w-1 rounded-full" />
                     <span className="font-medium text-amber-600">
                       {activeCount} Active
                     </span>
@@ -75,13 +75,13 @@ export function WorkflowCard({
 
         {isExpanded && (
           <div className="animate-in fade-in slide-in-from-top-2 flex min-h-0 flex-1 flex-col overflow-hidden duration-200">
-            <div className="flex h-full flex-col rounded-lg bg-gray-50 p-3">
-              <h4 className="mb-3 shrink-0 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+            <div className="bg-muted/10 flex h-full flex-col rounded-lg p-3">
+              <h4 className="text-muted-foreground mb-3 shrink-0 text-xs font-semibold tracking-wider uppercase">
                 Workflow Steps
               </h4>
               <div className="custom-scrollbar flex-1 overflow-y-auto pr-2 pl-0.5">
                 <div className="relative space-y-0">
-                  <div className="absolute top-2 left-[0.57rem] h-[calc(100%-16px)] w-0.5 bg-gray-200" />
+                  <div className="bg-border absolute top-2 left-[0.57rem] h-[calc(100%-16px)] w-0.5" />
 
                   {workflow.steps
                     .sort((a, b) => a.order_index - b.order_index)
@@ -90,17 +90,17 @@ export function WorkflowCard({
                         key={step.id}
                         className="relative flex items-center gap-3 py-1.5"
                       >
-                        <div className="relative z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white ring-2 ring-indigo-100">
-                          <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                        <div className="bg-background ring-primary/20 relative z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-2">
+                          <div className="bg-primary h-1.5 w-1.5 rounded-full" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-gray-700">
+                          <p className="text-foreground/80 truncate text-sm font-medium">
                             {step.name}
                           </p>
                         </div>
                         <Badge
                           variant="secondary"
-                          className="text-[10px] text-gray-500"
+                          className="text-muted-foreground text-[10px]"
                         >
                           Step {index + 1}
                         </Badge>
@@ -112,9 +112,9 @@ export function WorkflowCard({
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50/70 px-6 py-4 text-xs text-gray-600">
+      <div className="border-border bg-primary-light/40 text-muted-foreground flex items-center justify-between border-t px-6 py-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <Calendar className="h-3.5 w-3.5 text-gray-400" />
+          <Calendar className="text-muted-foreground/70 h-3.5 w-3.5" />
           <span>Updated {formatDate(workflow.updated_at)}</span>
         </div>
       </div>

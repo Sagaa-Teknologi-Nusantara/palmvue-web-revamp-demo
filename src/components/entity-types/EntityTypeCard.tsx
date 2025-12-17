@@ -41,10 +41,11 @@ export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-[0.5px]"
               style={{
                 backgroundColor: entityType.bg_color,
                 color: entityType.fg_color,
+                borderColor: entityType.fg_color,
               }}
             >
               <DynamicIcon
@@ -123,7 +124,7 @@ export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50/70 px-6 py-4 text-xs text-gray-600">
+      <div className="flex items-center justify-between border-t border-gray-200 bg-primary-light/40 px-6 py-4 text-xs text-gray-600">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5 text-gray-400" />
           <span>Updated {formatDate(entityType.updated_at)}</span>
