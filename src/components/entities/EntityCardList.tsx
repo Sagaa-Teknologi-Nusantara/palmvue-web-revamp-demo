@@ -54,12 +54,7 @@ export function EntityCardList({ entities, onDelete }: EntityCardListProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {paginatedEntities.map(({ entity, status }) => (
-          <EntityCard
-            key={entity.id}
-            entity={entity}
-            status={status}
-            onDelete={onDelete}
-          />
+          <EntityCard key={entity.id} entity={entity} onDelete={onDelete} />
         ))}
       </div>
 
