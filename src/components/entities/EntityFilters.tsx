@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Search } from 'lucide-react';
-import type { EntityType, Entity } from '@/types';
+} from "@/components/ui/select";
+import { Search } from "lucide-react";
+import type { EntityType, Entity } from "@/types";
 
 interface EntityFiltersProps {
   searchQuery: string;
@@ -18,6 +18,8 @@ interface EntityFiltersProps {
   onTypeChange: (typeId: string) => void;
   selectedParent: string;
   onParentChange: (parentId: string) => void;
+  selectedStatus: string;
+  onStatusChange: (status: string) => void;
   entityTypes: EntityType[];
   entities: Entity[];
 }
@@ -29,28 +31,29 @@ export function EntityFilters({
   onTypeChange,
   selectedParent,
   onParentChange,
+  selectedStatus,
+  onStatusChange,
   entityTypes,
   entities,
 }: EntityFiltersProps) {
-  // Get unique parents from entities
-  const parentsAvailable = entities.filter(
-    (e) => entities.some((child) => child.parent_id === e.id)
+  const parentsAvailable = entities.filter((e) =>
+    entities.some((child) => child.parent_id === e.id),
   );
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+    <div className="mb-6 flex flex-col gap-4 sm:flex-row">
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder="Search by name or code..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9"
+          className="bg-background pl-9"
         />
       </div>
 
       <Select value={selectedType} onValueChange={onTypeChange}>
-        <SelectTrigger className="w-full sm:w-[200px]">
+        <SelectTrigger className="bg-background w-full sm:w-[180px]">
           <SelectValue placeholder="All Entity Types" />
         </SelectTrigger>
         <SelectContent>
@@ -64,7 +67,7 @@ export function EntityFilters({
       </Select>
 
       <Select value={selectedParent} onValueChange={onParentChange}>
-        <SelectTrigger className="w-full sm:w-[200px]">
+        <SelectTrigger className="bg-background w-full sm:w-[180px]">
           <SelectValue placeholder="All Parents" />
         </SelectTrigger>
         <SelectContent>
@@ -75,6 +78,18 @@ export function EntityFilters({
               {entity.code} - {entity.name}
             </SelectItem>
           ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={selectedStatus} onValueChange={onStatusChange}>
+        <SelectTrigger className="bg-background w-full sm:w-[150px]">
+          <SelectValue placeholder="All Statuses" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="not_started">Not Started</SelectItem>
+          <SelectItem value="in_progress">In Progress</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
         </SelectContent>
       </Select>
     </div>

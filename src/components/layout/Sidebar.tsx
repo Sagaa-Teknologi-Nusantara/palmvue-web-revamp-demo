@@ -1,29 +1,24 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  Boxes,
-  Box,
-  GitBranch,
-} from 'lucide-react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { LayoutDashboard, Boxes, Box, GitBranch } from "lucide-react";
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Entity Types', href: '/entity-types', icon: Boxes },
-  { name: 'Entities', href: '/entities', icon: Box },
-  { name: 'Workflows', href: '/workflows', icon: GitBranch },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Entity Types", href: "/entity-types", icon: Boxes },
+  { name: "Entities", href: "/entities", icon: Box },
+  { name: "Workflows", href: "/workflows", icon: GitBranch },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200">
-      <div className="flex h-16 items-center gap-2 border-b border-gray-200 px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+    <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border fixed inset-y-0 left-0 z-50 w-64 border-r">
+      <div className="border-sidebar-border flex h-16 items-center gap-2 border-b px-6">
+        <div className="bg-sidebar-accent text-sidebar-accent-foreground flex h-8 w-8 items-center justify-center rounded-lg font-bold">
           P
         </div>
         <span className="text-lg font-semibold">PalmVue Demo</span>
@@ -32,17 +27,17 @@ export function Sidebar() {
         {navigation.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== '/' && pathname.startsWith(item.href));
+            (item.href !== "/" && pathname.startsWith(item.href));
 
           return (
             <Link
               key={item.name}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
               )}
             >
               <item.icon className="h-5 w-5" />

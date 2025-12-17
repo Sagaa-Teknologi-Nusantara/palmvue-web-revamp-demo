@@ -1,43 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { PageHeader } from '@/components/layout';
-import { EntityTypeTable } from '@/components/entity-types';
-import { useEntityTypes } from '@/hooks';
-import { Plus } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout";
+import { EntityTypeCardList } from "@/components/entity-types";
+import { useEntityTypes } from "@/hooks";
+import { Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EntityTypesPage() {
-  const { entityTypes, isLoaded, remove } = useEntityTypes();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const handleDelete = () => {
-    if (deleteId) {
-      remove(deleteId);
-      setDeleteId(null);
-    }
-  };
+  const { entityTypes, isLoaded } = useEntityTypes();
 
   if (!isLoaded) {
     return (
       <div>
-        <PageHeader title="Entity Types" description="Manage entity type definitions" />
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+        <PageHeader
+          title="Entity Types"
+          description="Manage entity type definitions"
+        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full rounded-xl" />
+          ))}
         </div>
       </div>
     );
@@ -58,28 +42,7 @@ export default function EntityTypesPage() {
         }
       />
 
-      <EntityTypeTable entityTypes={entityTypes} onDelete={setDeleteId} />
-
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Entity Type</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this entity type? This action cannot be
-              undone and may affect existing entities.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <EntityTypeCardList entityTypes={entityTypes} />
     </div>
   );
 }
