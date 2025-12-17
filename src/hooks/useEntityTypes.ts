@@ -1,25 +1,29 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useLocalStorage } from './useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/constants';
-import type { EntityType, CreateEntityTypeInput, UpdateEntityTypeInput, Workflow } from '@/types';
+import { useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useLocalStorage } from "./useLocalStorage";
+import { STORAGE_KEYS } from "@/lib/constants";
+import type {
+  EntityType,
+  CreateEntityTypeInput,
+  UpdateEntityTypeInput,
+  Workflow,
+} from "@/types";
 
 export function useEntityTypes() {
   const [entityTypes, setEntityTypes, isLoaded] = useLocalStorage<EntityType[]>(
     STORAGE_KEYS.ENTITY_TYPES,
-    []
+    [],
   );
-  const [entityTypeWorkflows, setEntityTypeWorkflows] = useLocalStorage<Record<string, string[]>>(
-    STORAGE_KEYS.ENTITY_TYPE_WORKFLOWS,
-    {}
-  );
+  const [entityTypeWorkflows, setEntityTypeWorkflows] = useLocalStorage<
+    Record<string, string[]>
+  >(STORAGE_KEYS.ENTITY_TYPE_WORKFLOWS, {});
   const [workflows] = useLocalStorage<Workflow[]>(STORAGE_KEYS.WORKFLOWS, []);
 
   const getById = useCallback(
     (id: string) => entityTypes.find((et) => et.id === id),
-    [entityTypes]
+    [entityTypes],
   );
 
   const create = useCallback(
@@ -34,7 +38,7 @@ export function useEntityTypes() {
       setEntityTypes((prev) => [...prev, newEntityType]);
       return newEntityType;
     },
-    [setEntityTypes]
+    [setEntityTypes],
   );
 
   const update = useCallback(
@@ -47,11 +51,11 @@ export function useEntityTypes() {
             return updated;
           }
           return et;
-        })
+        }),
       );
       return updated;
     },
-    [setEntityTypes]
+    [setEntityTypes],
   );
 
   const remove = useCallback(
@@ -63,7 +67,7 @@ export function useEntityTypes() {
         return newMap;
       });
     },
-    [setEntityTypes, setEntityTypeWorkflows]
+    [setEntityTypes, setEntityTypeWorkflows],
   );
 
   const assignWorkflow = useCallback(
@@ -74,17 +78,20 @@ export function useEntityTypes() {
         return { ...prev, [entityTypeId]: [...existing, workflowId] };
       });
     },
-    [setEntityTypeWorkflows]
+    [setEntityTypeWorkflows],
   );
 
   const unassignWorkflow = useCallback(
     (entityTypeId: string, workflowId: string) => {
       setEntityTypeWorkflows((prev) => {
         const existing = prev[entityTypeId] || [];
-        return { ...prev, [entityTypeId]: existing.filter((id) => id !== workflowId) };
+        return {
+          ...prev,
+          [entityTypeId]: existing.filter((id) => id !== workflowId),
+        };
       });
     },
-    [setEntityTypeWorkflows]
+    [setEntityTypeWorkflows],
   );
 
   const getAssignedWorkflows = useCallback(
@@ -92,14 +99,14 @@ export function useEntityTypes() {
       const workflowIds = entityTypeWorkflows[entityTypeId] || [];
       return workflows.filter((w) => workflowIds.includes(w.id));
     },
-    [entityTypeWorkflows, workflows]
+    [entityTypeWorkflows, workflows],
   );
 
   const getAssignedWorkflowIds = useCallback(
     (entityTypeId: string): string[] => {
       return entityTypeWorkflows[entityTypeId] || [];
     },
-    [entityTypeWorkflows]
+    [entityTypeWorkflows],
   );
 
   return {
@@ -113,5 +120,6 @@ export function useEntityTypes() {
     unassignWorkflow,
     getAssignedWorkflows,
     getAssignedWorkflowIds,
+    entityTypeWorkflows,
   };
 }
