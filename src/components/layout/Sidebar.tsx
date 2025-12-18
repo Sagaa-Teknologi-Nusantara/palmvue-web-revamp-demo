@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Boxes, Box, GitBranch } from "lucide-react";
+import {
+  LayoutDashboard,
+  Boxes,
+  Box,
+  GitBranch,
+  BarChart3,
+} from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Entity Types", href: "/entity-types", icon: Boxes },
   { name: "Entities", href: "/entities", icon: Box },
   { name: "Workflows", href: "/workflows", icon: GitBranch },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ];
 
 export function Sidebar() {
