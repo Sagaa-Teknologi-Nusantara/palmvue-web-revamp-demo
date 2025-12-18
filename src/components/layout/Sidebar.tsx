@@ -9,6 +9,7 @@ import {
   Box,
   GitBranch,
   BarChart3,
+  Bot,
 } from "lucide-react";
 
 const navigation = [
@@ -17,6 +18,7 @@ const navigation = [
   { name: "Entities", href: "/entities", icon: Box },
   { name: "Workflows", href: "/workflows", icon: GitBranch },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "AI Assistant", href: "/ai-assistant", icon: Bot },
 ];
 
 export function Sidebar() {
