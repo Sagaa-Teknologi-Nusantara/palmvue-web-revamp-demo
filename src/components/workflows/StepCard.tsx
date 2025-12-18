@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { GripVertical, Edit2, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { GripVertical, Edit2, Trash2, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StepCardProps {
   id: string;
@@ -39,46 +40,70 @@ export function StepCard({
   };
 
   return (
-    <Card
+    <div
       ref={setNodeRef}
       style={style}
-      className={cn(
-        'p-4 bg-white',
-        isDragging && 'opacity-50 shadow-lg'
-      )}
+      className={cn("group relative flex gap-4", isDragging && "opacity-50")}
     >
-      <div className="flex items-center gap-3">
-        <button
-          {...attributes}
-          {...listeners}
-          className="cursor-grab hover:bg-gray-100 p-1 rounded"
-        >
-          <GripVertical className="h-5 w-5 text-gray-400" />
-        </button>
-
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
-          {order + 1}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-medium truncate">{name}</p>
-          <p className="text-sm text-gray-500 truncate">Form: {formName}</p>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={onEdit}>
-            <Edit2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onDelete}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+      {/* Number Bubble - Acts as Drag Handle Target visually but sortable logic is on the car/grip */}
+      <div className="border-background bg-muted text-muted-foreground group-hover:border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 text-sm font-bold shadow-sm transition-colors">
+        {order + 1}
       </div>
-    </Card>
+
+      {/* Step Content Card */}
+      <Card
+        className={cn(
+          "w-full border p-0 transition-all hover:shadow-md",
+          isDragging ? "shadow-lg" : "shadow-sm",
+        )}
+      >
+        <div className="flex items-center gap-4 p-4">
+          {/* Drag Handle */}
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="hover:bg-muted text-muted-foreground cursor-grab rounded-md p-1.5 transition-colors"
+          >
+            <GripVertical className="h-5 w-5" />
+          </button>
+
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 flex items-center justify-between">
+              <h4 className="truncate pr-2 text-base font-semibold">{name}</h4>
+              <Badge variant="secondary" className="shrink-0 text-[10px]">
+                Step {order + 1}
+              </Badge>
+            </div>
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <FileText className="h-3 w-3" />
+              Form:{" "}
+              <span className="text-foreground font-medium">{formName}</span>
+            </div>
+          </div>
+
+          <div className="ml-2 flex items-center gap-1 border-l pl-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onEdit}
+              className="text-muted-foreground hover:text-foreground h-8 w-8"
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onDelete}
+              className="text-muted-foreground hover:text-destructive h-8 w-8"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

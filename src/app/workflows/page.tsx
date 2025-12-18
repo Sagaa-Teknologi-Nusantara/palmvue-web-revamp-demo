@@ -36,20 +36,29 @@ export default function WorkflowsPage() {
   const workflowStats = useMemo(() => {
     const stats: Record<string, { assigned: number; active: number }> = {};
 
+    // Initialize with active counts from records
     workflowRecords.forEach((record) => {
       if (!stats[record.workflow_id]) {
         stats[record.workflow_id] = { assigned: 0, active: 0 };
       }
-
-      stats[record.workflow_id].assigned += 1;
 
       if (record.status === "in_progress") {
         stats[record.workflow_id].active += 1;
       }
     });
 
+    // Calculate assigned count based on entity types
+    Object.values(entityTypeWorkflows).forEach((workflowIds) => {
+      workflowIds.forEach((wfId) => {
+        if (!stats[wfId]) {
+          stats[wfId] = { assigned: 0, active: 0 };
+        }
+        stats[wfId].assigned += 1;
+      });
+    });
+
     return stats;
-  }, [workflowRecords]);
+  }, [workflowRecords, entityTypeWorkflows]);
 
   const filteredWorkflows = useMemo(() => {
     return workflows.filter((w) => {

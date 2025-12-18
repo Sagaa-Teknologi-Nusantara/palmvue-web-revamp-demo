@@ -310,8 +310,8 @@ export default function EntityDetailPage({
         {workflowRecords.length > 0 ? (
           <div className="grid gap-6">
             {workflowRecords.map((record) => (
-              <Card key={record.id} className="overflow-hidden">
-                <CardHeader className="bg-muted/30 border-b pb-4">
+              <Card key={record.id} className="overflow-hidden p-0 gap-0">
+                <CardHeader className="bg-muted/30 border-b pb-4 pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full">

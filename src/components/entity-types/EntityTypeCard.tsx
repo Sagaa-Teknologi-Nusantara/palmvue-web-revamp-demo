@@ -124,7 +124,7 @@ export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 bg-primary-light/40 px-6 py-4 text-xs text-gray-600">
+      <div className="flex items-center justify-between border-t border-gray-200 bg-primary-light/40 px-6 py-3 text-xs text-gray-600">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5 text-gray-400" />
           <span>Updated {formatDate(entityType.updated_at)}</span>

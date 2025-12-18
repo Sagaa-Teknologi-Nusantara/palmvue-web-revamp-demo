@@ -110,7 +110,7 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
         </div>
       </div>
 
-      <div className="border-border bg-primary-light/40 text-muted-foreground flex items-center justify-between border-t px-6 py-3 text-xs">
+      <div className="border-border bg-primary-light/40 text-muted-foreground flex items-center justify-between border-t px-6 py-[0.6rem] text-xs">
         <div className="flex items-center gap-1.5">
           <Calendar className="text-muted-foreground/70 h-3.5 w-3.5" />
           <span>Updated {formatDate(entity.updated_at)}</span>

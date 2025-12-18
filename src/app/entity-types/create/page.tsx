@@ -1,38 +1,43 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PageHeader } from '@/components/layout';
-import { EntityTypeForm } from '@/components/entity-types';
-import { useEntityTypes } from '@/hooks';
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/layout";
+import { EntityTypeForm } from "@/components/entity-types";
+import { useEntityTypes, useWorkflows } from "@/hooks";
 
 export default function CreateEntityTypePage() {
   const router = useRouter();
-  const { create } = useEntityTypes();
+  const { create, assignWorkflow } = useEntityTypes();
+  const { workflows } = useWorkflows();
 
-  const handleSubmit = (data: Parameters<typeof create>[0]) => {
-    create(data);
-    router.push('/entity-types');
+  const handleSubmit = (
+    data: Parameters<typeof create>[0] & { assignedWorkflowIds: string[] },
+  ) => {
+    const { assignedWorkflowIds, ...createData } = data;
+    const newEntityType = create(createData);
+
+    // Assign selected workflows
+    if (assignedWorkflowIds && assignedWorkflowIds.length > 0) {
+      assignedWorkflowIds.forEach((workflowId) => {
+        assignWorkflow(newEntityType.id, workflowId);
+      });
+    }
+
+    router.push("/entity-types");
   };
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Create Entity Type"
-        description="Define a new entity type with its metadata schema"
+        description="Define a new entity type with its metadata schema and default workflows"
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Entity Type Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EntityTypeForm
-            onSubmit={handleSubmit}
-            onCancel={() => router.push('/entity-types')}
-          />
-        </CardContent>
-      </Card>
+      <EntityTypeForm
+        availableWorkflows={workflows}
+        onSubmit={handleSubmit}
+        onCancel={() => router.push("/entity-types")}
+      />
     </div>
   );
 }

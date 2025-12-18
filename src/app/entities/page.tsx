@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -22,7 +23,7 @@ import type { WorkflowRecordStatus } from "@/types/workflow-record";
 
 function computeEntityStatus(
   entityId: string,
-  workflowRecords: { entity_id: string; status: WorkflowRecordStatus }[]
+  workflowRecords: { entity_id: string; status: WorkflowRecordStatus }[],
 ): WorkflowRecordStatus {
   const records = workflowRecords.filter((r) => r.entity_id === entityId);
   if (records.length === 0) return "not_started";
@@ -40,10 +41,20 @@ export default function EntitiesPage() {
   const { entityTypes } = useEntityTypes();
   const { workflowRecords } = useWorkflowRecords();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
+  const [selectedType, setSelectedType] = useState(() => {
+    return searchParams.get("type") || "all";
+  });
   const [selectedParent, setSelectedParent] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    const typeParam = searchParams.get("type");
+    if (typeParam) {
+      setSelectedType(typeParam);
+    }
+  }, [searchParams]);
 
   const entitiesWithStatus = useMemo(() => {
     return entities.map((entity) => ({
@@ -104,7 +115,7 @@ export default function EntitiesPage() {
     return (
       <div>
         <PageHeader title="Entities" description="Manage entity instances" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-40 w-full rounded-xl" />
           ))}

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -9,20 +9,30 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { v4 as uuidv4 } from 'uuid';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from "@dnd-kit/sortable";
+import {
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+} from "@dnd-kit/modifiers";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -30,7 +40,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+  FormDescription,
+} from "@/components/ui/form";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,14 +51,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { StepCard } from './StepCard';
-import { StepEditModal, type StepData } from './StepEditModal';
-import { Plus } from 'lucide-react';
-import type { CreateWorkflowInput } from '@/types';
+} from "@/components/ui/alert-dialog";
+import { StepCard } from "./StepCard";
+import { StepEditModal, type StepData } from "./StepEditModal";
+import { Plus, PlayCircle, Split } from "lucide-react";
+import type { CreateWorkflowInput } from "@/types";
 
 const workflowSchema = z.object({
-  name: z.string().min(1, 'Workflow name is required'),
+  name: z.string().min(1, "Workflow name is required"),
 });
 
 interface WorkflowBuilderProps {
@@ -63,14 +74,14 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
 
   const form = useForm({
     resolver: zodResolver(workflowSchema),
-    defaultValues: { name: '' },
+    defaultValues: { name: "" },
   });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -95,18 +106,13 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
     setIsModalOpen(true);
   };
 
-  const handleSaveStep = (data: Omit<StepData, 'id'>) => {
+  const handleSaveStep = (data: Omit<StepData, "id">) => {
     if (editingStep) {
       setSteps((prev) =>
-        prev.map((s) =>
-          s.id === editingStep.id ? { ...s, ...data } : s
-        )
+        prev.map((s) => (s.id === editingStep.id ? { ...s, ...data } : s)),
       );
     } else {
-      setSteps((prev) => [
-        ...prev,
-        { id: uuidv4(), ...data },
-      ]);
+      setSteps((prev) => [...prev, { id: uuidv4(), ...data }]);
     }
   };
 
@@ -140,79 +146,136 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
   return (
     <div className="space-y-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <Card>
-            <CardContent className="pt-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Workflow Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Palm Tree Assessment" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="grid gap-6 md:grid-cols-5">
+            {/* Left Column: Details */}
+            <div className="space-y-6 md:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <span className="bg-primary/10 text-primary rounded-md p-1.5">
+                      <PlayCircle className="h-4 w-4" />
+                    </span>
+                    Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Workflow Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Palm Tree Assessment"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          A descriptive name for your workflow.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Steps</h3>
-              <Button type="button" variant="outline" onClick={handleAddStep}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Step
-              </Button>
+                  <div className="flex flex-col gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      disabled={steps.length === 0}
+                      className="w-full"
+                    >
+                      Create Workflow
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onCancel}
+                      className="w-full"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {steps.length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-gray-500 mb-4">
-                  No steps added yet. Add steps to define your workflow.
-                </p>
-                <Button type="button" onClick={handleAddStep}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add First Step
-                </Button>
-              </Card>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={steps.map((s) => s.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {steps.map((step, index) => (
-                      <StepCard
-                        key={step.id}
-                        id={step.id}
-                        name={step.name}
-                        formName={step.formName}
-                        order={index}
-                        onEdit={() => handleEditStep(step)}
-                        onDelete={() => setDeleteStepId(step.id)}
-                      />
-                    ))}
+            {/* Right Column: Steps */}
+            <div className="md:col-span-3">
+              <Card className="md:bg-card h-full border-none bg-transparent shadow-none md:border md:shadow-sm">
+                <CardHeader className="px-0 md:px-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <span className="bg-primary/10 text-primary rounded-md p-1.5">
+                          <Split className="h-4 w-4" />
+                        </span>
+                        Workflow Steps
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        Drag and drop to reorder steps
+                      </CardDescription>
+                    </div>
+                    <Button type="button" size="sm" onClick={handleAddStep}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Step
+                    </Button>
                   </div>
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={steps.length === 0}>
-              Create Workflow
-            </Button>
+                </CardHeader>
+                <CardContent className="px-0 pt-0 md:px-6">
+                  {steps.length === 0 ? (
+                    <div className="border-border bg-muted/20 rounded-lg border-2 border-dashed py-12 text-center">
+                      <p className="text-muted-foreground mb-4 text-sm">
+                        No steps added yet. Start building your workflow.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleAddStep}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add First Step
+                      </Button>
+                    </div>
+                  ) : (
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[
+                        restrictToVerticalAxis,
+                        restrictToWindowEdges,
+                      ]}
+                    >
+                      <SortableContext
+                        items={steps.map((s) => s.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-6 pt-4">
+                          {steps.map((step, index) => (
+                            <div key={step.id} className="group relative">
+                              {/* Timeline Line */}
+                              {index !== steps.length - 1 && (
+                                <div className="bg-border absolute top-10 -bottom-6 left-[1.15rem] w-0.5" />
+                              )}
+                              <StepCard
+                                id={step.id}
+                                name={step.name}
+                                formName={step.formName}
+                                order={index}
+                                onEdit={() => handleEditStep(step)}
+                                onDelete={() => setDeleteStepId(step.id)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </form>
       </Form>
@@ -224,12 +287,16 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
         step={editingStep}
       />
 
-      <AlertDialog open={!!deleteStepId} onOpenChange={() => setDeleteStepId(null)}>
+      <AlertDialog
+        open={!!deleteStepId}
+        onOpenChange={() => setDeleteStepId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Step</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this step? This action cannot be undone.
+              Are you sure you want to delete this step? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
