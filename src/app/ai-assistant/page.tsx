@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { PageHeader } from "@/components/layout";
 import {
   Card,
@@ -60,6 +60,39 @@ const DUMMY_TABLE_DATA = [
 const AI_RESPONSE_TEXT =
   "Based on the real-time analysis of your entity ecosystem, we observed a steady increase in operational efficiency over the last 5 weeks. The system status is largely healthy, though Logistics Hub C requires attention.";
 
+interface AnswerOption {
+  text: string;
+  hasChart: boolean;
+  hasTable: boolean;
+}
+
+const ANSWER_OPTIONS: AnswerOption[] = [
+  {
+    text: "Based on the real-time analysis of your entity ecosystem, we observed a steady increase in operational efficiency over the last 5 weeks. The system status is largely healthy, though Logistics Hub C requires attention.",
+    hasChart: true,
+    hasTable: true,
+  },
+  {
+    text: "Your workflow efficiency has improved significantly this quarter. The data shows a consistent upward trend in processing speeds across all units. Here's a visual breakdown of the weekly performance metrics.",
+    hasChart: true,
+    hasTable: false,
+  },
+  {
+    text: "Here's a summary of your top performing entities based on current operational data. Each entity has been evaluated against key performance indicators including throughput, uptime, and resource utilization.",
+    hasChart: false,
+    hasTable: true,
+  },
+  {
+    text: "All systems are operating within normal parameters. Current monitoring shows stable performance across your entity ecosystem with no immediate concerns requiring attention. Continue regular maintenance schedules as planned.",
+    hasChart: false,
+    hasTable: false,
+  },
+];
+
+const STREAMING_SPEED_MS = 20;
+const CHART_DELAY_MS = 300;
+const TABLE_DELAY_MS = 300;
+
 // --- Types ---
 
 interface Message {
@@ -69,7 +102,49 @@ interface Message {
   hasChart?: boolean;
   hasTable?: boolean;
   timestamp: Date;
+  isStreaming?: boolean;
 }
+
+// --- Streaming Text Component ---
+
+interface StreamingTextProps {
+  text: string;
+  onComplete: () => void;
+  isActive: boolean;
+}
+
+const StreamingText = ({ text, onComplete, isActive }: StreamingTextProps) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isActive) {
+      setDisplayedText(text);
+      return;
+    }
+
+    if (currentIndex >= text.length) {
+      onComplete();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setDisplayedText((prev) => prev + text[currentIndex]);
+      setCurrentIndex((prev) => prev + 1);
+    }, STREAMING_SPEED_MS);
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, text, onComplete, isActive]);
+
+  return (
+    <span>
+      {displayedText}
+      {isActive && currentIndex < text.length && (
+        <span className="ml-0.5 inline-block h-3 w-0.5 animate-pulse bg-current" />
+      )}
+    </span>
+  );
+};
 
 // --- Components ---
 
@@ -111,18 +186,36 @@ export default function AiAssistantPage() {
       content:
         "Hello! I am your AI Assistant. You can ask me about the current condition of your ecosystem, workflow statistics, or entity performance.",
       timestamp: new Date(),
+      isStreaming: false,
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
+  const [streamingComplete, setStreamingComplete] = useState<
+    Record<string, boolean>
+  >({});
+  const [showChart, setShowChart] = useState<Record<string, boolean>>({});
+  const [showTable, setShowTable] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, streamingComplete, showChart, showTable]);
+
+  const handleStreamingComplete = useCallback((messageId: string) => {
+    setStreamingComplete((prev) => ({ ...prev, [messageId]: true }));
+
+    setTimeout(() => {
+      setShowChart((prev) => ({ ...prev, [messageId]: true }));
+
+      setTimeout(() => {
+        setShowTable((prev) => ({ ...prev, [messageId]: true }));
+      }, TABLE_DELAY_MS);
+    }, CHART_DELAY_MS);
+  }, []);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -138,15 +231,18 @@ export default function AiAssistantPage() {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI delay
     setTimeout(() => {
+      const aiMessageId = (Date.now() + 1).toString();
+      const randomOption =
+        ANSWER_OPTIONS[Math.floor(Math.random() * ANSWER_OPTIONS.length)];
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: aiMessageId,
         role: "ai",
-        content: AI_RESPONSE_TEXT,
-        hasChart: true,
-        hasTable: true,
+        content: randomOption.text,
+        hasChart: randomOption.hasChart,
+        hasTable: randomOption.hasTable,
         timestamp: new Date(),
+        isStreaming: true,
       };
       setMessages((prev) => [...prev, aiMessage]);
       setIsTyping(false);
@@ -167,8 +263,8 @@ export default function AiAssistantPage() {
         description="Ask questions about your data and get instant insights"
       />
 
-      <Card className="flex flex-1 flex-col overflow-hidden p-0 shadow-sm">
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-10">
+      <Card className="flex flex-1 flex-col overflow-hidden p-0 shadow-sm gap-0">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 pt-10">
           <div className="space-y-6">
             {messages.map((msg) => (
               <div
@@ -204,12 +300,20 @@ export default function AiAssistantPage() {
                         : "bg-muted text-foreground"
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === "ai" && msg.isStreaming ? (
+                      <StreamingText
+                        text={msg.content}
+                        isActive={!streamingComplete[msg.id]}
+                        onComplete={() => handleStreamingComplete(msg.id)}
+                      />
+                    ) : (
+                      msg.content
+                    )}
                   </div>
 
                   {/* Chart Attachment */}
-                  {msg.hasChart && (
-                    <Card className="w-full max-w-md overflow-hidden border p-0">
+                  {msg.hasChart && (!msg.isStreaming || showChart[msg.id]) && (
+                    <Card className="animate-in fade-in slide-in-from-bottom-2 w-full max-w-md overflow-hidden border p-0 duration-300">
                       <CardHeader className="bg-muted/30 p-4 pb-2">
                         <CardTitle className="text-sm font-medium">
                           Efficiency Trend
@@ -261,14 +365,14 @@ export default function AiAssistantPage() {
                   )}
 
                   {/* Table Attachment */}
-                  {msg.hasTable && (
-                    <Card className="w-full max-w-md overflow-hidden border p-0">
+                  {msg.hasTable && (!msg.isStreaming || showTable[msg.id]) && (
+                    <Card className="animate-in fade-in slide-in-from-bottom-2 w-full max-w-md gap-0 overflow-hidden border p-0 duration-300">
                       <CardHeader className="bg-primary-light/40 p-4 pb-2">
                         <CardTitle className="text-sm font-medium">
                           Top Performing Entities
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-0">
+                      <CardContent className="p-2">
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -330,6 +434,7 @@ export default function AiAssistantPage() {
               </div>
             )}
           </div>
+          <div className="h-10"></div>
         </div>
         <div className="border-t p-4">
           <div className="flex gap-2">
