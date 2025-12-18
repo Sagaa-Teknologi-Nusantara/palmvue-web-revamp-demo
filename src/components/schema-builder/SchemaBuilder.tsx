@@ -32,6 +32,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Plus, LayoutGrid } from "lucide-react";
 import { FieldCard } from "./FieldCard";
 import { FieldEditor } from "./FieldEditor";
@@ -41,6 +48,7 @@ import type { JSONSchema, PropertySchema } from "@/types";
 interface SchemaBuilderProps {
   value: JSONSchema;
   onChange: (schema: JSONSchema) => void;
+  editMode?: "inline" | "modal";
 }
 
 // Convert JSONSchema to FieldConfig array
@@ -114,7 +122,11 @@ function fieldsToSchema(fields: FieldConfig[]): JSONSchema {
   };
 }
 
-export function SchemaBuilder({ value, onChange }: SchemaBuilderProps) {
+export function SchemaBuilder({
+  value,
+  onChange,
+  editMode = "inline",
+}: SchemaBuilderProps) {
   const [fields, setFields] = useState<FieldConfig[]>(() =>
     schemaToFields(value),
   );
@@ -186,7 +198,8 @@ export function SchemaBuilder({ value, onChange }: SchemaBuilderProps) {
     }
   };
 
-  if (isEditing) {
+  // Inline mode: Replace view with editor
+  if (editMode === "inline" && isEditing) {
     return (
       <div className="h-full">
         <FieldEditor
@@ -259,6 +272,33 @@ export function SchemaBuilder({ value, onChange }: SchemaBuilderProps) {
             </SortableContext>
           </DndContext>
         </div>
+      )}
+
+      {/* Modal for Edit Mode */}
+      {editMode === "modal" && (
+        <Dialog
+          open={isEditing}
+          onOpenChange={(open) => !open && handleCancelEdit()}
+        >
+          <DialogContent className="flex max-w-2xl flex-col gap-0 p-0">
+            <DialogHeader className="border-b p-5">
+              <DialogTitle>
+                {editingField ? "Edit Field" : "Add Field"}
+              </DialogTitle>
+              <DialogDescription>
+                Configure the properties for this field.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden">
+              <FieldEditor
+                field={editingField}
+                onSave={handleSaveField}
+                onCancel={handleCancelEdit}
+                variant="modal"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       <AlertDialog

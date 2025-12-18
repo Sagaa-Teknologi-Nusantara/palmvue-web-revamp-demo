@@ -54,9 +54,15 @@ interface FieldEditorProps {
   onSave: (field: Omit<FieldConfig, "id">) => void;
   onCancel: () => void;
   field?: FieldConfig | null;
+  variant?: "default" | "modal";
 }
 
-export function FieldEditor({ onSave, onCancel, field }: FieldEditorProps) {
+export function FieldEditor({
+  onSave,
+  onCancel,
+  field,
+  variant = "default",
+}: FieldEditorProps) {
   const [options, setOptions] = useState<string[]>([]);
   const [newOption, setNewOption] = useState("");
 
@@ -123,20 +129,24 @@ export function FieldEditor({ onSave, onCancel, field }: FieldEditorProps) {
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right-4 flex h-full flex-col duration-200 p-4">
-      <div className="border-border/40 mb-4 flex items-center gap-2 border-b pb-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onCancel}
-          className="-ml-2 h-8 w-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm font-semibold">
-          {field ? "Edit Field" : "New Field"}
-        </span>
-      </div>
+    <div
+      className={`animate-in fade-in slide-in-from-right-4 flex h-full flex-col duration-200 ${variant === "modal" ? "p-5" : "p-4"}`}
+    >
+      {variant !== "modal" && (
+        <div className="border-border/40 mb-4 flex items-center gap-2 border-b pb-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCancel}
+            className="-ml-2 h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-semibold">
+            {field ? "Edit Field" : "New Field"}
+          </span>
+        </div>
+      )}
 
       <Form {...form}>
         <div className="flex-1 space-y-4 overflow-y-auto p-1">

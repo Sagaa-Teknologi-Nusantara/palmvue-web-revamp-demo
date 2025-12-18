@@ -16,8 +16,22 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { SchemaBuilder } from "@/components/schema-builder";
-import type { EntityType, CreateEntityTypeInput, JSONSchema } from "@/types";
+import { WorkflowSelector } from "@/components/workflows";
+import type {
+  EntityType,
+  CreateEntityTypeInput,
+  JSONSchema,
+  Workflow,
+} from "@/types";
+import { Box, PlayCircle, Database } from "lucide-react";
 
 const defaultSchema: JSONSchema = {
   type: "object",
@@ -35,19 +49,26 @@ const formSchema = z.object({
     .refine((val) => val === val.toUpperCase(), {
       message: "Prefix must be uppercase",
     }),
+  assignedWorkflowIds: z.array(z.string()),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface EntityTypeFormProps {
   entityType?: EntityType;
-  onSubmit: (data: CreateEntityTypeInput) => void;
+  availableWorkflows?: Workflow[];
+  assignedWorkflowIds?: string[];
+  onSubmit: (
+    data: CreateEntityTypeInput & { assignedWorkflowIds: string[] },
+  ) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
 export function EntityTypeForm({
   entityType,
+  availableWorkflows = [],
+  assignedWorkflowIds = [],
   onSubmit,
   onCancel,
   isLoading,
@@ -62,6 +83,7 @@ export function EntityTypeForm({
       name: entityType?.name || "",
       description: entityType?.description || "",
       prefix: entityType?.prefix || "",
+      assignedWorkflowIds: assignedWorkflowIds,
     },
   });
 
@@ -74,79 +96,159 @@ export function EntityTypeForm({
       bg_color: entityType?.bg_color || "#dbeafe",
       fg_color: entityType?.fg_color || "#2563eb",
       metadata_schema: metadataSchema,
+      assignedWorkflowIds: values.assignedWorkflowIds,
     });
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Palm Tree" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* General Information */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <span className="bg-primary/10 text-primary rounded-md p-1.5">
+                  <Box className="h-4 w-4" />
+                </span>
+                General Information
+              </CardTitle>
+              <CardDescription>
+                Basic details about the entity type
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Palm Tree" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe what this entity type represents..."
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe what this entity type represents..."
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="prefix"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Prefix</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g., TREE"
-                  maxLength={5}
-                  {...field}
-                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                />
-              </FormControl>
-              <FormDescription>
-                Max 5 characters, uppercase. Used for generating entity codes.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="prefix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prefix</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., TREE"
+                        maxLength={5}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(e.target.value.toUpperCase())
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Max 5 characters, uppercase. Used for generating unique
+                      entity codes.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
-        <div>
-          <FormLabel>Metadata Fields</FormLabel>
-          <FormDescription className="mb-3">
-            Define the fields that will be available for entities of this type.
-          </FormDescription>
-          <SchemaBuilder value={metadataSchema} onChange={setMetadataSchema} />
+          {/* Default Workflows */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <span className="bg-primary/10 text-primary rounded-md p-1.5">
+                  <PlayCircle className="h-4 w-4" />
+                </span>
+                Default Workflows
+              </CardTitle>
+              <CardDescription>
+                Workflows automatically assigned to new entities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="assignedWorkflowIds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <WorkflowSelector
+                        availableWorkflows={availableWorkflows}
+                        selectedWorkflowIds={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Select workflows to be automatically assigned.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="flex justify-end gap-3">
+        {/* Metadata Schema */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <span className="bg-primary/10 text-primary rounded-md p-1.5">
+                <Database className="h-4 w-4" />
+              </span>
+              Metadata Schema
+            </CardTitle>
+            <CardDescription>
+              Define the custom fields and data structure for this entity type
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SchemaBuilder
+              value={metadataSchema}
+              onChange={setMetadataSchema}
+              editMode="modal"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Spacer for fixed footer */}
+        <div className="h-20" />
+
+        <div className="bg-background fixed right-0 bottom-0 left-64 z-50 flex items-center justify-end gap-3 border-t p-4 shadow-sm transition-all duration-300">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : entityType ? "Update" : "Create"}
+            {isLoading
+              ? "Saving..."
+              : entityType
+                ? "Update Entity Type"
+                : "Create Entity Type"}
           </Button>
         </div>
       </form>
