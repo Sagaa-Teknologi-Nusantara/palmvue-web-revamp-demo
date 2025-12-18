@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,151 +9,121 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
-  Users,
   Activity,
   ListCheck,
-  Zap,
+  GitBranch,
+  Boxes,
 } from "lucide-react";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import type { Workflow, EntityType } from "@/types";
+import type { Workflow } from "@/types";
 import { formatDate } from "@/lib/code-generator";
-import { Badge } from "../ui/badge";
 
 interface WorkflowCardProps {
   workflow: Workflow;
   assignedCount: number;
   activeCount: number;
-  entityType?: EntityType;
 }
 
 export function WorkflowCard({
   workflow,
   assignedCount,
   activeCount,
-  entityType,
 }: WorkflowCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const {
-    icon: typeIcon,
-    fg_color: typeColor,
-    bg_color: typeBgColor,
-    name: typeName,
-  } = entityType || {
-    icon: "box",
-    fg_color: "#6b7280",
-    bg_color: "#f3f4f6",
-    name: "Unassigned",
-  };
 
   return (
     <Card
       className={cn(
-        "group relative flex flex-col gap-0 overflow-hidden transition-all duration-200 hover:shadow-lg p-0",
+        "group relative flex flex-col gap-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-lg",
         isExpanded ? "h-auto" : "h-full",
       )}
     >
-      <div className="flex flex-col gap-5 p-6 pb-4">
-        {/* Header with Entity Type Info */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
-            <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-[0.5px] shadow-sm"
-              style={{
-                backgroundColor: typeBgColor,
-                color: typeColor,
-                borderColor: typeColor,
+      <Link href={`/workflows/${workflow.id}`} className="flex flex-1 flex-col">
+        <div className="flex flex-col gap-5 p-6 pb-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className="bg-primary/10 text-primary border-primary/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-sm">
+                <GitBranch className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="text-muted-foreground/80 text-xs font-semibold tracking-wider uppercase">
+                    Workflow
+                  </span>
+                </div>
+                <h3 className="text-foreground group-hover:text-primary line-clamp-1 text-lg font-bold transition-colors">
+                  {workflow.name}
+                </h3>
+              </div>
+            </div>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
               }}
             >
-              <DynamicIcon
-                name={(typeIcon as IconName) || "box"}
-                className="h-6 w-6"
-              />
-            </div>
-            <div>
-              <div className="mb-1 flex items-center gap-2">
-                <span className="text-muted-foreground/80 text-xs font-semibold tracking-wider uppercase">
-                  {typeName}
-                </span>
-                {!entityType && (
-                  <Badge
-                    variant="outline"
-                    className="h-5 px-1.5 py-0 text-[10px]"
-                  >
-                    Generic
-                  </Badge>
-                )}
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-muted/40 border-border/50 flex flex-col items-center justify-center rounded-lg border p-3">
+              <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
+                <ListCheck className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium uppercase">Steps</span>
               </div>
-              <h3 className="text-foreground line-clamp-1 text-lg font-bold">
-                {workflow.name}
-              </h3>
+              <span className="text-foreground text-lg font-bold">
+                {workflow.steps.length}
+              </span>
             </div>
-          </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-muted/40 border-border/50 flex flex-col items-center justify-center rounded-lg border p-3">
-            <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
-              <ListCheck className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium uppercase">Steps</span>
+            <div className="bg-muted/40 border-border/50 flex flex-col items-center justify-center rounded-lg border p-3">
+              <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
+                <Boxes className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium uppercase">Assigned</span>
+              </div>
+              <span className="text-foreground text-lg font-bold">
+                {assignedCount}
+              </span>
             </div>
-            <span className="text-foreground text-lg font-bold">
-              {workflow.steps.length}
-            </span>
-          </div>
 
-          <div className="bg-muted/40 border-border/50 flex flex-col items-center justify-center rounded-lg border p-3">
-            <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium uppercase">Assigned</span>
-            </div>
-            <span className="text-foreground text-lg font-bold">
-              {assignedCount}
-            </span>
-          </div>
-
-          <div
-            className={cn(
-              "flex flex-col items-center justify-center rounded-lg border p-3",
-              activeCount > 0
-                ? "border-amber-200 bg-amber-50"
-                : "bg-muted/40 border-border/50 opacity-60",
-            )}
-          >
             <div
               className={cn(
-                "mb-1 flex items-center gap-1.5",
-                activeCount > 0 ? "text-amber-700" : "text-muted-foreground",
+                "flex flex-col items-center justify-center rounded-lg border p-3",
+                activeCount > 0
+                  ? "border-amber-200 bg-amber-50"
+                  : "bg-muted/40 border-border/50 opacity-60",
               )}
             >
-              <Activity className="h-3.5 w-3.5" />
-              <span className="text-xs font-medium uppercase">Active</span>
+              <div
+                className={cn(
+                  "mb-1 flex items-center gap-1.5",
+                  activeCount > 0 ? "text-amber-700" : "text-muted-foreground",
+                )}
+              >
+                <Activity className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium uppercase">Active</span>
+              </div>
+              <span
+                className={cn(
+                  "text-lg font-bold",
+                  activeCount > 0 ? "text-amber-700" : "text-foreground",
+                )}
+              >
+                {activeCount}
+              </span>
             </div>
-            <span
-              className={cn(
-                "text-lg font-bold",
-                activeCount > 0 ? "text-amber-700" : "text-foreground",
-              )}
-            >
-              {activeCount}
-            </span>
           </div>
         </div>
-      </div>
+      </Link>
 
       {isExpanded && (
         <div className="animate-in fade-in slide-in-from-top-2 border-border/50 bg-muted/10 border-t px-6 py-4">
@@ -185,7 +156,7 @@ export function WorkflowCard({
         </div>
       )}
 
-      <div className="border-border bg-muted/20 mt-auto border-t px-6 py-3">
+      <div className="border-border bg-primary-light/40 mt-auto border-t px-6 py-3">
         <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
           <Calendar className="h-3.5 w-3.5 opacity-70" />
           <span>Updated {formatDate(workflow.updated_at)}</span>
