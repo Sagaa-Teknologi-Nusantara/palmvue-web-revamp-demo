@@ -31,7 +31,10 @@ import type {
   JSONSchema,
   Workflow,
 } from "@/types";
-import { Box, PlayCircle, Database } from "lucide-react";
+import { Box, PlayCircle, Database, Palette } from "lucide-react";
+import { IconPicker } from "@/components/ui/IconPicker";
+import { ColorPicker } from "@/components/ui/ColorPicker";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
 
 const defaultSchema: JSONSchema = {
   type: "object",
@@ -49,6 +52,9 @@ const formSchema = z.object({
     .refine((val) => val === val.toUpperCase(), {
       message: "Prefix must be uppercase",
     }),
+  icon: z.string().min(1, "Icon is required"),
+  bg_color: z.string().min(1, "Background color is required"),
+  fg_color: z.string().min(1, "Foreground color is required"),
   assignedWorkflowIds: z.array(z.string()),
 });
 
@@ -83,6 +89,9 @@ export function EntityTypeForm({
       name: entityType?.name || "",
       description: entityType?.description || "",
       prefix: entityType?.prefix || "",
+      icon: entityType?.icon || "Box",
+      bg_color: entityType?.bg_color || "#dbeafe",
+      fg_color: entityType?.fg_color || "#2563eb",
       assignedWorkflowIds: assignedWorkflowIds,
     },
   });
@@ -92,9 +101,9 @@ export function EntityTypeForm({
       name: values.name,
       description: values.description,
       prefix: values.prefix.toUpperCase(),
-      icon: entityType?.icon || "box",
-      bg_color: entityType?.bg_color || "#dbeafe",
-      fg_color: entityType?.fg_color || "#2563eb",
+      icon: values.icon,
+      bg_color: values.bg_color,
+      fg_color: values.fg_color,
       metadata_schema: metadataSchema,
       assignedWorkflowIds: values.assignedWorkflowIds,
     });
@@ -174,6 +183,69 @@ export function EntityTypeForm({
                   </FormItem>
                 )}
               />
+
+              <div className="flex w-full items-start gap-6">
+                <div className="flex-1 space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="icon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Icon</FormLabel>
+                        <FormControl>
+                          <IconPicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-2">
+                    <FormLabel>Preview</FormLabel>
+                    <div className="bg-muted/30 flex h-[6.3rem] items-center justify-center rounded-lg border border-dashed">
+                      <div
+                        className="flex h-12 w-12 items-center justify-center rounded-lg shadow-sm transition-colors"
+                        style={{
+                          backgroundColor: form.watch("bg_color"),
+                          color: form.watch("fg_color"),
+                        }}
+                      >
+                        <DynamicIcon
+                          name={form.watch("icon")}
+                          className="h-6 w-6"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="bg_color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color Theme</FormLabel>
+                        <FormControl>
+                          <ColorPicker
+                            value={{
+                              bg: field.value,
+                              fg: form.watch("fg_color"),
+                            }}
+                            onChange={(val) => {
+                              form.setValue("bg_color", val.bg);
+                              form.setValue("fg_color", val.fg);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
