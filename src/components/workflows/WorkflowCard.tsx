@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,7 @@ import {
   Boxes,
 } from "lucide-react";
 import type { Workflow } from "@/types";
-import { formatDate } from "@/lib/code-generator";
+import { formatDate } from "@/lib/date";
 
 interface WorkflowCardProps {
   workflow: Workflow;

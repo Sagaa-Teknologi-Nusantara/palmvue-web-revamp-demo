@@ -16,7 +16,7 @@ import {
   List,
   BoxSelect,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import { type FieldConfig, FIELD_TYPE_COLORS } from "./types";
 
 interface FieldCardProps {

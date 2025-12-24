@@ -37,7 +37,7 @@ import {
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/code-generator";
+import { formatDate } from "@/lib/date";
 import { WorkflowPipeline } from "@/components/workflows/WorkflowPipeline";
 import { StatusBadge } from "@/components/entities/StatusBadge";
 import type { WorkflowRecordStatus } from "@/types/workflow-record";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import { StepDetailModal } from "./StepDetailModal";
 import type { WorkflowRecord, WorkflowStep, StepSubmission } from "@/types";
 import { useWorkflowRecords } from "@/hooks";

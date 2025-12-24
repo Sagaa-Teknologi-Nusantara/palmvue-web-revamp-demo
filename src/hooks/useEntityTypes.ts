@@ -2,14 +2,16 @@
 
 import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useLocalStorage } from "./useLocalStorage";
+
 import { STORAGE_KEYS } from "@/lib/constants";
 import type {
-  EntityType,
   CreateEntityTypeInput,
+  EntityType,
   UpdateEntityTypeInput,
   Workflow,
 } from "@/types";
+
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useEntityTypes() {
   const [entityTypes, setEntityTypes, isLoaded] = useLocalStorage<EntityType[]>(

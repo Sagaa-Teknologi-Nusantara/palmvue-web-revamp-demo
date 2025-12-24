@@ -1,21 +1,22 @@
-'use client';
+"use client";
 
-import { useForm, FormProvider } from 'react-hook-form';
+import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
+
+import { JsonSchemaForm } from "@/components/entities/JsonSchemaForm";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
-import { useWorkflowRecords, useWorkflows } from '@/hooks';
-import { JsonSchemaForm } from '@/components/entities/JsonSchemaForm';
-import { STATUS_COLORS } from '@/lib/constants';
-import { cn } from '@/lib/utils';
-import { formatDateTime } from '@/lib/code-generator';
+} from "@/components/ui/dialog";
+import { useWorkflowRecords, useWorkflows } from "@/hooks";
+import { cn } from "@/lib/cn";
+import { STATUS_COLORS } from "@/lib/constants";
+import { formatDateTime } from "@/lib/date";
 
 interface WorkflowProgressProps {
   recordId: string;
@@ -23,7 +24,11 @@ interface WorkflowProgressProps {
   onClose: () => void;
 }
 
-export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressProps) {
+export function WorkflowProgress({
+  recordId,
+  open,
+  onClose,
+}: WorkflowProgressProps) {
   const {
     getById,
     getWorkflowSteps,
@@ -56,12 +61,12 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>{workflow.name}</DialogTitle>
             <Badge className={STATUS_COLORS[record.status]} variant="secondary">
-              {record.status.replace('_', ' ')}
+              {record.status.replace("_", " ")}
             </Badge>
           </div>
         </DialogHeader>
@@ -80,27 +85,27 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
                   return (
                     <div
                       key={step.id}
-                      className="flex flex-col items-center flex-1"
+                      className="flex flex-1 flex-col items-center"
                     >
-                      <div className="flex items-center w-full">
+                      <div className="flex w-full items-center">
                         {index > 0 && (
                           <div
                             className={cn(
-                              'flex-1 h-0.5',
+                              "h-0.5 flex-1",
                               isCompleted || isCurrent
-                                ? 'bg-primary'
-                                : 'bg-gray-200'
+                                ? "bg-primary"
+                                : "bg-gray-200",
                             )}
                           />
                         )}
                         <div
                           className={cn(
-                            'flex items-center justify-center w-10 h-10 rounded-full border-2',
+                            "flex h-10 w-10 items-center justify-center rounded-full border-2",
                             isCompleted
-                              ? 'bg-primary border-primary text-white'
+                              ? "bg-primary border-primary text-white"
                               : isCurrent
-                              ? 'border-primary text-primary bg-white'
-                              : 'border-gray-200 text-gray-400 bg-white'
+                                ? "border-primary text-primary bg-white"
+                                : "border-gray-200 bg-white text-gray-400",
                           )}
                         >
                           {isCompleted ? (
@@ -114,22 +119,22 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
                         {index < steps.length - 1 && (
                           <div
                             className={cn(
-                              'flex-1 h-0.5',
-                              isCompleted ? 'bg-primary' : 'bg-gray-200'
+                              "h-0.5 flex-1",
+                              isCompleted ? "bg-primary" : "bg-gray-200",
                             )}
                           />
                         )}
                       </div>
                       <p
                         className={cn(
-                          'mt-2 text-xs text-center font-medium',
-                          isCurrent ? 'text-primary' : 'text-gray-500'
+                          "mt-2 text-center text-xs font-medium",
+                          isCurrent ? "text-primary" : "text-gray-500",
                         )}
                       >
                         {step.name}
                       </p>
                       {submission && (
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="mt-0.5 text-xs text-gray-400">
                           {formatDateTime(submission.submitted_at)}
                         </p>
                       )}
@@ -140,13 +145,15 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
           </div>
 
           {/* Current Step Form or Completed Message */}
-          {record.status === 'completed' ? (
-            <Card className="bg-green-50 border-green-200">
+          {record.status === "completed" ? (
+            <Card className="border-green-200 bg-green-50">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-8 w-8 text-green-600" />
                   <div>
-                    <p className="font-medium text-green-800">Workflow Completed</p>
+                    <p className="font-medium text-green-800">
+                      Workflow Completed
+                    </p>
                     <p className="text-sm text-green-600">
                       Completed on {formatDateTime(record.completed_at!)}
                     </p>
@@ -158,15 +165,17 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Step {currentStepWithForm.order_index + 1}: {currentStepWithForm.name}
+                  Step {currentStepWithForm.order_index + 1}:{" "}
+                  {currentStepWithForm.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <FormProvider {...form}>
-                  <form onSubmit={form.handleSubmit(handleSubmitStep)} className="space-y-6">
-                    <JsonSchemaForm
-                      schema={currentStepWithForm.form.schema}
-                    />
+                  <form
+                    onSubmit={form.handleSubmit(handleSubmitStep)}
+                    className="space-y-6"
+                  >
+                    <JsonSchemaForm schema={currentStepWithForm.form.schema} />
                     <div className="flex justify-end">
                       <Button type="submit">
                         {currentStepWithForm.order_index < steps.length - 1 ? (
@@ -175,7 +184,7 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </>
                         ) : (
-                          'Complete Workflow'
+                          "Complete Workflow"
                         )}
                       </Button>
                     </div>
@@ -200,28 +209,30 @@ export function WorkflowProgress({ recordId, open, onClose }: WorkflowProgressPr
                     return (
                       <div
                         key={submission.step_id}
-                        className="p-3 bg-gray-50 rounded-lg"
+                        className="rounded-lg bg-gray-50 p-3"
                       >
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="mb-2 flex items-center gap-2">
                           <CheckCircle2 className="h-4 w-4 text-green-600" />
-                          <p className="font-medium text-sm">{step.name}</p>
+                          <p className="text-sm font-medium">{step.name}</p>
                           <span className="text-xs text-gray-400">
                             {formatDateTime(submission.submitted_at)}
                           </span>
                         </div>
                         <dl className="grid grid-cols-2 gap-2 text-sm">
-                          {Object.entries(submission.data).map(([key, value]) => (
-                            <div key={key}>
-                              <dt className="text-gray-500">{key}</dt>
-                              <dd>
-                                {typeof value === 'boolean'
-                                  ? value
-                                    ? 'Yes'
-                                    : 'No'
-                                  : String(value)}
-                              </dd>
-                            </div>
-                          ))}
+                          {Object.entries(submission.data).map(
+                            ([key, value]) => (
+                              <div key={key}>
+                                <dt className="text-gray-500">{key}</dt>
+                                <dd>
+                                  {typeof value === "boolean"
+                                    ? value
+                                      ? "Yes"
+                                      : "No"
+                                    : String(value)}
+                                </dd>
+                              </div>
+                            ),
+                          )}
                         </dl>
                       </div>
                     );

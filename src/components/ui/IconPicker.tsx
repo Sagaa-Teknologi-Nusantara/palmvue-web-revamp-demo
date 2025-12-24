@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon, Search } from "lucide-react";
-import { cn, toKebabCase, toPascalCase } from "@/lib/utils";
+import { useMemo, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/cn";
+import { toKebabCase, toPascalCase } from "@/lib/string";
 
 interface IconPickerProps {
   value: string;

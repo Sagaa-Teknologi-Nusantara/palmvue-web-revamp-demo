@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/layout';
 import { useEntityTypes, useEntities, useWorkflows, useWorkflowRecords } from '@/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Boxes, Box, GitBranch, Plus, ArrowRight, CheckCircle2, Clock, CircleDot } from 'lucide-react';
-import { formatDate } from '@/lib/code-generator';
+import { formatDate } from '@/lib/date';
 import { STATUS_COLORS } from '@/lib/constants';
 
 export default function DashboardPage() {

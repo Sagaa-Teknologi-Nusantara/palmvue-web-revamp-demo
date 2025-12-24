@@ -12,7 +12,7 @@ import {
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { MoreVertical, Eye, Trash2, Calendar, ArrowRight } from "lucide-react";
 import type { Entity } from "@/types";
-import { formatDate } from "@/lib/code-generator";
+import { formatDate } from "@/lib/date";
 
 interface EntityCardProps {
   entity: Entity;

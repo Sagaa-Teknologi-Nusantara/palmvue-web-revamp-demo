@@ -41,8 +41,8 @@ import {
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/code-generator";
-import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/date";
+import { cn } from "@/lib/cn";
 import type { JSONSchema, PropertySchema } from "@/types";
 
 // Field type display configuration

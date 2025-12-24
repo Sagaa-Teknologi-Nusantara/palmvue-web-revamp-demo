@@ -1,18 +1,20 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useLocalStorage } from "./useLocalStorage";
-import { STORAGE_KEYS, DEFAULT_USER_ID } from "@/lib/constants";
+
 import { generateEntityCode } from "@/lib/code-generator";
+import { DEFAULT_USER_ID, STORAGE_KEYS } from "@/lib/constants";
 import type {
-  Entity,
   CreateEntityInput,
-  UpdateEntityInput,
+  Entity,
   EntityType,
-  WorkflowRecord,
+  UpdateEntityInput,
   Workflow,
+  WorkflowRecord,
 } from "@/types";
+
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useEntities() {
   const [entities, setEntities, isLoaded] = useLocalStorage<Entity[]>(
@@ -23,9 +25,10 @@ export function useEntities() {
     STORAGE_KEYS.ENTITY_TYPES,
     [],
   );
-  const [workflowRecords, setWorkflowRecords] = useLocalStorage<
-    WorkflowRecord[]
-  >(STORAGE_KEYS.WORKFLOW_RECORDS, []);
+  const [, setWorkflowRecords] = useLocalStorage<WorkflowRecord[]>(
+    STORAGE_KEYS.WORKFLOW_RECORDS,
+    [],
+  );
   const [entityTypeWorkflows] = useLocalStorage<Record<string, string[]>>(
     STORAGE_KEYS.ENTITY_TYPE_WORKFLOWS,
     {},

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Eye, Trash2 } from 'lucide-react';
 import type { Workflow } from '@/types';
-import { formatDate } from '@/lib/code-generator';
+import { formatDate } from '@/lib/date';
 
 interface WorkflowTableProps {
   workflows: Workflow[];

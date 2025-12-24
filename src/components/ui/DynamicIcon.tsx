@@ -1,6 +1,8 @@
 import { LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import { cn, toPascalCase } from "@/lib/utils";
+
+import { cn } from "@/lib/cn";
+import { toPascalCase } from "@/lib/string";
 
 interface DynamicIconProps extends React.SVGProps<SVGSVGElement> {
   name: string;

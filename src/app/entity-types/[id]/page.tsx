@@ -42,7 +42,7 @@ import {
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/code-generator";
+import { formatDate } from "@/lib/date";
 import {
   Select,
   SelectContent,
@@ -50,7 +50,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import type { JSONSchema, PropertySchema } from "@/types";
 
 // Field type display configuration with enhanced visuals

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Circle, Loader2, CheckCircle2 } from "lucide-react";
 import type { WorkflowRecordStatus } from "@/types/workflow-record";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 interface StatusBadgeProps {
   status: WorkflowRecordStatus;
