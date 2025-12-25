@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PalmVue Revamp Web
+
+A Next.js web application for managing entities and workflows in palm plantation operations.
+
+## Tech Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4** + **shadcn/ui** (Radix UI)
+- **React Query** + **Axios** for API integration
+- **React Hook Form** + **Zod** for forms
+- **@dnd-kit** for drag-and-drop
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/           # Next.js pages (entities, entity-types, workflows)
+├── api/           # API client, services, types
+├── components/    # UI components (entities, workflows, ui, providers)
+├── hooks/         # Custom hooks + React Query hooks
+├── types/         # Domain type definitions
+└── lib/           # Utilities
+```
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+- **Entity Management** - Create and track entities with custom schemas
+- **Workflow Builder** - Visual drag-and-drop workflow designer
+- **Dynamic Forms** - JSON Schema-driven form rendering
+- **Schema Builder** - Visual JSON Schema editor
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [context/project_overview.md](context/project_overview.md) for detailed architecture.
