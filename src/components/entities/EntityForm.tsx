@@ -1,17 +1,27 @@
 "use client";
 
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Database, Network } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,18 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
+import type { CreateEntityInput, Entity, EntityType } from "@/types";
+
 import { JsonSchemaForm } from "./JsonSchemaForm";
-import { Box, Database, Network } from "lucide-react";
-import type { EntityType, Entity, CreateEntityInput } from "@/types";
 
 const baseSchema = z.object({
   name: z.string().min(1, "Name is required"),

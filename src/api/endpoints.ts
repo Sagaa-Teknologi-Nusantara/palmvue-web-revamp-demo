@@ -13,6 +13,7 @@ export const ENDPOINTS = {
   ENTITIES: {
     LIST: "/entities",
     DELETE: (id: string) => `/entities/${id}`,
+    OPTIONS: "/entities/options",
   },
   WORKFLOWS: {
     OPTIONS: "/workflows/options",

@@ -1,16 +1,22 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { EntityForm } from "@/components/entities";
-import { useEntities, useEntityTypes } from "@/hooks";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import { Boxes } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { EntityForm, EntitySelector } from "@/components/entities";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEntities, useEntityTypes } from "@/hooks";
 
 export default function CreateEntityPage() {
   const router = useRouter();
   const { entities, create, isLoaded: entitiesLoaded } = useEntities();
   const { entityTypes, isLoaded: typesLoaded } = useEntityTypes();
+
+  // Demo state for EntitySelector
+  const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
   const handleSubmit = (data: Parameters<typeof create>[0]) => {
     create(data);
@@ -68,6 +74,25 @@ export default function CreateEntityPage() {
         onSubmit={handleSubmit}
         onCancel={() => router.push("/entities")}
       />
+
+      {/* Demo: EntitySelector Component */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="text-base">
+            EntitySelector Demo (for testing)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EntitySelector
+            value={selectedParentId}
+            onChange={setSelectedParentId}
+            placeholder="Select a parent entity..."
+          />
+          <p className="text-muted-foreground mt-2 text-sm">
+            Selected ID: {selectedParentId || "None"}
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

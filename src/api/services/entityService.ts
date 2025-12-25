@@ -3,7 +3,12 @@ import type { Entity } from "@/types";
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 import type { ApiResponse } from "../types";
-import type { EntityListParams, EntityListResponse } from "../types/entity";
+import type {
+  EntityListParams,
+  EntityListResponse,
+  EntityOption,
+  EntityOptionsParams,
+} from "../types/entity";
 
 export const entityService = {
   getList: async (
@@ -28,6 +33,21 @@ export const entityService = {
         total_pages: 1,
       },
     };
+  },
+
+  getOptions: async (
+    params: EntityOptionsParams = {},
+  ): Promise<EntityOption[]> => {
+    const { search, entity_type_id } = params;
+    const queryParams: Record<string, string> = {};
+    if (search) queryParams.search = search;
+    if (entity_type_id) queryParams.entity_type_id = entity_type_id;
+
+    const response = await apiClient.get<ApiResponse<EntityOption[]>>(
+      ENDPOINTS.ENTITIES.OPTIONS,
+      { params: queryParams },
+    );
+    return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {

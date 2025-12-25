@@ -22,3 +22,14 @@ export interface EntityTypeOption {
   icon: string;
   color: string;
 }
+
+export interface EntityOption {
+  id: string;
+  code: string;
+  name: string;
+}
+
+export interface EntityOptionsParams {
+  search?: string;
+  entity_type_id?: string;
+}

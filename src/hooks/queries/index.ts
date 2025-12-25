@@ -2,6 +2,7 @@ export * from "./useCreateEntityTypeMutation";
 export * from "./useDeleteEntityMutation";
 export * from "./useDeleteEntityTypeMutation";
 export * from "./useEntitiesQuery";
+export * from "./useEntityOptionsQuery";
 export * from "./useEntityTypeDetailQuery";
 export * from "./useEntityTypeOptionsQuery";
 export * from "./useEntityTypesQuery";
