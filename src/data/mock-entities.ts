@@ -5,7 +5,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-plot-001",
     entity_type_id: "et-plot",
-    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", bg_color: "#fef3c7", fg_color: "#d97706" },
+    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", color: "amber" },
     parent_id: null,
     parent: null,
     name: "North Section A",
@@ -22,7 +22,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-plot-002",
     entity_type_id: "et-plot",
-    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", bg_color: "#fef3c7", fg_color: "#d97706" },
+    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", color: "amber" },
     parent_id: null,
     parent: null,
     name: "South Section B",
@@ -39,7 +39,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-plot-003",
     entity_type_id: "et-plot",
-    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", bg_color: "#fef3c7", fg_color: "#d97706" },
+    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", color: "amber" },
     parent_id: null,
     parent: null,
     name: "East Section C",
@@ -56,7 +56,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-plot-004",
     entity_type_id: "et-plot",
-    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", bg_color: "#fef3c7", fg_color: "#d97706" },
+    entity_type: { id: "et-plot", name: "Plot", prefix: "PLOT", icon: "map", color: "amber" },
     parent_id: null,
     parent: null,
     name: "West Section D",
@@ -74,7 +74,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-001",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-001",
     parent: { id: "ent-plot-001", code: "PLOT-001", name: "North Section A" },
     name: "Palm Tree Alpha",
@@ -92,7 +92,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-002",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-001",
     parent: { id: "ent-plot-001", code: "PLOT-001", name: "North Section A" },
     name: "Palm Tree Beta",
@@ -110,7 +110,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-003",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-001",
     parent: { id: "ent-plot-001", code: "PLOT-001", name: "North Section A" },
     name: "Palm Tree Gamma",
@@ -128,7 +128,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-004",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-002",
     parent: { id: "ent-plot-002", code: "PLOT-002", name: "South Section B" },
     name: "Palm Tree Delta",
@@ -146,7 +146,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-005",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-002",
     parent: { id: "ent-plot-002", code: "PLOT-002", name: "South Section B" },
     name: "Palm Tree Epsilon",
@@ -164,7 +164,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-006",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-002",
     parent: { id: "ent-plot-002", code: "PLOT-002", name: "South Section B" },
     name: "Palm Tree Zeta",
@@ -182,7 +182,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-007",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-003",
     parent: { id: "ent-plot-003", code: "PLOT-003", name: "East Section C" },
     name: "Palm Tree Eta",
@@ -200,7 +200,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-008",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-003",
     parent: { id: "ent-plot-003", code: "PLOT-003", name: "East Section C" },
     name: "Palm Tree Theta",
@@ -218,7 +218,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-009",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-004",
     parent: { id: "ent-plot-004", code: "PLOT-004", name: "West Section D" },
     name: "Palm Tree Iota",
@@ -236,7 +236,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-tree-010",
     entity_type_id: "et-palm-tree",
-    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", bg_color: "#dcfce7", fg_color: "#16a34a" },
+    entity_type: { id: "et-palm-tree", name: "Palm Tree", prefix: "TREE", icon: "tree-palm", color: "green" },
     parent_id: "ent-plot-004",
     parent: { id: "ent-plot-004", code: "PLOT-004", name: "West Section D" },
     name: "Palm Tree Kappa",
@@ -255,7 +255,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-001",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "John Smith",
@@ -273,7 +273,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-002",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "Maria Garcia",
@@ -291,7 +291,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-003",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "Ahmad Hassan",
@@ -309,7 +309,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-004",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "Sarah Johnson",
@@ -327,7 +327,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-005",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "David Chen",
@@ -345,7 +345,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-worker-006",
     entity_type_id: "et-worker",
-    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", bg_color: "#e0e7ff", fg_color: "#4f46e5" },
+    entity_type: { id: "et-worker", name: "Worker", prefix: "WRK", icon: "hard-hat", color: "indigo" },
     parent_id: null,
     parent: null,
     name: "Lisa Wong",
@@ -364,7 +364,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-001",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Tractor Model X500",
@@ -382,7 +382,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-002",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Harvester Pro 3000",
@@ -400,7 +400,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-003",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Sprayer Unit A7",
@@ -418,7 +418,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-004",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Fertilizer Spreader B12",
@@ -436,7 +436,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-005",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Mini Excavator ME200",
@@ -454,7 +454,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-006",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Water Pump WP500",
@@ -472,7 +472,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-007",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Transport Truck T800",
@@ -490,7 +490,7 @@ export const mockEntities: Entity[] = [
   {
     id: "ent-equip-008",
     entity_type_id: "et-equipment",
-    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", bg_color: "#fee2e2", fg_color: "#dc2626" },
+    entity_type: { id: "et-equipment", name: "Equipment", prefix: "EQUIP", icon: "wrench", color: "red" },
     parent_id: null,
     parent: null,
     name: "Drone Surveyor DS100",

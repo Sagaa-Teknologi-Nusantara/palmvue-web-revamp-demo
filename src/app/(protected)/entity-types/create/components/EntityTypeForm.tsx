@@ -1,21 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Database, PlayCircle } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+
+import { ColorPicker } from "@/components/pickers";
+import { IconPicker } from "@/components/pickers/IconPicker";
+import { SchemaBuilder } from "@/components/schema-builder";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
 import {
   Card,
   CardContent,
@@ -23,18 +18,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SchemaBuilder } from "@/components/schema-builder";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { WorkflowSelector } from "@/components/workflows";
+import { getColorByLabel } from "@/lib/colors";
 import type {
-  EntityType,
   CreateEntityTypeInput,
+  EntityType,
   JSONSchema,
-  Workflow,
+  WorkflowOption,
 } from "@/types";
-import { Box, PlayCircle, Database, Palette } from "lucide-react";
-import { IconPicker } from "@/components/ui/IconPicker";
-import { ColorPicker } from "@/components/ui/ColorPicker";
-import { DynamicIcon } from "@/components/ui/DynamicIcon";
 
 const defaultSchema: JSONSchema = {
   type: "object",
@@ -53,20 +55,16 @@ const formSchema = z.object({
       message: "Prefix must be uppercase",
     }),
   icon: z.string().min(1, "Icon is required"),
-  bg_color: z.string().min(1, "Background color is required"),
-  fg_color: z.string().min(1, "Foreground color is required"),
-  assignedWorkflowIds: z.array(z.string()),
+  color: z.string().min(1, "Color is required"),
+  workflow_ids: z.array(z.string()),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface EntityTypeFormProps {
   entityType?: EntityType;
-  availableWorkflows?: Workflow[];
-  assignedWorkflowIds?: string[];
-  onSubmit: (
-    data: CreateEntityTypeInput & { assignedWorkflowIds: string[] },
-  ) => void;
+  availableWorkflows?: WorkflowOption[];
+  onSubmit: (data: CreateEntityTypeInput) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -74,7 +72,6 @@ interface EntityTypeFormProps {
 export function EntityTypeForm({
   entityType,
   availableWorkflows = [],
-  assignedWorkflowIds = [],
   onSubmit,
   onCancel,
   isLoading,
@@ -89,10 +86,9 @@ export function EntityTypeForm({
       name: entityType?.name || "",
       description: entityType?.description || "",
       prefix: entityType?.prefix || "",
-      icon: entityType?.icon || "Box",
-      bg_color: entityType?.bg_color || "#dbeafe",
-      fg_color: entityType?.fg_color || "#2563eb",
-      assignedWorkflowIds: assignedWorkflowIds,
+      icon: entityType?.icon || "box",
+      color: "Neutral",
+      workflow_ids: [],
     },
   });
 
@@ -102,18 +98,20 @@ export function EntityTypeForm({
       description: values.description,
       prefix: values.prefix.toUpperCase(),
       icon: values.icon,
-      bg_color: values.bg_color,
-      fg_color: values.fg_color,
+      color: values.color,
       metadata_schema: metadataSchema,
-      assignedWorkflowIds: values.assignedWorkflowIds,
+      workflow_ids: values.workflow_ids,
     });
   };
+
+  const watchedColor = useWatch({ control: form.control, name: "color" });
+  const watchedIcon = useWatch({ control: form.control, name: "icon" });
+  const selectedColor = getColorByLabel(watchedColor);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <div className="grid gap-6 md:grid-cols-2">
-          {/* General Information */}
           <Card className="h-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -209,12 +207,12 @@ export function EntityTypeForm({
                       <div
                         className="flex h-12 w-12 items-center justify-center rounded-lg shadow-sm transition-colors"
                         style={{
-                          backgroundColor: form.watch("bg_color"),
-                          color: form.watch("fg_color"),
+                          backgroundColor: selectedColor.bg,
+                          color: selectedColor.fg,
                         }}
                       >
                         <DynamicIcon
-                          name={form.watch("icon")}
+                          name={watchedIcon as IconName}
                           className="h-6 w-6"
                         />
                       </div>
@@ -224,20 +222,14 @@ export function EntityTypeForm({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="bg_color"
+                    name="color"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Color Theme</FormLabel>
                         <FormControl>
                           <ColorPicker
-                            value={{
-                              bg: field.value,
-                              fg: form.watch("fg_color"),
-                            }}
-                            onChange={(val) => {
-                              form.setValue("bg_color", val.bg);
-                              form.setValue("fg_color", val.fg);
-                            }}
+                            value={field.value}
+                            onChange={field.onChange}
                           />
                         </FormControl>
                         <FormMessage />
@@ -249,7 +241,6 @@ export function EntityTypeForm({
             </CardContent>
           </Card>
 
-          {/* Default Workflows */}
           <Card className="h-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -265,7 +256,7 @@ export function EntityTypeForm({
             <CardContent>
               <FormField
                 control={form.control}
-                name="assignedWorkflowIds"
+                name="workflow_ids"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -286,7 +277,6 @@ export function EntityTypeForm({
           </Card>
         </div>
 
-        {/* Metadata Schema */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -308,7 +298,6 @@ export function EntityTypeForm({
           </CardContent>
         </Card>
 
-        {/* Spacer for fixed footer */}
         <div className="h-20" />
 
         <div className="bg-background fixed right-0 bottom-0 left-64 z-50 flex items-center justify-end gap-3 border-t p-4 shadow-sm transition-all duration-300">

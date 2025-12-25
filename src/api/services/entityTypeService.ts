@@ -3,7 +3,10 @@ import type { EntityType } from "@/types/entity-type";
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 import type { ApiResponse, PaginationParams } from "../types";
-import type { EntityTypeListResponse } from "../types/entity-type";
+import type {
+  CreateEntityTypeRequest,
+  EntityTypeListResponse,
+} from "../types/entity-type";
 
 export const entityTypeService = {
   getList: async (
@@ -29,6 +32,14 @@ export const entityTypeService = {
   getById: async (id: string): Promise<EntityType> => {
     const response = await apiClient.get<ApiResponse<EntityType>>(
       ENDPOINTS.ENTITY_TYPES.DETAIL(id),
+    );
+    return response.data.data;
+  },
+
+  create: async (data: CreateEntityTypeRequest): Promise<EntityType> => {
+    const response = await apiClient.post<ApiResponse<EntityType>>(
+      ENDPOINTS.ENTITY_TYPES.CREATE,
+      data,
     );
     return response.data.data;
   },

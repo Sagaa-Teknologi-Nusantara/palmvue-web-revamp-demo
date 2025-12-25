@@ -1,20 +1,21 @@
 "use client";
 
+import { Calendar, Eye, FileCode, MoreVertical, Trash2 } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import { MoreVertical, Eye, Trash2, FileCode, Calendar } from "lucide-react";
-import type { EntityType } from "@/types";
+import { getColorByLabel } from "@/lib/colors";
 import { formatDate } from "@/lib/date";
-import { Separator } from "@/components/ui/separator";
+import type { EntityType } from "@/types";
 
 interface EntityTypeCardProps {
   entityType: EntityType;
@@ -22,6 +23,7 @@ interface EntityTypeCardProps {
 
 export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
   const router = useRouter();
+  const colorOption = getColorByLabel(entityType.color);
 
   const handleCardClick = () => {
     router.push(`/entity-types/${entityType.id}`);
@@ -43,9 +45,9 @@ export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-[0.5px]"
               style={{
-                backgroundColor: entityType.bg_color,
-                color: entityType.fg_color,
-                borderColor: entityType.fg_color,
+                backgroundColor: colorOption.bg,
+                color: colorOption.fg,
+                borderColor: colorOption.fg,
               }}
             >
               <DynamicIcon
@@ -124,7 +126,7 @@ export function EntityTypeCard({ entityType }: EntityTypeCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 bg-primary-light/40 px-6 py-3 text-xs text-gray-600">
+      <div className="bg-primary-light/40 flex items-center justify-between border-t border-gray-200 px-6 py-3 text-xs text-gray-600">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5 text-gray-400" />
           <span>Updated {formatDate(entityType.updated_at)}</span>

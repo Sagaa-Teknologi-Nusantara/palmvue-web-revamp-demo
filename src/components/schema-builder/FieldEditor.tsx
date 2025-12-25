@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,17 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
-import { Plus, X, ArrowLeft } from "lucide-react";
-import { type FieldConfig, FIELD_TYPE_OPTIONS } from "./types";
+import { Textarea } from "@/components/ui/textarea";
+
+import { FIELD_TYPE_OPTIONS, type FieldConfig } from "./types";
 
 const formSchema = z.object({
   name: z
@@ -63,44 +65,42 @@ export function FieldEditor({
   field,
   variant = "default",
 }: FieldEditorProps) {
-  const [options, setOptions] = useState<string[]>([]);
+  // Derive a stable key from the field prop to reset state when field changes
+  const fieldKey = field?.id ?? "new";
+
+  // Track the previous field key to detect changes
+  const [prevFieldKey, setPrevFieldKey] = useState(fieldKey);
+  const [options, setOptions] = useState<string[]>(() => field?.options || []);
   const [newOption, setNewOption] = useState("");
+
+  // Reset state when field changes (recommended pattern for prop-driven resets)
+  if (prevFieldKey !== fieldKey) {
+    setPrevFieldKey(fieldKey);
+    setOptions(field?.options || []);
+    setNewOption("");
+  }
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      label: "",
-      type: "string",
-      required: false,
-      description: "",
+      name: field?.name ?? "",
+      label: field?.label ?? "",
+      type: field?.type ?? "string",
+      required: field?.required ?? false,
+      description: field?.description ?? "",
     },
+    values: field
+      ? {
+          name: field.name,
+          label: field.label,
+          type: field.type,
+          required: field.required,
+          description: field.description || "",
+        }
+      : undefined,
   });
 
-  const fieldType = form.watch("type");
-
-  useEffect(() => {
-    if (field) {
-      form.reset({
-        name: field.name,
-        label: field.label,
-        type: field.type,
-        required: field.required,
-        description: field.description || "",
-      });
-      setOptions(field.options || []);
-    } else {
-      form.reset({
-        name: "",
-        label: "",
-        type: "string",
-        required: false,
-        description: "",
-      });
-      setOptions([]);
-    }
-    setNewOption("");
-  }, [field, form]);
+  const watchedType = useWatch({ control: form.control, name: "type" });
 
   const handleAddOption = () => {
     if (newOption.trim() && !options.includes(newOption.trim())) {
@@ -224,7 +224,7 @@ export function FieldEditor({
             )}
           />
 
-          {fieldType === "dropdown" && (
+          {watchedType === "dropdown" && (
             <div className="space-y-2">
               <FormLabel>Dropdown Options</FormLabel>
               <div className="flex gap-2">
@@ -316,7 +316,7 @@ export function FieldEditor({
             <Button
               type="button"
               className="flex-1"
-              disabled={fieldType === "dropdown" && options.length === 0}
+              disabled={watchedType === "dropdown" && options.length === 0}
               onClick={form.handleSubmit(handleSubmit)}
             >
               {field ? "Update Field" : "Add Field"}

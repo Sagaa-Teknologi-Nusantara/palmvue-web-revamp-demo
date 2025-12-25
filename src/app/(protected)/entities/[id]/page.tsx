@@ -1,17 +1,22 @@
 "use client";
 
-import { use, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Code2,
+  ExternalLink,
+  GitFork,
+  PlayCircle,
+  Trash2,
+} from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useMemo, useState } from "react";
+
+import { StatusBadge } from "@/components/entities/StatusBadge";
+import { PageHeader } from "@/components/layout";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,24 +27,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PageHeader } from "@/components/layout";
-import { useEntities, useEntityTypes, useWorkflowRecords } from "@/hooks";
+import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
-  Trash2,
-  ExternalLink,
-  Calendar,
-  Code2,
-  GitFork,
-  PlayCircle,
-  Clock,
-} from "lucide-react";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/date";
+import { Skeleton } from "@/components/ui/skeleton";
 import { WorkflowPipeline } from "@/components/workflows/WorkflowPipeline";
-import { StatusBadge } from "@/components/entities/StatusBadge";
+import { useEntities, useEntityTypes, useWorkflowRecords } from "@/hooks";
+import { getColorByLabel } from "@/lib/colors";
+import { formatDate } from "@/lib/date";
 import type { WorkflowRecordStatus } from "@/types/workflow-record";
 
 function computeEntityStatus(
@@ -99,15 +100,14 @@ export default function EntityDetailPage({
 
   const {
     icon: typeIcon,
-    fg_color: typeColor,
-    bg_color: typeBgColor,
+    color: typeColorLabel,
     name: typeName,
   } = entityType || {
     icon: "box",
-    fg_color: "#000000",
-    bg_color: "#ffffff",
+    color: "neutral",
     name: "Unknown",
   };
+  const { bg: typeBgColor, fg: typeColor } = getColorByLabel(typeColorLabel);
 
   return (
     <div className="space-y-6">
@@ -310,8 +310,8 @@ export default function EntityDetailPage({
         {workflowRecords.length > 0 ? (
           <div className="grid gap-6">
             {workflowRecords.map((record) => (
-              <Card key={record.id} className="overflow-hidden p-0 gap-0">
-                <CardHeader className="bg-muted/30 border-b pb-4 pt-6">
+              <Card key={record.id} className="gap-0 overflow-hidden p-0">
+                <CardHeader className="bg-muted/30 border-b pt-6 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full">

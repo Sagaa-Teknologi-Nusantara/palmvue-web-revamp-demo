@@ -1,17 +1,25 @@
 "use client";
 
-import { use, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+  ArrowLeft,
+  Box,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  FileText,
+  GitBranch,
+  Hash,
+  List,
+  PlayCircle,
+  Split,
+  Trash2,
+  Type,
+} from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,27 +30,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useWorkflows, useEntityTypes } from "@/hooks";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
-  Trash2,
-  Calendar,
-  Clock,
-  PlayCircle,
-  CheckCircle2,
-  Hash,
-  Type,
-  List,
-  GitBranch,
-  Split,
-  FileText,
-  Box,
-} from "lucide-react";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/date";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEntityTypes, useWorkflows } from "@/hooks";
 import { cn } from "@/lib/cn";
+import { getColorByLabel } from "@/lib/colors";
+import { formatDate } from "@/lib/date";
 import type { JSONSchema, PropertySchema } from "@/types";
 
 // Field type display configuration
@@ -325,11 +327,9 @@ export default function WorkflowDetailPage({
               {assignedEntityTypes.length > 0 ? (
                 <div className="space-y-3">
                   {assignedEntityTypes.map((et) => {
-                    const {
-                      icon: typeIcon,
-                      fg_color: typeColor,
-                      bg_color: typeBgColor,
-                    } = et;
+                    const { icon: typeIcon, color: typeColorLabel } = et;
+                    const { bg: typeBgColor, fg: typeColor } =
+                      getColorByLabel(typeColorLabel);
 
                     return (
                       <Link

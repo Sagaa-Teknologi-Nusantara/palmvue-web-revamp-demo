@@ -1,7 +1,7 @@
 "use client";
 
-import * as LucideIcons from "lucide-react";
-import { LucideIcon, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/cn";
-import { toKebabCase, toPascalCase } from "@/lib/string";
+import { getIconDisplayName, ICON_NAMES } from "@/lib/icon-names";
 
 interface IconPickerProps {
   value: string;
@@ -24,45 +24,18 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const iconList = useMemo(() => {
-    const excluded = new Set(["icons", "createLucideIcon"]);
-    return Object.entries(LucideIcons)
-      .filter(([name, component]) => {
-        if (excluded.has(name)) return false;
-        if (!isNaN(Number(name))) return false;
-        if (name.endsWith("Icon")) return false; // Filter out *Icon duplicates
-        return (
-          typeof component === "object" &&
-          component !== null &&
-          "$$typeof" in component
-        );
-      })
-      .map(([pascalName, Icon]) => ({
-        pascalName,
-        kebabName: toKebabCase(pascalName),
-        displayName: pascalName.replace(/([A-Z])/g, " $1").trim(),
-        Icon: Icon as LucideIcon,
-      }));
-  }, []);
-
   const filteredIcons = useMemo(() => {
-    if (!search) return iconList.slice(0, 100);
+    if (!search) return ICON_NAMES;
     const lowerSearch = search.toLowerCase();
-    return iconList
-      .filter(
-        (icon) =>
-          icon.displayName.toLowerCase().includes(lowerSearch) ||
-          icon.kebabName.includes(lowerSearch),
-      )
-      .slice(0, 100);
-  }, [search, iconList]);
+    return ICON_NAMES.filter(
+      (name) =>
+        name.includes(lowerSearch) ||
+        getIconDisplayName(name).toLowerCase().includes(lowerSearch),
+    );
+  }, [search]);
 
-  const pascalValue = value ? toPascalCase(value) : "";
-  const SelectedIcon =
-    (LucideIcons as unknown as Record<string, LucideIcon>)[pascalValue] ||
-    LucideIcons.Box;
   const displayValue = value
-    ? pascalValue.replace(/([A-Z])/g, " $1").trim()
+    ? getIconDisplayName(value as IconName)
     : "Select icon...";
 
   return (
@@ -75,7 +48,10 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
           className="w-full justify-between"
         >
           <span className="flex items-center gap-2">
-            <SelectedIcon className="h-4 w-4" />
+            <DynamicIcon
+              name={(value as IconName) || "box"}
+              className="h-4 w-4"
+            />
             <span className="truncate">{displayValue}</span>
           </span>
           <Search className="ml-2 h-4 w-4 opacity-50" />
@@ -92,22 +68,22 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
         </div>
         <ScrollArea className="h-[300px] p-2">
           <div className="grid grid-cols-5 gap-2">
-            {filteredIcons.map(({ pascalName, kebabName, Icon }) => (
+            {filteredIcons.map((iconName) => (
               <Button
-                key={pascalName}
+                key={iconName}
                 variant="ghost"
                 className={cn(
                   "h-10 w-10 p-0",
-                  value === kebabName && "bg-accent text-accent-foreground",
+                  value === iconName && "bg-accent text-accent-foreground",
                 )}
                 onClick={() => {
-                  onChange(kebabName);
+                  onChange(iconName);
                   setOpen(false);
                 }}
-                title={pascalName.replace(/([A-Z])/g, " $1").trim()}
+                title={getIconDisplayName(iconName)}
               >
-                <Icon className="h-5 w-5" />
-                <span className="sr-only">{pascalName}</span>
+                <DynamicIcon name={iconName} className="h-5 w-5" />
+                <span className="sr-only">{getIconDisplayName(iconName)}</span>
               </Button>
             ))}
           </div>

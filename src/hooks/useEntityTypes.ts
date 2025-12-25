@@ -33,7 +33,12 @@ export function useEntityTypes() {
       const now = new Date().toISOString();
       const newEntityType: EntityType = {
         id: uuidv4(),
-        ...data,
+        name: data.name,
+        description: data.description,
+        prefix: data.prefix,
+        icon: data.icon,
+        color: data.color,
+        metadata_schema: data.metadata_schema,
         created_at: now,
         updated_at: now,
       };

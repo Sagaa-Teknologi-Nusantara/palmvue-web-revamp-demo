@@ -1,18 +1,20 @@
 "use client";
 
+import { ArrowRight, Calendar, Eye, MoreVertical, Trash2 } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
-import { MoreVertical, Eye, Trash2, Calendar, ArrowRight } from "lucide-react";
-import type { Entity } from "@/types";
+import { getColorByLabel } from "@/lib/colors";
 import { formatDate } from "@/lib/date";
+import type { Entity } from "@/types";
 
 interface EntityCardProps {
   entity: Entity;
@@ -26,7 +28,8 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
     router.push(`/entities/${entity.id}`);
   };
 
-  const { icon, fg_color, bg_color, name: typeName } = entity.entity_type;
+  const { icon, color, name: typeName } = entity.entity_type;
+  const colorOption = getColorByLabel(color);
 
   return (
     <Card
@@ -38,9 +41,9 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
           <div
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-[0.5px] shadow-sm"
             style={{
-              backgroundColor: bg_color,
-              color: fg_color,
-              borderColor: fg_color,
+              backgroundColor: colorOption.bg,
+              color: colorOption.fg,
+              borderColor: colorOption.fg,
             }}
           >
             <DynamicIcon
@@ -54,7 +57,7 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
               <div className="flex min-w-0 items-center gap-2">
                 <span
                   className="truncate text-xs font-bold tracking-wider uppercase opacity-90"
-                  style={{ color: fg_color }}
+                  style={{ color: colorOption.fg }}
                 >
                   {typeName}
                 </span>

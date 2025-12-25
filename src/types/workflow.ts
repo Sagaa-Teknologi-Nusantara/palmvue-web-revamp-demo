@@ -21,6 +21,13 @@ export interface Workflow {
   updated_at: string;
 }
 
+export interface WorkflowOption {
+  id: string;
+  name: string;
+  is_loopable: boolean;
+  is_auto_start: boolean;
+}
+
 export interface CreateStepInput {
   name: string;
   order_index: number;

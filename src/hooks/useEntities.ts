@@ -65,8 +65,7 @@ export function useEntities() {
           name: entityType.name,
           prefix: entityType.prefix,
           icon: entityType.icon,
-          bg_color: entityType.bg_color,
-          fg_color: entityType.fg_color,
+          color: entityType.color,
         },
         parent_id: data.parent_id || null,
         parent: parent

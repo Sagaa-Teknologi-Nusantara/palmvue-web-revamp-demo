@@ -7,8 +7,7 @@ export const mockEntityTypes: EntityType[] = [
     description: "Represents a palm tree asset in the plantation",
     prefix: "TREE",
     icon: "tree-palm",
-    bg_color: "#dcfce7",
-    fg_color: "#16a34a",
+    color: "green",
     metadata_schema: {
       type: "object",
       properties: {
@@ -32,8 +31,7 @@ export const mockEntityTypes: EntityType[] = [
     description: "A plot of land containing multiple trees",
     prefix: "PLOT",
     icon: "map",
-    bg_color: "#fef3c7",
-    fg_color: "#d97706",
+    color: "amber",
     metadata_schema: {
       type: "object",
       properties: {
@@ -56,8 +54,7 @@ export const mockEntityTypes: EntityType[] = [
     description: "Plantation worker profile",
     prefix: "WRK",
     icon: "hard-hat",
-    bg_color: "#e0e7ff",
-    fg_color: "#4f46e5",
+    color: "indigo",
     metadata_schema: {
       type: "object",
       properties: {
@@ -77,8 +74,7 @@ export const mockEntityTypes: EntityType[] = [
     description: "Machinery and equipment",
     prefix: "EQUIP",
     icon: "wrench",
-    bg_color: "#fee2e2",
-    fg_color: "#dc2626",
+    color: "red",
     metadata_schema: {
       type: "object",
       properties: {

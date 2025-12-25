@@ -9,13 +9,14 @@ import {
   LayoutDashboard,
   LogOut,
 } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/components/providers/AuthProvider";
-import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useEntityTypes } from "@/hooks";
 import { cn } from "@/lib/cn";
+import { getColorByLabel } from "@/lib/colors";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -69,7 +70,7 @@ export function Sidebar() {
           );
         })}
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <h3 className="text-sidebar-foreground/50 mb-2 px-2 text-xs font-semibold uppercase">
             Entity Types
           </h3>
@@ -94,13 +95,13 @@ export function Sidebar() {
                   <div
                     className="flex h-5 w-5 items-center justify-center rounded"
                     style={{
-                      backgroundColor: type.bg_color || undefined,
+                      backgroundColor: getColorByLabel(type.color).bg,
                     }}
                   >
                     <DynamicIcon
-                      name={type.icon}
+                      name={(type.icon as IconName) || "box"}
                       className="h-3 w-3"
-                      style={{ color: type.fg_color || undefined }}
+                      style={{ color: getColorByLabel(type.color).fg }}
                     />
                   </div>
                   {type.name}
@@ -108,7 +109,7 @@ export function Sidebar() {
               );
             })}
           </div>
-        </div>
+        </div> */}
       </nav>
 
       <div className="border-sidebar-border border-t p-4">

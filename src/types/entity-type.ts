@@ -6,8 +6,7 @@ export interface EntityType {
   description: string;
   prefix: string;
   icon: string;
-  bg_color: string;
-  fg_color: string;
+  color: string;
   metadata_schema: JSONSchema;
   created_at: string;
   updated_at: string;
@@ -18,9 +17,9 @@ export interface CreateEntityTypeInput {
   description: string;
   prefix: string;
   icon: string;
-  bg_color: string;
-  fg_color: string;
+  color: string;
   metadata_schema: JSONSchema;
+  workflow_ids: string[];
 }
 
 export interface UpdateEntityTypeInput {
