@@ -1,37 +1,38 @@
 "use client";
 
+import { Box, Boxes, GitBranch, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { PageHeader } from "@/components/layout";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { PageHeader } from "@/components/layout";
-import {
-  useEntityTypes,
-  useEntities,
-  useWorkflows,
-  useWorkflowRecords,
-} from "@/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Boxes, Box, GitBranch, TrendingUp } from "lucide-react";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  Legend,
-} from "recharts";
+  useEntities,
+  useEntityTypes,
+  useWorkflowRecords,
+  useWorkflows,
+} from "@/hooks";
 
 // Brand-aligned colors derived from CSS variables
 const COLORS = {

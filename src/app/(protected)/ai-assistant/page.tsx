@@ -1,27 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { PageHeader } from "@/components/layout";
+import { Bot, Send, User } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Send, Bot, User } from "lucide-react";
-import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
 } from "recharts";
+
+import { PageHeader } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -263,7 +257,7 @@ export default function AiAssistantPage() {
         description="Ask questions about your data and get instant insights"
       />
 
-      <Card className="flex flex-1 flex-col overflow-hidden p-0 shadow-sm gap-0">
+      <Card className="flex flex-1 flex-col gap-0 overflow-hidden p-0 shadow-sm">
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 pt-10">
           <div className="space-y-6">
             {messages.map((msg) => (

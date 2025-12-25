@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
-import { Sidebar } from "@/components/layout/Sidebar";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { DatabaseProvider } from "@/components/providers/DatabaseProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
@@ -37,10 +36,7 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <DatabaseProvider>
-              <Sidebar />
-              <main className="min-h-screen pl-64">
-                <div className="mx-auto max-w-7xl p-8">{children}</div>
-              </main>
+              {children}
               <Toaster />
             </DatabaseProvider>
           </AuthProvider>
