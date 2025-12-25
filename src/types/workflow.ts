@@ -1,4 +1,4 @@
-import type { JSONSchema } from './entity-type';
+import type { JSONSchema } from "./json-schema";
 
 export interface StepForm {
   id: string;

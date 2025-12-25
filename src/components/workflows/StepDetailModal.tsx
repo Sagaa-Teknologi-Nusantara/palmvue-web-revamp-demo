@@ -1,18 +1,18 @@
 "use client";
 
+import { StatusBadge } from "@/components/entities/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { StatusBadge } from "@/components/entities/StatusBadge";
-import type { WorkflowStep, StepSubmission } from "@/types";
-import type { JSONSchema, PropertySchema } from "@/types";
+import type { StepSubmission, WorkflowStep } from "@/types";
+import type { PropertySchema } from "@/types";
 
 interface StepDetailModalProps {
   open: boolean;
@@ -100,7 +100,8 @@ export function StepDetailModal({
         </h4>
         <div className="space-y-2">
           {Object.entries(schema.properties).map(([key, prop]) => {
-            const type = getFieldType(prop);
+            const typedProp = prop as PropertySchema;
+            const type = getFieldType(typedProp);
             const isRequired = schema.required?.includes(key);
 
             return (
@@ -110,7 +111,7 @@ export function StepDetailModal({
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {prop.title || key}
+                    {typedProp.title || key}
                   </span>
                   {isRequired && (
                     <span className="text-destructive text-xs" title="Required">

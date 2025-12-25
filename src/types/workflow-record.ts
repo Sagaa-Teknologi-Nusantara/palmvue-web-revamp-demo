@@ -1,6 +1,6 @@
-import type { JSONSchema } from './entity-type';
+import { JSONSchema } from "./json-schema";
 
-export type WorkflowRecordStatus = 'not_started' | 'in_progress' | 'completed';
+export type WorkflowRecordStatus = "not_started" | "in_progress" | "completed";
 
 export interface WorkflowRef {
   id: string;

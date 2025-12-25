@@ -1,16 +1,4 @@
-export interface PropertySchema {
-  type: "string" | "number" | "boolean" | "integer";
-  enum?: string[];
-  format?: "date" | "date-time" | "email" | "uri";
-  title?: string;
-  description?: string;
-}
-
-export interface JSONSchema {
-  type: "object";
-  properties: Record<string, PropertySchema>;
-  required?: string[];
-}
+import type { JSONSchema } from "./json-schema";
 
 export interface EntityType {
   id: string;

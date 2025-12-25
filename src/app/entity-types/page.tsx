@@ -1,17 +1,30 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/layout";
-import { EntityTypeCardList } from "@/components/entity-types";
-import { useEntityTypes } from "@/hooks";
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useCallback, useState } from "react";
+
+import { EntityTypeCardList } from "@/components/entity-types";
+import { PageHeader } from "@/components/layout";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEntityTypesQuery } from "@/hooks/queries";
 
 export default function EntityTypesPage() {
-  const { entityTypes, isLoaded } = useEntityTypes();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
 
-  if (!isLoaded) {
+  const { entityTypes, pagination, isLoading } = useEntityTypesQuery({
+    page,
+    size: pageSize,
+  });
+
+  const handlePageSizeChange = useCallback((newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
+  }, []);
+
+  if (isLoading) {
     return (
       <div>
         <PageHeader
@@ -42,7 +55,15 @@ export default function EntityTypesPage() {
         }
       />
 
-      <EntityTypeCardList entityTypes={entityTypes} />
+      <EntityTypeCardList
+        entityTypes={entityTypes}
+        currentPage={page}
+        totalPages={pagination.total_pages}
+        pageSize={pageSize}
+        totalItems={pagination.total_items}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }
