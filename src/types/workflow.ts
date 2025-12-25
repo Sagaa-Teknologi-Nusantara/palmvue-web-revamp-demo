@@ -10,12 +10,15 @@ export interface WorkflowStep {
   id: string;
   name: string;
   order_index: number;
+  requires_approval: boolean;
   form: StepForm;
 }
 
 export interface Workflow {
   id: string;
   name: string;
+  is_loopable: boolean;
+  is_auto_start: boolean;
   steps: WorkflowStep[];
   created_at: string;
   updated_at: string;

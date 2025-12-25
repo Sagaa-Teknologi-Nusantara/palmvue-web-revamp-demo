@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useLocalStorage } from './useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/constants';
-import type { Workflow, CreateWorkflowInput, UpdateWorkflowInput, WorkflowStep } from '@/types';
+import { useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
+
+import { STORAGE_KEYS } from "@/lib/constants";
+import type {
+  CreateWorkflowInput,
+  UpdateWorkflowInput,
+  Workflow,
+  WorkflowStep,
+} from "@/types";
+
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useWorkflows() {
   const [workflows, setWorkflows, isLoaded] = useLocalStorage<Workflow[]>(
     STORAGE_KEYS.WORKFLOWS,
-    []
+    [],
   );
 
   const getById = useCallback(
     (id: string) => workflows.find((w) => w.id === id),
-    [workflows]
+    [workflows],
   );
 
   const create = useCallback(
@@ -24,6 +31,7 @@ export function useWorkflows() {
         id: uuidv4(),
         name: step.name,
         order_index: index,
+        requires_approval: false,
         form: {
           id: uuidv4(),
           name: step.form.name,
@@ -34,6 +42,8 @@ export function useWorkflows() {
       const newWorkflow: Workflow = {
         id: uuidv4(),
         name: data.name,
+        is_loopable: false,
+        is_auto_start: false,
         steps,
         created_at: now,
         updated_at: now,
@@ -41,7 +51,7 @@ export function useWorkflows() {
       setWorkflows((prev) => [...prev, newWorkflow]);
       return newWorkflow;
     },
-    [setWorkflows]
+    [setWorkflows],
   );
 
   const update = useCallback(
@@ -55,6 +65,7 @@ export function useWorkflows() {
                   id: uuidv4(),
                   name: step.name,
                   order_index: index,
+                  requires_approval: false,
                   form: {
                     id: uuidv4(),
                     name: step.form.name,
@@ -72,18 +83,18 @@ export function useWorkflows() {
             return updated;
           }
           return w;
-        })
+        }),
       );
       return updated;
     },
-    [setWorkflows]
+    [setWorkflows],
   );
 
   const remove = useCallback(
     (id: string) => {
       setWorkflows((prev) => prev.filter((w) => w.id !== id));
     },
-    [setWorkflows]
+    [setWorkflows],
   );
 
   return {

@@ -1,4 +1,4 @@
-import type { EntityType } from "@/types/entity-type";
+import type { EntityType, Workflow } from "@/types";
 
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
@@ -36,12 +36,23 @@ export const entityTypeService = {
     return response.data.data;
   },
 
+  getWorkflows: async (id: string): Promise<Workflow[]> => {
+    const response = await apiClient.get<ApiResponse<Workflow[]>>(
+      ENDPOINTS.ENTITY_TYPES.WORKFLOWS(id),
+    );
+    return response.data.data;
+  },
+
   create: async (data: CreateEntityTypeRequest): Promise<EntityType> => {
     const response = await apiClient.post<ApiResponse<EntityType>>(
       ENDPOINTS.ENTITY_TYPES.CREATE,
       data,
     );
     return response.data.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(ENDPOINTS.ENTITY_TYPES.DELETE(id));
   },
 };
 

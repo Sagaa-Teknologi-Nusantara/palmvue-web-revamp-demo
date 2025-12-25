@@ -2,21 +2,12 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  BoxSelect,
-  Calendar,
-  Edit2,
-  GripVertical,
-  Hash,
-  List,
-  ToggleLeft,
-  Trash2,
-  Type,
-} from "lucide-react";
+import { BoxSelect, Edit2, GripVertical, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
+import { getFieldConfig } from "@/lib/field-types";
 
 import { type FieldConfig } from "./types";
 
@@ -25,15 +16,6 @@ interface FieldCardProps {
   onEdit: () => void;
   onDelete: () => void;
 }
-
-const FIELD_ICONS: Record<string, typeof Type> = {
-  string: Type,
-  number: Hash,
-  integer: Hash,
-  boolean: ToggleLeft,
-  date: Calendar,
-  dropdown: List,
-};
 
 export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
   const {
@@ -50,7 +32,8 @@ export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
     transition,
   };
 
-  const FieldIcon = FIELD_ICONS[field.type] || BoxSelect;
+  const config = getFieldConfig(field.type);
+  const FieldIcon = config?.icon || BoxSelect;
 
   return (
     <Card
@@ -74,14 +57,7 @@ export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
         <div
           className={cn(
             "bg-muted/30 border-border/50 mr-3 rounded-md border p-2",
-            field.type === "string" &&
-              "border-blue-100 bg-blue-50/50 text-blue-500",
-            field.type === "number" &&
-              "border-amber-100 bg-amber-50/50 text-amber-500",
-            field.type === "date" &&
-              "border-purple-100 bg-purple-50/50 text-purple-500",
-            field.type === "boolean" &&
-              "border-green-100 bg-green-50/50 text-green-500",
+            config?.iconContainerColor,
           )}
         >
           <FieldIcon className="h-4 w-4" />
@@ -103,7 +79,7 @@ export function FieldCard({ field, onEdit, onDelete }: FieldCardProps) {
               {field.name}
             </code>
             <span className="text-muted-foreground/70 flex items-center gap-1 text-[10px] capitalize">
-              • {field.type.replace("-", " ")}
+              • {config.label}
               {field.type === "dropdown" &&
                 field.options &&
                 ` (${field.options.length})`}

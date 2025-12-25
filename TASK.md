@@ -1,59 +1,122 @@
-I want to integrate entity type creation page with real API backend. The API endpoint is as follows:
+I want to integrate entity type detail page with real backend API. The API provided are as follows:
 
-POST /entity-types
-
-Request Body:
-{
-  "description": "Represents a palm tree entity",
-  "metadata_schema": {},
-  "name": "Tree",
-  "prefix": "TREE",
-  "workflow_ids": [],
-  "icon": "alarm",
-  "color": "red"
-}
+GET /entity-types/:id
 
 Response Body:
 {
-  "message": "string",
   "success": true,
+  "message": "Entity type retrieved successfully",
   "data": {
-    "color": "string",
-    "created_at": "string",
-    "description": "string",
-    "icon": "string",
-    "id": "string",
-    "metadata_schema": {},
-    "name": "string",
-    "prefix": "string",
-    "updated_at": "string",
-    "workflow_ids": [
-      "string"
-    ]
+    "id": "13eebc99-9c0b-4ef8-bb6d-6bb9bd380a43",
+    "name": "Palm Seed",
+    "description": "Palm seeds for germination studies and seed bank storage",
+    "prefix": "SEED",
+    "metadata_schema": {
+      "type": "object",
+      "required": [
+        "seed_source",
+        "parent_varieties"
+      ],
+      "properties": {
+        "batch_id": {
+          "type": "string"
+        },
+        "seed_source": {
+          "enum": [
+            "controlled-cross",
+            "open-pollinated"
+          ],
+          "type": "string"
+        },
+        "genetic_marker": {
+          "type": "string"
+        },
+        "parent_varieties": {
+          "type": "object",
+          "properties": {
+            "father": {
+              "type": "string"
+            },
+            "mother": {
+              "type": "string"
+            }
+          }
+        },
+        "viability_tested": {
+          "type": "boolean"
+        },
+        "storage_duration_days": {
+          "type": "number",
+          "minimum": 0
+        },
+        "germination_rate_percentage": {
+          "type": "number",
+          "maximum": 100,
+          "minimum": 0
+        }
+      }
+    },
+    "color": "yellow",
+    "icon": "trees",
+    "workflow_ids": null,
+    "created_at": "2025-07-18T16:23:52.474066+07:00",
+    "updated_at": "2025-07-18T16:23:52.474066+07:00"
   }
 }
 
-You also need options for available workflows
 
-GET /workflows/options
+Other than that, you will also need all workflow related to that entity types using this API:
+
+GET /entity-types/:id/workflows
 
 Response Body:
 {
-  "message": "string",
   "success": true,
+  "message": "Workflows retrieved successfully",
   "data": [
     {
-      "id": "string",
-      "name": "string"
-      "is_auto_start": true,
+      "id": "70eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
+      "name": "Palm Tree Registration & Initial Assessment",
       "is_loopable": true,
-    }
+      "is_auto_start": true,
+      "steps": [
+        {
+          "id": "80eebc99-9c0b-4ef8-bb6d-6bb9bd380d01",
+          "name": "Tree Tagging & GPS Mapping",
+          "order_index": 0,
+          "requires_approval": true,
+          "form": {
+            "id": "60eebc99-9c0b-4ef8-bb6d-6bb9bd380b01",
+            "name": "Tree Registration Form",
+            "schema": {
+              ...
+            }
+          }
+        },
+        ...
+      ],
+      "entity_types": [], // for now it always empty and not populated, you can ignore this
+      "created_at": "2025-07-08T16:23:52.474066+07:00",
+      "updated_at": "2025-07-08T16:23:52.474066+07:00"
+    },
+    ...
   ]
 }
 
 
-For the color, just use constant colors where name of the color will have 2 colors for foreground and background. So in backend, it only need to store the name of the color.
+Please analyze if both endpoint are sufficient to display all the related data. Also dont change the visual, only focus on integration
 
-For the icon, just use lucide icons name that already used now
+You can refer to the entity type list page, and entity type creation page that already integrated
 
-Dont change the visual, just focus on the API integration
+Please make a plan first
+
+Additional endpoints for deletion:
+DELETE /entity-types/:id
+
+Response Body:
+{
+  "success": true,
+  "message": "Entity type deleted successfully"
+}
+
+But it will be error if the entity type already have entities

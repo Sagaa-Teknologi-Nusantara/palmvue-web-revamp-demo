@@ -4,11 +4,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-tree-assessment",
     name: "Palm Tree Assessment",
+    is_loopable: false,
+    is_auto_start: false,
     steps: [
       {
         id: "step-initial-check",
         name: "Initial Check",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-initial-check",
           name: "Initial Check Form",
@@ -31,6 +34,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-detailed-assessment",
         name: "Detailed Assessment",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-detailed-assessment",
           name: "Detailed Assessment Form",
@@ -58,6 +62,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-final-review",
         name: "Final Review",
         order_index: 2,
+        requires_approval: true,
         form: {
           id: "form-final-review",
           name: "Final Review Form",
@@ -97,11 +102,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-equipment-maintenance",
     name: "Equipment Maintenance",
+    is_loopable: false,
+    is_auto_start: false,
     steps: [
       {
         id: "step-pre-inspection",
         name: "Pre-Inspection",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-pre-inspection",
           name: "Pre-Inspection Form",
@@ -128,6 +136,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-maintenance-work",
         name: "Maintenance Work",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-maintenance-work",
           name: "Maintenance Work Form",
@@ -146,6 +155,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-post-inspection",
         name: "Post-Inspection",
         order_index: 2,
+        requires_approval: true,
         form: {
           id: "form-post-inspection",
           name: "Post-Inspection Form",
@@ -171,11 +181,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-plot-inspection",
     name: "Plot Inspection",
+    is_loopable: true,
+    is_auto_start: false,
     steps: [
       {
         id: "step-boundary-check",
         name: "Boundary Check",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-boundary-check",
           name: "Boundary Check Form",
@@ -201,6 +214,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-soil-analysis",
         name: "Soil Analysis",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-soil-analysis",
           name: "Soil Analysis Form",
@@ -227,6 +241,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-vegetation-survey",
         name: "Vegetation Survey",
         order_index: 2,
+        requires_approval: false,
         form: {
           id: "form-vegetation-survey",
           name: "Vegetation Survey Form",
@@ -252,6 +267,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-report-generation",
         name: "Report Generation",
         order_index: 3,
+        requires_approval: true,
         form: {
           id: "form-report-generation",
           name: "Report Generation Form",
@@ -281,11 +297,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-harvest-cycle",
     name: "Harvest Cycle",
+    is_loopable: true,
+    is_auto_start: true,
     steps: [
       {
         id: "step-pre-harvest-check",
         name: "Pre-Harvest Check",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-pre-harvest-check",
           name: "Pre-Harvest Checklist",
@@ -312,6 +331,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-harvesting",
         name: "Harvesting",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-harvesting",
           name: "Harvest Log",
@@ -331,6 +351,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-yield-recording",
         name: "Yield Recording",
         order_index: 2,
+        requires_approval: true,
         form: {
           id: "form-yield-recording",
           name: "Yield Record",
@@ -359,11 +380,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-safety-training",
     name: "Safety Training Log",
+    is_loopable: false,
+    is_auto_start: false,
     steps: [
       {
         id: "step-training-session",
         name: "Training Session",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-training-session",
           name: "Training Details",
@@ -387,6 +411,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-quiz",
         name: "Quiz / Assessment",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-quiz",
           name: "Assessment Results",
@@ -408,6 +433,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-certification",
         name: "Certification Issuance",
         order_index: 2,
+        requires_approval: true,
         form: {
           id: "form-certification",
           name: "Certificate Details",
@@ -433,11 +459,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-pest-control",
     name: "Pest Control",
+    is_loopable: true,
+    is_auto_start: false,
     steps: [
       {
         id: "step-pest-inspection",
         name: "Pest Inspection",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-pest-inspection",
           name: "Pest Inspection Form",
@@ -462,11 +491,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-fertilizer-application",
     name: "Fertilizer Application",
+    is_loopable: true,
+    is_auto_start: false,
     steps: [
       {
         id: "step-soil-test",
         name: "Soil Testing",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-soil-test",
           name: "Soil Test Form",
@@ -488,6 +520,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-apply-fertilizer",
         name: "Apply Fertilizer",
         order_index: 1,
+        requires_approval: true,
         form: {
           id: "form-apply-fertilizer",
           name: "Application Log",
@@ -513,11 +546,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-new-planting",
     name: "New Planting",
+    is_loopable: false,
+    is_auto_start: true,
     steps: [
       {
         id: "step-site-prep",
         name: "Site Preparation",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-site-prep",
           name: "Site Prep Form",
@@ -535,6 +571,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-hole-digging",
         name: "Hole Digging",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-hole-digging",
           name: "Hole Digging Log",
@@ -552,6 +589,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-seedling-plant",
         name: "Seedling Planting",
         order_index: 2,
+        requires_approval: false,
         form: {
           id: "form-seedling-plant",
           name: "Planting Log",
@@ -569,6 +607,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-initial-watering",
         name: "Initial Watering",
         order_index: 3,
+        requires_approval: true,
         form: {
           id: "form-initial-watering",
           name: "Watering Log",
@@ -589,11 +628,14 @@ export const mockWorkflows: Workflow[] = [
   {
     id: "wf-worker-onboarding",
     name: "Worker Onboarding",
+    is_loopable: false,
+    is_auto_start: true,
     steps: [
       {
         id: "step-document-check",
         name: "Document Verification",
         order_index: 0,
+        requires_approval: false,
         form: {
           id: "form-document-check",
           name: "Document Check Form",
@@ -611,6 +653,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-orientation",
         name: "Orientation Session",
         order_index: 1,
+        requires_approval: false,
         form: {
           id: "form-orientation",
           name: "Orientation Form",
@@ -634,6 +677,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-ppe-issuance",
         name: "PPE Issuance",
         order_index: 2,
+        requires_approval: false,
         form: {
           id: "form-ppe-issuance",
           name: "PPE Issuance Form",
@@ -652,6 +696,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-field-intro",
         name: "Field Introduction",
         order_index: 3,
+        requires_approval: false,
         form: {
           id: "form-field-intro",
           name: "Field Intro Form",
@@ -669,6 +714,7 @@ export const mockWorkflows: Workflow[] = [
         id: "step-final-checklist",
         name: "Final Checklist",
         order_index: 4,
+        requires_approval: true,
         form: {
           id: "form-final-checklist",
           name: "Final Checklist Form",
