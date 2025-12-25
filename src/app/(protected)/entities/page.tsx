@@ -2,128 +2,79 @@
 
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
-import { EntityCardList, EntityFilters } from "@/components/entities";
 import { PageHeader } from "@/components/layout";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEntities, useEntityTypes, useWorkflowRecords } from "@/hooks";
-import type { WorkflowRecordStatus } from "@/types/workflow-record";
+import {
+  useDeleteEntityMutation,
+  useEntitiesQuery,
+  useEntityTypeOptionsQuery,
+} from "@/hooks/queries";
 
-function computeEntityStatus(
-  entityId: string,
-  workflowRecords: { entity_id: string; status: WorkflowRecordStatus }[],
-): WorkflowRecordStatus {
-  const records = workflowRecords.filter((r) => r.entity_id === entityId);
-  if (records.length === 0) return "not_started";
-
-  const statuses = new Set(records.map((r) => r.status));
-  if (statuses.size === 1) return records[0].status;
-
-  if (statuses.has("in_progress")) return "in_progress";
-  if (statuses.has("not_started")) return "in_progress";
-  return "completed";
-}
+import { EntityCardList, EntityFilters } from "./components";
 
 export default function EntitiesPage() {
-  const { entities, isLoaded, remove } = useEntities();
-  const { entityTypes } = useEntityTypes();
-  const { workflowRecords } = useWorkflowRecords();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState(() => {
-    return searchParams.get("type") || "all";
-  });
-  const [selectedParent, setSelectedParent] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const selectedType = searchParams.get("type") || "all";
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
 
   useEffect(() => {
-    const typeParam = searchParams.get("type");
-    if (typeParam) {
-      setSelectedType(typeParam);
-    }
-  }, [searchParams]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const entitiesWithStatus = useMemo(() => {
-    return entities.map((entity) => ({
-      entity,
-      status: computeEntityStatus(entity.id, workflowRecords),
-    }));
-  }, [entities, workflowRecords]);
+  const { entities, pagination, isLoading } = useEntitiesQuery({
+    page,
+    size: pageSize,
+    search: debouncedSearch || undefined,
+    entity_type_id: selectedType !== "all" ? selectedType : undefined,
+  });
+  const { options: entityTypeOptions } = useEntityTypeOptionsQuery();
+  const deleteMutation = useDeleteEntityMutation();
 
-  const filteredEntities = useMemo(() => {
-    return entitiesWithStatus.filter(({ entity, status }) => {
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        if (
-          !entity.name.toLowerCase().includes(query) &&
-          !entity.code.toLowerCase().includes(query)
-        ) {
-          return false;
-        }
+  const handleTypeChange = useCallback(
+    (typeId: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (typeId === "all") {
+        params.delete("type");
+      } else {
+        params.set("type", typeId);
       }
+      router.push(
+        `/entities${params.toString() ? `?${params.toString()}` : ""}`,
+      );
+      setPage(1);
+    },
+    [router, searchParams],
+  );
 
-      if (selectedType !== "all" && entity.entity_type_id !== selectedType) {
-        return false;
-      }
-
-      if (selectedParent === "none" && entity.parent_id !== null) {
-        return false;
-      }
-      if (
-        selectedParent !== "all" &&
-        selectedParent !== "none" &&
-        entity.parent_id !== selectedParent
-      ) {
-        return false;
-      }
-
-      if (selectedStatus !== "all" && status !== selectedStatus) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [
-    entitiesWithStatus,
-    searchQuery,
-    selectedType,
-    selectedParent,
-    selectedStatus,
-  ]);
+  const handlePageSizeChange = useCallback((newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
+  }, []);
 
   const handleDelete = () => {
     if (deleteId) {
-      remove(deleteId);
-      setDeleteId(null);
+      deleteMutation.mutate(deleteId, {
+        onSettled: () => setDeleteId(null),
+      });
     }
   };
-
-  if (!isLoaded) {
-    return (
-      <div>
-        <PageHeader title="Entities" description="Manage entity instances" />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-40 w-full rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -144,37 +95,37 @@ export default function EntitiesPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedType={selectedType}
-        onTypeChange={setSelectedType}
-        selectedParent={selectedParent}
-        onParentChange={setSelectedParent}
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
-        entityTypes={entityTypes}
-        entities={entities}
+        onTypeChange={handleTypeChange}
+        entityTypeOptions={entityTypeOptions}
       />
 
-      <EntityCardList entities={filteredEntities} onDelete={setDeleteId} />
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : (
+        <EntityCardList
+          entities={entities}
+          currentPage={page}
+          totalPages={pagination.total_pages}
+          pageSize={pageSize}
+          totalItems={pagination.total_items}
+          onPageChange={setPage}
+          onPageSizeChange={handlePageSizeChange}
+          onDelete={setDeleteId}
+        />
+      )}
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Entity</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this entity? This will also delete
-              associated workflow records.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmationDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        isPending={deleteMutation.isPending}
+        title="Delete Entity"
+        description="Are you sure you want to delete this entity? This will also delete associated workflow records."
+      />
     </div>
   );
 }

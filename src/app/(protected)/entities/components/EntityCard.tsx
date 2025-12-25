@@ -36,8 +36,8 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
       className="group relative cursor-pointer gap-2 space-y-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-md"
       onClick={handleCardClick}
     >
-      <div className="p-6 pb-4">
-        <div className="flex items-center gap-4">
+      <div className="h-full p-6 pb-4">
+        <div className="flex h-full items-center gap-4">
           <div
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-[0.5px] shadow-sm"
             style={{
@@ -52,7 +52,7 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
             />
           </div>
 
-          <div className="min-w-0 flex-1">
+          <div className="h-full min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
                 <span
@@ -66,44 +66,6 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
                   {entity.code}
                 </span>
               </div>
-
-              <div className="flex shrink-0 items-center gap-1">
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    asChild
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground -mr-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/entities/${entity.id}`);
-                      }}
-                    >
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(entity.id);
-                      }}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
             </div>
 
             <h3 className="text-foreground text-lg leading-tight font-bold">
@@ -113,12 +75,47 @@ export function EntityCard({ entity, onDelete }: EntityCardProps) {
         </div>
       </div>
 
-      <div className="border-border bg-primary-light/40 text-muted-foreground flex items-center justify-between border-t px-6 py-[0.6rem] text-xs">
+      <div className="border-border bg-primary-light/40 text-muted-foreground mt-auto flex items-center justify-between border-t px-6 py-[0.6rem] text-xs">
         <div className="flex items-center gap-1.5">
           <Calendar className="text-muted-foreground/70 h-3.5 w-3.5" />
           <span>Updated {formatDate(entity.updated_at)}</span>
         </div>
         <ArrowRight className="text-muted-foreground/70 h-4 w-4 opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100" />
+      </div>
+
+      <div className="absolute top-3 right-5">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground -mr-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center" side="bottom">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/entities/${entity.id}`);
+              }}
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              View Details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(entity.id);
+              }}
+            >
+              <Trash2 className="text-destructive mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </Card>
   );

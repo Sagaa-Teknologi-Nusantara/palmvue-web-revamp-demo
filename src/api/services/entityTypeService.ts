@@ -3,6 +3,7 @@ import type { EntityType, Workflow } from "@/types";
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 import type { ApiResponse, PaginationParams } from "../types";
+import type { EntityTypeOption } from "../types/entity";
 import type {
   CreateEntityTypeRequest,
   EntityTypeListResponse,
@@ -53,6 +54,13 @@ export const entityTypeService = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(ENDPOINTS.ENTITY_TYPES.DELETE(id));
+  },
+
+  getOptions: async (): Promise<EntityTypeOption[]> => {
+    const response = await apiClient.get<ApiResponse<EntityTypeOption[]>>(
+      ENDPOINTS.ENTITY_TYPES.OPTIONS,
+    );
+    return response.data.data;
   },
 };
 

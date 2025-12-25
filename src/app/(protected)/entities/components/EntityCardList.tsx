@@ -1,39 +1,34 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { PaginationBar } from "@/components/ui/pagination-bar";
-import { EntityCard } from "./EntityCard";
 import type { Entity } from "@/types";
-import type { WorkflowRecordStatus } from "@/types/workflow-record";
 
-interface EntityWithStatus {
-  entity: Entity;
-  status: WorkflowRecordStatus;
-}
+import { EntityCard } from "./EntityCard";
 
 interface EntityCardListProps {
-  entities: EntityWithStatus[];
+  entities: Entity[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
   onDelete: (id: string) => void;
 }
 
-export function EntityCardList({ entities, onDelete }: EntityCardListProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
-
-  const totalPages = Math.ceil(entities.length / pageSize);
-
-  const paginatedEntities = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return entities.slice(startIndex, startIndex + pageSize);
-  }, [entities, currentPage, pageSize]);
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1);
-  };
-
+export function EntityCardList({
+  entities,
+  currentPage,
+  totalPages,
+  pageSize,
+  totalItems,
+  onPageChange,
+  onPageSizeChange,
+  onDelete,
+}: EntityCardListProps) {
   if (entities.length === 0) {
     return (
       <div className="border-border bg-card rounded-lg border py-12 text-center">
@@ -53,7 +48,7 @@ export function EntityCardList({ entities, onDelete }: EntityCardListProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {paginatedEntities.map(({ entity, status }) => (
+        {entities.map((entity) => (
           <EntityCard key={entity.id} entity={entity} onDelete={onDelete} />
         ))}
       </div>
@@ -62,9 +57,9 @@ export function EntityCardList({ entities, onDelete }: EntityCardListProps) {
         currentPage={currentPage}
         totalPages={totalPages}
         pageSize={pageSize}
-        totalItems={entities.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={handlePageSizeChange}
+        totalItems={totalItems}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
       />
     </div>
   );
