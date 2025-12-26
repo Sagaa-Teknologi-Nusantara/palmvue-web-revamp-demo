@@ -33,3 +33,10 @@ export interface EntityOptionsParams {
   search?: string;
   entity_type_id?: string;
 }
+
+export interface CreateEntityRequest {
+  entity_type_id: string;
+  parent_id?: string;
+  name: string;
+  metadata: Record<string, unknown>;
+}

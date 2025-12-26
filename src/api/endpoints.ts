@@ -12,6 +12,7 @@ export const ENDPOINTS = {
   },
   ENTITIES: {
     LIST: "/entities",
+    CREATE: "/entities",
     DELETE: (id: string) => `/entities/${id}`,
     OPTIONS: "/entities/options",
   },

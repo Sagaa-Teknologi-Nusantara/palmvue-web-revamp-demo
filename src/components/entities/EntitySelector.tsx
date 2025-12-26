@@ -176,7 +176,11 @@ export function EntitySelector({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
+      <PopoverContent
+        className="p-0 min-w-sm"
+        align="start"
+        style={{ width: "var(--radix-popover-trigger-width)" }}
+      >
         <Command shouldFilter={false} className="max-h-[350px]">
           <div className="bg-muted/30 border-b px-2 py-1.5">
             <Select

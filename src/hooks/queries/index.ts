@@ -1,3 +1,4 @@
+export * from "./useCreateEntityMutation";
 export * from "./useCreateEntityTypeMutation";
 export * from "./useDeleteEntityMutation";
 export * from "./useDeleteEntityTypeMutation";

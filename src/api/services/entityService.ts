@@ -4,6 +4,7 @@ import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 import type { ApiResponse } from "../types";
 import type {
+  CreateEntityRequest,
   EntityListParams,
   EntityListResponse,
   EntityOption,
@@ -46,6 +47,14 @@ export const entityService = {
     const response = await apiClient.get<ApiResponse<EntityOption[]>>(
       ENDPOINTS.ENTITIES.OPTIONS,
       { params: queryParams },
+    );
+    return response.data.data;
+  },
+
+  create: async (data: CreateEntityRequest): Promise<Entity> => {
+    const response = await apiClient.post<ApiResponse<Entity>>(
+      ENDPOINTS.ENTITIES.CREATE,
+      data,
     );
     return response.data.data;
   },
