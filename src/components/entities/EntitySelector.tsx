@@ -141,17 +141,10 @@ export function EntitySelector({
             <div className="flex items-center gap-2 truncate">
               <span
                 className="rounded-[4px] px-1.5 py-0.5 font-mono text-[10px] font-medium"
-                style={
-                  entityType
-                    ? {
-                        backgroundColor: entityTypeColors.bg,
-                        color: entityTypeColors.fg,
-                      }
-                    : {
-                        backgroundColor: "var(--secondary)",
-                        color: "var(--secondary-foreground)",
-                      }
-                }
+                style={{
+                  backgroundColor: entityTypeColors.bg,
+                  color: entityTypeColors.fg,
+                }}
               >
                 {selectedEntity.code}
               </span>
@@ -277,14 +270,10 @@ export function EntitySelector({
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <span
                           className="shrink-0 rounded-[3px] px-1.5 py-0.5 font-mono text-[10px] font-medium"
-                          style={
-                            currentFilterType
-                              ? {
-                                  backgroundColor: filterTypeColors.bg,
-                                  color: filterTypeColors.fg,
-                                }
-                              : {}
-                          }
+                          style={{
+                            backgroundColor: filterTypeColors.bg,
+                            color: filterTypeColors.fg,
+                          }}
                         >
                           {entity.code}
                         </span>
