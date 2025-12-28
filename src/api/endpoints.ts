@@ -19,7 +19,9 @@ export const ENDPOINTS = {
     WORKFLOW_DETAILS: (id: string) => `/entities/${id}/workflows`,
   },
   WORKFLOWS: {
+    LIST: "/workflows",
     OPTIONS: "/workflows/options",
+    DELETE: (id: string) => `/workflows/${id}`,
   },
   WORKFLOW_RECORDS: {
     STEP_SUBMISSIONS: (recordId: string, stepId: string) =>

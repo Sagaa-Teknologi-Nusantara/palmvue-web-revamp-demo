@@ -1,3 +1,4 @@
+import { EntityTypeRef } from "./entity-type";
 import type { JSONSchema } from "./json-schema";
 
 export interface StepForm {
@@ -20,6 +21,26 @@ export interface Workflow {
   is_loopable: boolean;
   is_auto_start: boolean;
   steps: WorkflowStep[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkflowStepRef {
+  id: string;
+  name: string;
+  order_index: number;
+  requires_approval: boolean;
+}
+
+export interface WorkflowListItem {
+  id: string;
+  name: string;
+  is_loopable: boolean;
+  is_auto_start: boolean;
+  step_count: number;
+  active_record_count: number;
+  steps: WorkflowStepRef[];
+  entity_types: EntityTypeRef[];
   created_at: string;
   updated_at: string;
 }

@@ -1,207 +1,86 @@
-Now i want to integrate the workflow, it should use this endpoint:
+I want to integrate the workflow list page with real API. These are the endpoints:
 
-GET /entities/{entity_id}/workflows/details
+GET /workflows?size=2&search=tree&entity_type_ids=10eebc99-9c0b-4ef8-bb6d-6bb9bd380a40
 
-Response body:
 {
   "success": true,
-  "message": "Workflow details retrieved successfully",
+  "message": "Workflows retrieved successfully",
   "data": [
     {
-      "id": "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380f21", // workflow record id
-      "workflow_id": "71eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
-      "workflow": {
-        "id": "71eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
-        "name": "Annual Growth & Health Monitoring"
-      },
-      "status": "completed", // completed, pending_approval, not_started, in_progress
-      "current_step_id": "86eebc99-9c0b-4ef8-bb6d-6bb9bd380d07", // can be NULL if not_started
+      "id": "70eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
+      "name": "Palm Tree Registration & Initial Assessment",
+      "is_loopable": true,
+      "is_auto_start": true,
+      "step_count": 4,
+      "active_record_count": 4,
       "steps": [
         {
-          "id": "84eebc99-9c0b-4ef8-bb6d-6bb9bd380d05",
-          "name": "Growth Metrics Collection",
+          "id": "80eebc99-9c0b-4ef8-bb6d-6bb9bd380d01",
+          "name": "Tree Tagging & GPS Mapping",
           "order_index": 0,
-          "requires_approval": false,
-          "form": {
-            "id": "64eebc99-9c0b-4ef8-bb6d-6bb9bd380b05",
-            "name": "Annual Growth Metrics",
-            "schema": {
-              "type": "object",
-              "required": [
-                "height_increase_cm",
-                "frond_production",
-                "health_maintained",
-                "measurement_date"
-              ],
-              "properties": {
-                "fruiting_status": {
-                  "type": "boolean"
-                },
-                "frond_production": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "measurement_date": {
-                  "type": "string",
-                  "format": "date"
-                },
-                "health_maintained": {
-                  "type": "boolean"
-                },
-                "flowering_observed": {
-                  "type": "boolean"
-                },
-                "height_increase_cm": {
-                  "type": "number",
-                  "minimum": 0
-                }
-              }
-            }
-          },
-          "submission_count": 0
+          "requires_approval": true
         },
         {
-          "id": "85eebc99-9c0b-4ef8-bb6d-6bb9bd380d06",
-          "name": "Field Health Inspection",
+          "id": "81eebc99-9c0b-4ef8-bb6d-6bb9bd380d02",
+          "name": "Genetic Background Documentation",
           "order_index": 1,
-          "requires_approval": true,
-          "form": {
-            "id": "66eebc99-9c0b-4ef8-bb6d-6bb9bd380b07",
-            "name": "Field Inspection Report",
-            "schema": {
-              "type": "object",
-              "required": [
-                "plot_condition",
-                "plant_health",
-                "pest_control",
-                "overall_rating"
-              ],
-              "properties": {
-                "pest_control": {
-                  "type": "number",
-                  "maximum": 10,
-                  "minimum": 1
-                },
-                "plant_health": {
-                  "type": "number",
-                  "maximum": 10,
-                  "minimum": 1
-                },
-                "overall_rating": {
-                  "enum": [
-                    "excellent",
-                    "good",
-                    "satisfactory",
-                    "needs_improvement",
-                    "unsatisfactory"
-                  ],
-                  "type": "string"
-                },
-                "plot_condition": {
-                  "type": "number",
-                  "maximum": 10,
-                  "minimum": 1
-                },
-                "irrigation_status": {
-                  "type": "number",
-                  "maximum": 10,
-                  "minimum": 1
-                },
-                "deficiencies_found": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "submission_count": 0
+          "requires_approval": false
         },
         {
-          "id": "86eebc99-9c0b-4ef8-bb6d-6bb9bd380d07",
-          "name": "Annual Performance Review",
+          "id": "82eebc99-9c0b-4ef8-bb6d-6bb9bd380d03",
+          "name": "Field Condition Assessment",
           "order_index": 2,
-          "requires_approval": false,
-          "form": {
-            "id": "65eebc99-9c0b-4ef8-bb6d-6bb9bd380b06",
-            "name": "Annual Performance Report",
-            "schema": {
-              "type": "object",
-              "required": [
-                "growth_performance",
-                "review_date"
-              ],
-              "properties": {
-                "review_date": {
-                  "type": "string",
-                  "format": "date"
-                },
-                "recommendations": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "fruit_bunch_count": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "growth_performance": {
-                  "enum": [
-                    "excellent",
-                    "good",
-                    "fair",
-                    "poor"
-                  ],
-                  "type": "string"
-                },
-                "oil_yield_estimate": {
-                  "type": "number",
-                  "minimum": 0
-                }
-              }
-            }
-          },
-          "submission_count": 0
+          "requires_approval": true
+        },
+        {
+          "id": "83eebc99-9c0b-4ef8-bb6d-6bb9bd380d04",
+          "name": "Registration Completion",
+          "order_index": 3,
+          "requires_approval": false
         }
       ],
-      "started_at": "2025-10-07T10:29:49.048311+07:00",
-      "completed_at": "2025-12-01T10:29:49.048311+07:00",
-      "created_at": "2025-10-07T10:29:49.048311+07:00",
-      "updated_at": "2025-12-01T10:29:49.048311+07:00"
+      "entity_types": [
+        {
+          "id": "10eebc99-9c0b-4ef8-bb6d-6bb9bd380a40",
+          "name": "Oil Palm Tree",
+          "prefix": "TREE",
+          "color": "red",
+          "icon": "trees"
+        },
+        {
+          "id": "11eebc99-9c0b-4ef8-bb6d-6bb9bd380a41",
+          "name": "Palm Inflorescence",
+          "prefix": "INFL",
+          "color": "blue",
+          "icon": "trees"
+        },
+        {
+          "id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
+          "name": "Pollen Sample",
+          "prefix": "POLN",
+          "color": "green",
+          "icon": "trees"
+        },
+        {
+          "id": "13eebc99-9c0b-4ef8-bb6d-6bb9bd380a43",
+          "name": "Palm Seed",
+          "prefix": "SEED",
+          "color": "yellow",
+          "icon": "trees"
+        }
+      ],
+      "created_at": "2025-07-09T10:29:49.048311+07:00",
+      "updated_at": "2025-07-09T10:29:49.048311+07:00"
     }
-  ]
-}
-
-
-GET /workflow-records/{workflow_record_id}/steps/{step_id}/submissions
-
-Workflow Record ID can be retrieved from the above endpoint
-
-Response body:
-{
-  "success": true,
-  "message": "Workflow details retrieved successfully",
-  "data": [
-  {
-    "id": "submission_uuid", 
-    "workflow_record_id": "record_uuid",
-    "step_id": "step_uuid",
-    "form_name": "Onboarding Form",
-    "data": { /* JSON data */ },
-    "status": "approved",
-    "submitted_by": {
-      "id": "user_uuid",
-      "username": "john.doe"
-    },
-    "reviewed_by": {
-      "id": "user_uuid",
-      "username": "admin"
-    },
-    "submitted_at": "2025-01-01T10:00:00Z",
-    "created_at": "...",
-    "updated_at": "..."
+  ],
+  "meta": {
+    "page": 1,
+    "size": 2,
+    "total_items": 1,
+    "total_pages": 1
   }
-]
 }
+
+GET /entity-types/options, the implementation of the query and service should exists. Use this to show the available options for entity type filter. Also integrate the pagination also
+
+You can refer to the existing list page such as entities and entity types to understand the implementation. 

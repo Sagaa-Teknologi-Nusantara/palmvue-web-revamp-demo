@@ -1,10 +1,4 @@
-export interface EntityTypeRef {
-  id: string;
-  name: string;
-  prefix: string;
-  icon: string;
-  color: string;
-}
+import { EntityTypeRef } from "./entity-type";
 
 export interface EntityRef {
   id: string;

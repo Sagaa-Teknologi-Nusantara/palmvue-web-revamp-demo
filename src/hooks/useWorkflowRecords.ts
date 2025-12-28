@@ -75,13 +75,19 @@ export function useWorkflowRecords() {
 
           const now = new Date().toISOString();
           const requiresApproval = currentStep.requires_approval;
+          const mockUserId = "mock-user-001";
           const newSubmission: StepSubmission = {
             id: crypto.randomUUID(),
+            workflow_record_id: recordId,
             step_id: stepId,
+            form_name: currentStep.form?.name || "Form",
             data,
             submitted_at: now,
-            submitted_by: "Current User", // TODO: Replace with actual user
+            submitted_by_id: mockUserId,
+            submitted_by: { id: mockUserId, username: "Current User" },
             status: requiresApproval ? "pending" : "submitted",
+            created_at: now,
+            updated_at: now,
           };
 
           // Find next step

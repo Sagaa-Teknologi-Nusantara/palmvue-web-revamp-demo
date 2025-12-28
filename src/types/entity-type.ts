@@ -12,6 +12,14 @@ export interface EntityType {
   updated_at: string;
 }
 
+export interface EntityTypeRef {
+  id: string;
+  name: string;
+  prefix: string;
+  icon: string;
+  color: string;
+}
+
 export interface CreateEntityTypeInput {
   name: string;
   description: string;

@@ -1,4 +1,37 @@
-import type { WorkflowRecord } from "@/types";
+import type { StepSubmission, WorkflowRecord } from "@/types";
+
+// Helper to create mock step submissions
+function createMockSubmission(
+  id: string,
+  stepId: string,
+  data: Record<string, unknown>,
+  submittedAt: string,
+  submittedById: string,
+  submittedByUsername: string,
+  status: StepSubmission["status"],
+  reviewedAt?: string,
+  reviewedById?: string,
+  reviewedByUsername?: string,
+): StepSubmission {
+  return {
+    id,
+    workflow_record_id: "", // Will be set by parent
+    step_id: stepId,
+    form_name: "Mock Form",
+    data,
+    status,
+    submitted_by_id: submittedById,
+    submitted_by: { id: submittedById, username: submittedByUsername },
+    submitted_at: submittedAt,
+    ...(reviewedAt && { reviewed_at: reviewedAt }),
+    ...(reviewedById && {
+      reviewed_by_id: reviewedById,
+      reviewed_by: { id: reviewedById, username: reviewedByUsername || "" },
+    }),
+    created_at: submittedAt,
+    updated_at: reviewedAt || submittedAt,
+  };
+}
 
 export const mockWorkflowRecords: WorkflowRecord[] = [
   // Tree 001 - Completed assessment
@@ -11,48 +44,53 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     current_step: null,
     status: "completed",
     step_submissions: [
-      {
-        id: "sub-001-1",
-        step_id: "step-initial-check",
-        data: {
+      createMockSubmission(
+        "sub-001-1",
+        "step-initial-check",
+        {
           condition: "good",
           visualIssues: "None observed",
           notes: "Tree looks healthy",
         },
-        submitted_at: "2024-03-10T10:00:00Z",
-        submitted_by: "John Smith",
-        status: "approved",
-        reviewed_at: "2024-03-10T10:30:00Z",
-        reviewed_by: "Manager A",
-      },
-      {
-        id: "sub-001-2",
-        step_id: "step-detailed-assessment",
-        data: {
+        "2024-03-10T10:00:00Z",
+        "user-001",
+        "John Smith",
+        "approved",
+        "2024-03-10T10:30:00Z",
+        "user-mgr-001",
+        "Manager A",
+      ),
+      createMockSubmission(
+        "sub-001-2",
+        "step-detailed-assessment",
+        {
           trunkCondition: "healthy",
           crownCondition: "healthy",
           pestPresence: false,
           estimatedYield: 45,
         },
-        submitted_at: "2024-03-10T11:30:00Z",
-        submitted_by: "John Smith",
-        status: "approved",
-        reviewed_at: "2024-03-10T12:00:00Z",
-        reviewed_by: "Manager A",
-      },
-      {
-        id: "sub-001-3",
-        step_id: "step-final-review",
-        data: {
+        "2024-03-10T11:30:00Z",
+        "user-001",
+        "John Smith",
+        "approved",
+        "2024-03-10T12:00:00Z",
+        "user-mgr-001",
+        "Manager A",
+      ),
+      createMockSubmission(
+        "sub-001-3",
+        "step-final-review",
+        {
           recommendation: "no_action",
           priority: "low",
           followUpDate: "2024-09-10",
           summary: "Tree is in excellent condition. No action required.",
         },
-        submitted_at: "2024-03-10T14:00:00Z",
-        submitted_by: "John Smith",
-        status: "submitted",
-      },
+        "2024-03-10T14:00:00Z",
+        "user-001",
+        "John Smith",
+        "submitted",
+      ),
     ],
     started_at: "2024-03-10T10:00:00Z",
     completed_at: "2024-03-10T14:00:00Z",
@@ -73,20 +111,22 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     },
     status: "in_progress",
     step_submissions: [
-      {
-        id: "sub-002-1",
-        step_id: "step-initial-check",
-        data: {
+      createMockSubmission(
+        "sub-002-1",
+        "step-initial-check",
+        {
           condition: "fair",
           visualIssues: "Some yellowing on leaves",
           notes: "Needs closer inspection",
         },
-        submitted_at: "2024-03-12T09:30:00Z",
-        submitted_by: "Jane Doe",
-        status: "approved",
-        reviewed_at: "2024-03-12T10:00:00Z",
-        reviewed_by: "Manager B",
-      },
+        "2024-03-12T09:30:00Z",
+        "user-002",
+        "Jane Doe",
+        "approved",
+        "2024-03-12T10:00:00Z",
+        "user-mgr-002",
+        "Manager B",
+      ),
     ],
     started_at: "2024-03-12T09:30:00Z",
     completed_at: null,
@@ -117,7 +157,10 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     id: "wr-004",
     entity_id: "ent-equip-002",
     workflow_id: "wf-equipment-maintenance",
-    workflow: { id: "wf-equipment-maintenance", name: "Equipment Maintenance" },
+    workflow: {
+      id: "wf-equipment-maintenance",
+      name: "Equipment Maintenance",
+    },
     current_step_id: "step-maintenance-work",
     current_step: {
       id: "step-maintenance-work",
@@ -126,18 +169,19 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     },
     status: "in_progress",
     step_submissions: [
-      {
-        id: "sub-004-1",
-        step_id: "step-pre-inspection",
-        data: {
+      createMockSubmission(
+        "sub-004-1",
+        "step-pre-inspection",
+        {
           operatingHours: 1250,
           visualCondition: "wear",
           fluidLevels: "low",
         },
-        submitted_at: "2024-03-15T08:00:00Z",
-        submitted_by: "Tech Mike",
-        status: "submitted",
-      },
+        "2024-03-15T08:00:00Z",
+        "user-003",
+        "Tech Mike",
+        "submitted",
+      ),
     ],
     started_at: "2024-03-15T08:00:00Z",
     completed_at: null,
@@ -154,76 +198,83 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     current_step: null,
     status: "completed",
     step_submissions: [
-      {
-        id: "sub-005-1",
-        step_id: "step-boundary-check",
-        data: {
+      createMockSubmission(
+        "sub-005-1",
+        "step-boundary-check",
+        {
           boundaryIntact: true,
           fencingCondition: "good",
           accessPoints: 2,
         },
-        submitted_at: "2024-03-08T09:00:00Z",
-        submitted_by: "Field Agent A",
-        status: "approved",
-        reviewed_at: "2024-03-08T09:30:00Z",
-        reviewed_by: "Supervisor X",
-      },
-      // Example of rejection + resubmission for step-soil-analysis
-      {
-        id: "sub-005-2a",
-        step_id: "step-soil-analysis",
-        data: {
+        "2024-03-08T09:00:00Z",
+        "user-004",
+        "Field Agent A",
+        "approved",
+        "2024-03-08T09:30:00Z",
+        "user-sup-001",
+        "Supervisor X",
+      ),
+      createMockSubmission(
+        "sub-005-2a",
+        "step-soil-analysis",
+        {
           phLevel: 5.2,
           moistureLevel: "low",
           nutrientStatus: "poor",
         },
-        submitted_at: "2024-03-08T10:00:00Z",
-        submitted_by: "Field Agent A",
-        status: "rejected",
-        reviewed_at: "2024-03-08T10:30:00Z",
-        reviewed_by: "Supervisor X",
-        rejection_reason: "pH level seems incorrect, please re-measure",
-      },
-      {
-        id: "sub-005-2b",
-        step_id: "step-soil-analysis",
-        data: {
+        "2024-03-08T10:00:00Z",
+        "user-004",
+        "Field Agent A",
+        "rejected",
+        "2024-03-08T10:30:00Z",
+        "user-sup-001",
+        "Supervisor X",
+      ),
+      createMockSubmission(
+        "sub-005-2b",
+        "step-soil-analysis",
+        {
           phLevel: 6.8,
           moistureLevel: "optimal",
           nutrientStatus: "adequate",
         },
-        submitted_at: "2024-03-08T11:00:00Z",
-        submitted_by: "Field Agent A",
-        status: "approved",
-        reviewed_at: "2024-03-08T11:30:00Z",
-        reviewed_by: "Supervisor X",
-      },
-      {
-        id: "sub-005-3",
-        step_id: "step-vegetation-survey",
-        data: {
+        "2024-03-08T11:00:00Z",
+        "user-004",
+        "Field Agent A",
+        "approved",
+        "2024-03-08T11:30:00Z",
+        "user-sup-001",
+        "Supervisor X",
+      ),
+      createMockSubmission(
+        "sub-005-3",
+        "step-vegetation-survey",
+        {
           treeCount: 45,
           weedPresence: "light",
           diseaseIndicators: false,
         },
-        submitted_at: "2024-03-08T14:00:00Z",
-        submitted_by: "Field Agent A",
-        status: "approved",
-        reviewed_at: "2024-03-08T14:30:00Z",
-        reviewed_by: "Supervisor X",
-      },
-      {
-        id: "sub-005-4",
-        step_id: "step-report-generation",
-        data: {
+        "2024-03-08T14:00:00Z",
+        "user-004",
+        "Field Agent A",
+        "approved",
+        "2024-03-08T14:30:00Z",
+        "user-sup-001",
+        "Supervisor X",
+      ),
+      createMockSubmission(
+        "sub-005-4",
+        "step-report-generation",
+        {
           overallRating: "good",
           recommendations: "Continue current maintenance schedule",
           nextInspectionDate: "2024-06-08",
         },
-        submitted_at: "2024-03-08T16:00:00Z",
-        submitted_by: "Field Agent A",
-        status: "submitted",
-      },
+        "2024-03-08T16:00:00Z",
+        "user-004",
+        "Field Agent A",
+        "submitted",
+      ),
     ],
     started_at: "2024-03-08T09:00:00Z",
     completed_at: "2024-03-08T16:00:00Z",
