@@ -20,6 +20,7 @@ export const ENDPOINTS = {
   },
   WORKFLOWS: {
     LIST: "/workflows",
+    CREATE: "/workflows",
     OPTIONS: "/workflows/options",
     DELETE: (id: string) => `/workflows/${id}`,
   },

@@ -2,10 +2,11 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Edit2, FileText, GripVertical, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, Edit2, Trash2, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
 
 interface StepCardProps {

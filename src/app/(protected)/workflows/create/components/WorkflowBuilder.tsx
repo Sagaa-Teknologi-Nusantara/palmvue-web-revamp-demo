@@ -1,47 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from "@dnd-kit/modifiers";
-import { useForm } from "react-hook-form";
+import { DragEndEvent } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { PlayCircle, Repeat, Zap } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
+import { z } from "zod";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,13 +19,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { StepCard } from "./StepCard";
-import { StepEditModal, type StepData } from "./StepEditModal";
-import { Plus, PlayCircle, Split } from "lucide-react";
-import type { CreateWorkflowInput } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import type {
+  CreateWorkflowInput,
+  OnCompleteAction,
+  StartWorkflowConfig,
+} from "@/types";
+
+import { EntityTypePicker } from "./EntityTypePicker";
+import { OnCompleteActionsEditor } from "./OnCompleteActionsEditor";
+import { type StepData, StepEditModal } from "./StepEditModal";
+import { StepsList } from "./StepsList";
 
 const workflowSchema = z.object({
   name: z.string().min(1, "Workflow name is required"),
+  isAutoStart: z.boolean(),
+  isLoopable: z.boolean(),
 });
 
 interface WorkflowBuilderProps {
@@ -71,18 +59,22 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
   const [editingStep, setEditingStep] = useState<StepData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteStepId, setDeleteStepId] = useState<string | null>(null);
+  const [selectedEntityTypeIds, setSelectedEntityTypeIds] = useState<string[]>(
+    [],
+  );
+  const [onCompleteActions, setOnCompleteActions] = useState<
+    OnCompleteAction[]
+  >([]);
+  const [modalKey, setModalKey] = useState(0);
 
   const form = useForm({
     resolver: zodResolver(workflowSchema),
-    defaultValues: { name: "" },
+    defaultValues: {
+      name: "",
+      isAutoStart: false,
+      isLoopable: false,
+    },
   });
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -98,11 +90,13 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
 
   const handleAddStep = () => {
     setEditingStep(null);
+    setModalKey((prev) => prev + 1);
     setIsModalOpen(true);
   };
 
   const handleEditStep = (step: StepData) => {
     setEditingStep(step);
+    setModalKey((prev) => prev + 1);
     setIsModalOpen(true);
   };
 
@@ -123,21 +117,56 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
     }
   };
 
-  const handleSubmit = (values: { name: string }) => {
+  const handleEntityTypeIdsChange = (newIds: string[]) => {
+    setSelectedEntityTypeIds(newIds);
+
+    setOnCompleteActions((prev) =>
+      prev.map((action) => {
+        if (action.type === "start_workflow") {
+          const config = action.config as StartWorkflowConfig;
+          if (
+            config.entity_type_id &&
+            !newIds.includes(config.entity_type_id)
+          ) {
+            return {
+              ...action,
+              config: {
+                ...config,
+                entity_type_id: "",
+                workflow_id: "",
+              },
+            };
+          }
+        }
+        return action;
+      }),
+    );
+  };
+
+  const handleSubmit = (values: {
+    name: string;
+    isAutoStart: boolean;
+    isLoopable: boolean;
+  }) => {
     if (steps.length === 0) {
       return;
     }
 
     const workflowData: CreateWorkflowInput = {
       name: values.name,
+      entity_type_ids: selectedEntityTypeIds,
+      is_auto_start: values.isAutoStart,
+      is_loopable: values.isLoopable,
       steps: steps.map((step, index) => ({
         name: step.name,
         order_index: index,
+        requires_approval: step.requiresApproval,
         form: {
           name: step.formName,
           schema: step.formSchema,
         },
       })),
+      on_complete: onCompleteActions,
     };
 
     onSubmit(workflowData);
@@ -159,7 +188,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                     Details
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <FormField
                     control={form.control}
                     name="name"
@@ -180,6 +209,63 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                     )}
                   />
 
+                  {/* Entity Type Multi-Select */}
+                  <EntityTypePicker
+                    selectedIds={selectedEntityTypeIds}
+                    onChange={handleEntityTypeIdsChange}
+                  />
+
+                  {/* Toggles */}
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="isAutoStart"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel className="flex items-center gap-2">
+                              <Zap className="text-muted-foreground h-4 w-4" />
+                              Auto Start
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Automatically start when entity is created.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="isLoopable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel className="flex items-center gap-2">
+                              <Repeat className="text-muted-foreground h-4 w-4" />
+                              Loopable
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                              Allow workflow to restart after completion.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <div className="flex flex-col gap-3 pt-4">
                     <Button
                       type="submit"
@@ -199,88 +285,32 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* On Complete Actions */}
+              <OnCompleteActionsEditor
+                value={onCompleteActions}
+                onChange={setOnCompleteActions}
+                assignedEntityTypeIds={selectedEntityTypeIds}
+                steps={steps}
+              />
             </div>
 
             {/* Right Column: Steps */}
             <div className="md:col-span-3">
-              <Card className="md:bg-card h-full border-none bg-transparent shadow-none md:border md:shadow-sm">
-                <CardHeader className="px-0 md:px-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <span className="bg-primary/10 text-primary rounded-md p-1.5">
-                          <Split className="h-4 w-4" />
-                        </span>
-                        Workflow Steps
-                      </CardTitle>
-                      <CardDescription className="mt-1">
-                        Drag and drop to reorder steps
-                      </CardDescription>
-                    </div>
-                    <Button type="button" size="sm" onClick={handleAddStep}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Step
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-0 pt-0 md:px-6">
-                  {steps.length === 0 ? (
-                    <div className="border-border bg-muted/20 rounded-lg border-2 border-dashed py-12 text-center">
-                      <p className="text-muted-foreground mb-4 text-sm">
-                        No steps added yet. Start building your workflow.
-                      </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleAddStep}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add First Step
-                      </Button>
-                    </div>
-                  ) : (
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                      modifiers={[
-                        restrictToVerticalAxis,
-                        restrictToWindowEdges,
-                      ]}
-                    >
-                      <SortableContext
-                        items={steps.map((s) => s.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <div className="space-y-6 pt-4">
-                          {steps.map((step, index) => (
-                            <div key={step.id} className="group relative">
-                              {/* Timeline Line */}
-                              {index !== steps.length - 1 && (
-                                <div className="bg-border absolute top-10 -bottom-6 left-[1.15rem] w-0.5" />
-                              )}
-                              <StepCard
-                                id={step.id}
-                                name={step.name}
-                                formName={step.formName}
-                                order={index}
-                                onEdit={() => handleEditStep(step)}
-                                onDelete={() => setDeleteStepId(step.id)}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </SortableContext>
-                    </DndContext>
-                  )}
-                </CardContent>
-              </Card>
+              <StepsList
+                steps={steps}
+                onDragEnd={handleDragEnd}
+                onAddStep={handleAddStep}
+                onEditStep={handleEditStep}
+                onDeleteStep={setDeleteStepId}
+              />
             </div>
           </div>
         </form>
       </Form>
 
       <StepEditModal
+        key={modalKey}
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveStep}

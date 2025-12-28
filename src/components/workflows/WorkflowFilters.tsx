@@ -1,9 +1,8 @@
 "use client";
 
-import { ChevronDown, Filter, Search, X } from "lucide-react";
+import { ChevronDown, Filter, Search } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";

@@ -1,5 +1,6 @@
 export * from "./useCreateEntityMutation";
 export * from "./useCreateEntityTypeMutation";
+export * from "./useCreateWorkflowMutation";
 export * from "./useDeleteEntityMutation";
 export * from "./useDeleteEntityTypeMutation";
 export * from "./useDeleteWorkflowMutation";

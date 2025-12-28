@@ -1,18 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { WorkflowBuilder } from "@/components/workflows";
-import { useWorkflows } from "@/hooks";
 import { GitBranch } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 import { Separator } from "@/components/ui/separator";
+import { useCreateWorkflowMutation } from "@/hooks/queries";
+import type { CreateWorkflowInput } from "@/types";
+
+import { WorkflowBuilder } from "./components";
 
 export default function CreateWorkflowPage() {
   const router = useRouter();
-  const { create } = useWorkflows();
+  const createMutation = useCreateWorkflowMutation();
 
-  const handleSubmit = (data: Parameters<typeof create>[0]) => {
-    create(data);
-    router.push("/workflows");
+  const handleSubmit = (data: CreateWorkflowInput) => {
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        router.push("/workflows");
+      },
+    });
   };
 
   return (

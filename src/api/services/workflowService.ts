@@ -1,4 +1,9 @@
-import type { WorkflowListItem, WorkflowOption } from "@/types";
+import type {
+  CreateWorkflowInput,
+  Workflow,
+  WorkflowListItem,
+  WorkflowOption,
+} from "@/types";
 
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
@@ -33,9 +38,19 @@ export const workflowService = {
     };
   },
 
-  getOptions: async (): Promise<WorkflowOption[]> => {
+  getOptions: async (entityTypeId?: string): Promise<WorkflowOption[]> => {
+    const params = entityTypeId ? { entity_type_id: entityTypeId } : {};
     const response = await apiClient.get<ApiResponse<WorkflowOption[]>>(
       ENDPOINTS.WORKFLOWS.OPTIONS,
+      { params },
+    );
+    return response.data.data;
+  },
+
+  create: async (data: CreateWorkflowInput): Promise<Workflow> => {
+    const response = await apiClient.post<ApiResponse<Workflow>>(
+      ENDPOINTS.WORKFLOWS.CREATE,
+      data,
     );
     return response.data.data;
   },

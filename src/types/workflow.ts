@@ -52,9 +52,35 @@ export interface WorkflowOption {
   is_auto_start: boolean;
 }
 
+export type CompletionActionType = "create_entities" | "start_workflow";
+export type CountSourceType = "fixed" | "submission_field";
+
+export interface CountSource {
+  type: CountSourceType;
+  step_order?: number;
+  field_path?: string;
+  value: number;
+}
+
+export interface CreateEntitiesConfig {
+  entity_type_id: string;
+  count_source: CountSource;
+}
+
+export interface StartWorkflowConfig {
+  workflow_id: string;
+  entity_type_id: string;
+}
+
+export interface OnCompleteAction {
+  type: CompletionActionType;
+  config: CreateEntitiesConfig | StartWorkflowConfig;
+}
+
 export interface CreateStepInput {
   name: string;
   order_index: number;
+  requires_approval: boolean;
   form: {
     name: string;
     schema: JSONSchema;
@@ -63,7 +89,11 @@ export interface CreateStepInput {
 
 export interface CreateWorkflowInput {
   name: string;
+  entity_type_ids: string[];
+  is_auto_start: boolean;
+  is_loopable: boolean;
   steps: CreateStepInput[];
+  on_complete: OnCompleteAction[];
 }
 
 export interface UpdateWorkflowInput {
