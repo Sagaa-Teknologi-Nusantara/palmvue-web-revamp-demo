@@ -100,7 +100,7 @@ export function OnCompleteActionsEditor({
           <Button
             type="button"
             size="sm"
-            variant="outline"
+            variant="ghost"
             onClick={handleAddAction}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -113,9 +113,15 @@ export function OnCompleteActionsEditor({
       </CardHeader>
       <CardContent className="space-y-4">
         {value.length === 0 ? (
-          <div className="border-border bg-muted/20 rounded-lg border-2 border-dashed py-8 text-center">
-            <p className="text-muted-foreground text-sm">
-              No completion actions configured.
+          <div className="border-border bg-card rounded-lg border-2 border-dashed py-8 text-center">
+            <div className="bg-muted/50 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+              <Workflow className="text-muted-foreground h-6 w-6 opacity-50" />
+            </div>
+            <p className="text-muted-foreground font-medium">
+              No actions defined
+            </p>
+            <p className="text-muted-foreground text-xs">
+              Add actions to trigger automation when this workflow completes.
             </p>
           </div>
         ) : (
@@ -170,43 +176,44 @@ function ActionCard({
   onTypeChange,
 }: ActionCardProps) {
   return (
-    <div className="bg-muted/30 relative rounded-lg border p-4">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="text-muted-foreground hover:text-destructive absolute top-2 right-2 h-8 w-8 p-0"
-        onClick={onRemove}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-
-      <div className="space-y-4 pr-10">
-        <div className="flex items-center gap-4">
-          <div className="text-muted-foreground bg-muted flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium">
+    <div className="bg-card relative rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
             {index + 1}
           </div>
           <Select value={action.type} onValueChange={onTypeChange}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="h-8 w-48 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="create_entities">
                 <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
+                  <Package className="h-3 w-3" />
                   Create Entities
                 </div>
               </SelectItem>
               <SelectItem value="start_workflow">
                 <div className="flex items-center gap-2">
-                  <Workflow className="h-4 w-4" />
+                  <Workflow className="h-3 w-3" />
                   Start Workflow
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-destructive h-8 w-8"
+          onClick={onRemove}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
 
+      <div className="pl-9">
         {action.type === "create_entities" ? (
           <CreateEntitiesForm
             config={action.config as CreateEntitiesConfig}
@@ -268,7 +275,7 @@ function CreateEntitiesForm({
   );
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4">
       <div className="space-y-2">
         <Label>Entity Type</Label>
         <Select
@@ -326,101 +333,119 @@ function CreateEntitiesForm({
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label>Count Source</Label>
-        <Select
-          value={config.count_source.type}
-          onValueChange={handleCountSourceTypeChange}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="fixed">Fixed Value</SelectItem>
-            <SelectItem value="submission_field">From Field</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Count Source</Label>
+          <Select
+            value={config.count_source.type}
+            onValueChange={handleCountSourceTypeChange}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="fixed">Fixed Value</SelectItem>
+              <SelectItem value="submission_field">From Field</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="space-y-2">
-        <Label>
-          {config.count_source.type === "fixed" ? "Count" : "Default Value"}
-        </Label>
-        <Input
-          type="number"
-          min={1}
-          value={config.count_source.value}
-          onChange={(e) =>
-            onUpdate({
-              ...config,
-              count_source: {
-                ...config.count_source,
-                value: parseInt(e.target.value) || 1,
-              },
-            })
-          }
-        />
+        <div className="space-y-2">
+          <Label>
+            {config.count_source.type === "fixed" ? "Count" : "Default Value"}
+          </Label>
+          <Input
+            type="number"
+            min={1}
+            value={config.count_source.value}
+            onChange={(e) =>
+              onUpdate({
+                ...config,
+                count_source: {
+                  ...config.count_source,
+                  value: parseInt(e.target.value) || 1,
+                },
+              })
+            }
+          />
+        </div>
       </div>
 
       {config.count_source.type === "submission_field" && (
         <>
-          <div className="space-y-2">
-            <Label>Step</Label>
-            <Select
-              value={config.count_source.step_order?.toString() ?? ""}
-              onValueChange={(v) =>
-                onUpdate({
-                  ...config,
-                  count_source: {
-                    ...config.count_source,
-                    step_order: parseInt(v),
-                    field_path: undefined,
-                  },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select step" />
-              </SelectTrigger>
-              <SelectContent>
-                {steps.map((step, idx) => (
-                  <SelectItem key={step.id} value={idx.toString()}>
-                    Step {idx + 1}: {step.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {config.count_source.step_order !== undefined && (
-            <div className="space-y-2">
-              <Label>Integer Field</Label>
-              <Select
-                value={config.count_source.field_path ?? ""}
-                onValueChange={(v) =>
-                  onUpdate({
-                    ...config,
-                    count_source: {
-                      ...config.count_source,
-                      field_path: v,
-                    },
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select field" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getIntegerFields(config.count_source.step_order).map(
-                    (field) => (
-                      <SelectItem key={field} value={field}>
-                        {field}
+          {steps.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No steps available in this workflow to pick from. Please add steps
+              first.
+            </p>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label>Step</Label>
+                <Select
+                  value={config.count_source.step_order?.toString() ?? ""}
+                  onValueChange={(v) =>
+                    onUpdate({
+                      ...config,
+                      count_source: {
+                        ...config.count_source,
+                        step_order: parseInt(v),
+                        field_path: undefined,
+                      },
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select step" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {steps.map((step, idx) => (
+                      <SelectItem key={step.id} value={idx.toString()}>
+                        Step {idx + 1}: {step.name}
                       </SelectItem>
-                    ),
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {config.count_source.step_order !== undefined && (
+                <div className="space-y-2">
+                  <Label>Integer Field</Label>
+                  {getIntegerFields(config.count_source.step_order).length ===
+                  0 ? (
+                    <p className="text-muted-foreground text-sm">
+                      This step has no integer/number fields.
+                    </p>
+                  ) : (
+                    <Select
+                      value={config.count_source.field_path ?? ""}
+                      onValueChange={(v) =>
+                        onUpdate({
+                          ...config,
+                          count_source: {
+                            ...config.count_source,
+                            field_path: v,
+                          },
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getIntegerFields(config.count_source.step_order).map(
+                          (field) => (
+                            <SelectItem key={field} value={field}>
+                              {field}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
                   )}
-                </SelectContent>
-              </Select>
-            </div>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
@@ -459,7 +484,7 @@ function StartWorkflowForm({
   );
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4">
       <div className="space-y-2">
         <Label>Entity Type</Label>
         {entityTypes.length === 0 ? (

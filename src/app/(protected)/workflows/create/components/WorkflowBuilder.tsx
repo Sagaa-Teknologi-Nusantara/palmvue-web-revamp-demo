@@ -19,7 +19,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -39,6 +38,7 @@ import type {
 } from "@/types";
 
 import { EntityTypePicker } from "./EntityTypePicker";
+import { FormFooter } from "./FormFooter";
 import { OnCompleteActionsEditor } from "./OnCompleteActionsEditor";
 import { type StepData, StepEditModal } from "./StepEditModal";
 import { StepsList } from "./StepsList";
@@ -265,24 +265,6 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                       )}
                     />
                   </div>
-
-                  <div className="flex flex-col gap-3 pt-4">
-                    <Button
-                      type="submit"
-                      disabled={steps.length === 0}
-                      className="w-full"
-                    >
-                      Create Workflow
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={onCancel}
-                      className="w-full"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -306,6 +288,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
               />
             </div>
           </div>
+          <FormFooter onCancel={onCancel} isDisabled={steps.length === 0} />
         </form>
       </Form>
 
