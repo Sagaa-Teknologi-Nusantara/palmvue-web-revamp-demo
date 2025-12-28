@@ -13,10 +13,16 @@ export const ENDPOINTS = {
   ENTITIES: {
     LIST: "/entities",
     CREATE: "/entities",
+    DETAIL: (id: string) => `/entities/${id}`,
     DELETE: (id: string) => `/entities/${id}`,
     OPTIONS: "/entities/options",
+    WORKFLOW_DETAILS: (id: string) => `/entities/${id}/workflows`,
   },
   WORKFLOWS: {
     OPTIONS: "/workflows/options",
+  },
+  WORKFLOW_RECORDS: {
+    STEP_SUBMISSIONS: (recordId: string, stepId: string) =>
+      `/workflow-records/${recordId}/steps/${stepId}/submissions`,
   },
 } as const;

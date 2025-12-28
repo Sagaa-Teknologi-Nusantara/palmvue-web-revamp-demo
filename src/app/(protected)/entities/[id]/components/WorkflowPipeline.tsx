@@ -1,46 +1,67 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+
 import { cn } from "@/lib/cn";
-import { StepDetailModal } from "./StepDetailModal";
-import type { WorkflowRecord, WorkflowStep, StepSubmission } from "@/types";
-import { useWorkflowRecords } from "@/hooks";
+import type { EntityWorkflowDetail, EntityWorkflowStep } from "@/types";
+
+import { FormSchemaModal } from "./FormSchemaModal";
+import { SubmissionListModal } from "./SubmissionListModal";
 
 interface WorkflowPipelineProps {
-  workflowRecord: WorkflowRecord;
+  workflowDetail: EntityWorkflowDetail;
 }
 
-export function WorkflowPipeline({ workflowRecord }: WorkflowPipelineProps) {
-  const { getWorkflowSteps, getStepSubmission } = useWorkflowRecords();
-  const [selectedStep, setSelectedStep] = useState<{
-    step: WorkflowStep;
-    status: "completed" | "current" | "pending";
-    submission: StepSubmission | null;
+export function WorkflowPipeline({ workflowDetail }: WorkflowPipelineProps) {
+  const [formSchemaStep, setFormSchemaStep] =
+    useState<EntityWorkflowStep | null>(null);
+  const [submissionStep, setSubmissionStep] = useState<{
+    step: EntityWorkflowStep;
   } | null>(null);
 
-  const steps = getWorkflowSteps(workflowRecord.id).sort(
+  const steps = [...workflowDetail.steps].sort(
     (a, b) => a.order_index - b.order_index,
   );
 
-  const getStepStatus = (
-    step: WorkflowStep,
-  ): "completed" | "current" | "pending" => {
-    const submission = getStepSubmission(workflowRecord.id, step.id);
-    if (submission) return "completed";
+  const currentStepIndex = workflowDetail.current_step_id
+    ? steps.findIndex((s) => s.id === workflowDetail.current_step_id)
+    : -1;
 
-    if (workflowRecord.current_step_id === step.id) return "current";
-    if (workflowRecord.status === "completed" && !submission) {
+  const getStepStatus = (
+    step: EntityWorkflowStep,
+    stepIndex: number,
+  ): "completed" | "current" | "pending" => {
+    if (workflowDetail.status === "completed") {
+      return "completed";
+    }
+
+    if (step.submission_count > 0) {
+      return "completed";
+    }
+
+    if (workflowDetail.current_step_id === step.id) {
+      return "current";
+    }
+
+    if (currentStepIndex >= 0 && stepIndex < currentStepIndex) {
       return "completed";
     }
 
     return "pending";
   };
 
-  const handleStepClick = (step: WorkflowStep) => {
-    const status = getStepStatus(step);
-    const submission = getStepSubmission(workflowRecord.id, step.id);
-    setSelectedStep({ step, status, submission });
+  const handleStepClick = (step: EntityWorkflowStep, stepIndex: number) => {
+    const status = getStepStatus(step, stepIndex);
+    const hasSubmissions = step.submission_count > 0;
+
+    // Show SubmissionListModal for completed steps or steps with submissions
+    if (status === "completed" || hasSubmissions) {
+      setSubmissionStep({ step });
+    } else {
+      // Show FormSchemaModal for pending/current steps with no submissions
+      setFormSchemaStep(step);
+    }
   };
 
   return (
@@ -48,13 +69,13 @@ export function WorkflowPipeline({ workflowRecord }: WorkflowPipelineProps) {
       <div className="scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-muted w-full overflow-x-auto px-1 pt-2 pb-4">
         <div className="flex min-w-max items-center">
           {steps.map((step, index) => {
-            const status = getStepStatus(step);
+            const status = getStepStatus(step, index);
             const isLast = index === steps.length - 1;
 
             return (
               <div key={step.id} className="flex items-center">
                 <button
-                  onClick={() => handleStepClick(step)}
+                  onClick={() => handleStepClick(step, index)}
                   className={cn(
                     "group focus:ring-ring relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none",
                     "min-w-[180px] text-left hover:shadow-md",
@@ -77,7 +98,7 @@ export function WorkflowPipeline({ workflowRecord }: WorkflowPipelineProps) {
                         "border-gray-200 bg-gray-100 text-gray-400",
                     )}
                   >
-                    {step.order_index}
+                    {step.order_index + 1}
                   </div>
                   <div className="flex flex-col overflow-hidden">
                     <span
@@ -100,7 +121,7 @@ export function WorkflowPipeline({ workflowRecord }: WorkflowPipelineProps) {
                       )}
                     >
                       {status === "completed"
-                        ? "Completed"
+                        ? `Completed${step.submission_count > 0 ? ` (${step.submission_count})` : ""}`
                         : status === "current"
                           ? "In Progress"
                           : "Pending"}
@@ -126,13 +147,20 @@ export function WorkflowPipeline({ workflowRecord }: WorkflowPipelineProps) {
         </div>
       </div>
 
-      {selectedStep && (
-        <StepDetailModal
-          open={!!selectedStep}
-          onOpenChange={(open) => !open && setSelectedStep(null)}
-          step={selectedStep.step}
-          submission={selectedStep.submission}
-          status={selectedStep.status}
+      {formSchemaStep && (
+        <FormSchemaModal
+          open={!!formSchemaStep}
+          onOpenChange={(open) => !open && setFormSchemaStep(null)}
+          step={formSchemaStep}
+        />
+      )}
+
+      {submissionStep && (
+        <SubmissionListModal
+          open={!!submissionStep}
+          onOpenChange={(open) => !open && setSubmissionStep(null)}
+          step={submissionStep.step}
+          workflowRecordId={workflowDetail.id}
         />
       )}
     </>

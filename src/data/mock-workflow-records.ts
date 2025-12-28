@@ -12,6 +12,7 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     status: "completed",
     step_submissions: [
       {
+        id: "sub-001-1",
         step_id: "step-initial-check",
         data: {
           condition: "good",
@@ -19,8 +20,13 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           notes: "Tree looks healthy",
         },
         submitted_at: "2024-03-10T10:00:00Z",
+        submitted_by: "John Smith",
+        status: "approved",
+        reviewed_at: "2024-03-10T10:30:00Z",
+        reviewed_by: "Manager A",
       },
       {
+        id: "sub-001-2",
         step_id: "step-detailed-assessment",
         data: {
           trunkCondition: "healthy",
@@ -29,8 +35,13 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           estimatedYield: 45,
         },
         submitted_at: "2024-03-10T11:30:00Z",
+        submitted_by: "John Smith",
+        status: "approved",
+        reviewed_at: "2024-03-10T12:00:00Z",
+        reviewed_by: "Manager A",
       },
       {
+        id: "sub-001-3",
         step_id: "step-final-review",
         data: {
           recommendation: "no_action",
@@ -39,6 +50,8 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           summary: "Tree is in excellent condition. No action required.",
         },
         submitted_at: "2024-03-10T14:00:00Z",
+        submitted_by: "John Smith",
+        status: "submitted",
       },
     ],
     started_at: "2024-03-10T10:00:00Z",
@@ -61,6 +74,7 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     status: "in_progress",
     step_submissions: [
       {
+        id: "sub-002-1",
         step_id: "step-initial-check",
         data: {
           condition: "fair",
@@ -68,6 +82,10 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           notes: "Needs closer inspection",
         },
         submitted_at: "2024-03-12T09:30:00Z",
+        submitted_by: "Jane Doe",
+        status: "approved",
+        reviewed_at: "2024-03-12T10:00:00Z",
+        reviewed_by: "Manager B",
       },
     ],
     started_at: "2024-03-12T09:30:00Z",
@@ -109,6 +127,7 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     status: "in_progress",
     step_submissions: [
       {
+        id: "sub-004-1",
         step_id: "step-pre-inspection",
         data: {
           operatingHours: 1250,
@@ -116,6 +135,8 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           fluidLevels: "low",
         },
         submitted_at: "2024-03-15T08:00:00Z",
+        submitted_by: "Tech Mike",
+        status: "submitted",
       },
     ],
     started_at: "2024-03-15T08:00:00Z",
@@ -123,7 +144,7 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     created_at: "2024-03-15T07:30:00Z",
     updated_at: "2024-03-15T08:00:00Z",
   },
-  // Plot 001 - Completed inspection
+  // Plot 001 - Completed inspection with rejection example
   {
     id: "wr-005",
     entity_id: "ent-plot-001",
@@ -134,6 +155,7 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
     status: "completed",
     step_submissions: [
       {
+        id: "sub-005-1",
         step_id: "step-boundary-check",
         data: {
           boundaryIntact: true,
@@ -141,8 +163,29 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           accessPoints: 2,
         },
         submitted_at: "2024-03-08T09:00:00Z",
+        submitted_by: "Field Agent A",
+        status: "approved",
+        reviewed_at: "2024-03-08T09:30:00Z",
+        reviewed_by: "Supervisor X",
+      },
+      // Example of rejection + resubmission for step-soil-analysis
+      {
+        id: "sub-005-2a",
+        step_id: "step-soil-analysis",
+        data: {
+          phLevel: 5.2,
+          moistureLevel: "low",
+          nutrientStatus: "poor",
+        },
+        submitted_at: "2024-03-08T10:00:00Z",
+        submitted_by: "Field Agent A",
+        status: "rejected",
+        reviewed_at: "2024-03-08T10:30:00Z",
+        reviewed_by: "Supervisor X",
+        rejection_reason: "pH level seems incorrect, please re-measure",
       },
       {
+        id: "sub-005-2b",
         step_id: "step-soil-analysis",
         data: {
           phLevel: 6.8,
@@ -150,8 +193,13 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           nutrientStatus: "adequate",
         },
         submitted_at: "2024-03-08T11:00:00Z",
+        submitted_by: "Field Agent A",
+        status: "approved",
+        reviewed_at: "2024-03-08T11:30:00Z",
+        reviewed_by: "Supervisor X",
       },
       {
+        id: "sub-005-3",
         step_id: "step-vegetation-survey",
         data: {
           treeCount: 45,
@@ -159,8 +207,13 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           diseaseIndicators: false,
         },
         submitted_at: "2024-03-08T14:00:00Z",
+        submitted_by: "Field Agent A",
+        status: "approved",
+        reviewed_at: "2024-03-08T14:30:00Z",
+        reviewed_by: "Supervisor X",
       },
       {
+        id: "sub-005-4",
         step_id: "step-report-generation",
         data: {
           overallRating: "good",
@@ -168,6 +221,8 @@ export const mockWorkflowRecords: WorkflowRecord[] = [
           nextInspectionDate: "2024-06-08",
         },
         submitted_at: "2024-03-08T16:00:00Z",
+        submitted_by: "Field Agent A",
+        status: "submitted",
       },
     ],
     started_at: "2024-03-08T09:00:00Z",

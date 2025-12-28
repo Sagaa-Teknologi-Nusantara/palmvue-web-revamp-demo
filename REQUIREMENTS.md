@@ -1,52 +1,207 @@
-I want to integrate /entities/create page with real API. The API provided:
+Now i want to integrate the workflow, it should use this endpoint:
 
-POST /entities
+GET /entities/{entity_id}/workflows/details
 
-Request Body:
-{
-  "entity_type_id": "string",
-  "metadata": {},
-  "name": "string",
-  "parent_id": "string"
-}
-
-Response Body:
+Response body:
 {
   "success": true,
-  "message": "Entity created successfully",
-  "data": {
-    "id": "e52cca99-f30d-4dcd-8155-f091d1832641",
-    "entity_type_id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
-    "entity_type": {
-      "id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
-      "name": "Pollen Sample",
-      "prefix": "POLN",
-      "color": "",
-      "icon": ""
-    },
-    "parent_id": "42eebc99-9c0b-4ef8-bb6d-6bb9bd380a72",
-    "parent": {
-      "id": "42eebc99-9c0b-4ef8-bb6d-6bb9bd380a72",
-      "code": "POLN-0008",
-      "name": "Fresh Pollen Collection FP-2024-06-20"
-    },
-    "name": "Female Flower - Block A12",
-    "code": "POLN-0011",
-    "metadata": {
-      "batch_number": "A-2025-01",
-      "quantity_grams": 125.5,
-      "collection_date": "2025-01-12",
-      "collection_method": "manual extraction",
-      "source_tree_variety": "pisifera",
-      "viability_percentage": 92.3,
-      "storage_temperature_celsius": -18
-    },
-    "created_by": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-    "created_at": "2025-12-26T10:06:09.176889+07:00",
-    "updated_at": "2025-12-26T10:06:09.176889+07:00"
-  }
+  "message": "Workflow details retrieved successfully",
+  "data": [
+    {
+      "id": "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380f21", // workflow record id
+      "workflow_id": "71eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
+      "workflow": {
+        "id": "71eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
+        "name": "Annual Growth & Health Monitoring"
+      },
+      "status": "completed", // completed, pending_approval, not_started, in_progress
+      "current_step_id": "86eebc99-9c0b-4ef8-bb6d-6bb9bd380d07", // can be NULL if not_started
+      "steps": [
+        {
+          "id": "84eebc99-9c0b-4ef8-bb6d-6bb9bd380d05",
+          "name": "Growth Metrics Collection",
+          "order_index": 0,
+          "requires_approval": false,
+          "form": {
+            "id": "64eebc99-9c0b-4ef8-bb6d-6bb9bd380b05",
+            "name": "Annual Growth Metrics",
+            "schema": {
+              "type": "object",
+              "required": [
+                "height_increase_cm",
+                "frond_production",
+                "health_maintained",
+                "measurement_date"
+              ],
+              "properties": {
+                "fruiting_status": {
+                  "type": "boolean"
+                },
+                "frond_production": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "measurement_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "health_maintained": {
+                  "type": "boolean"
+                },
+                "flowering_observed": {
+                  "type": "boolean"
+                },
+                "height_increase_cm": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "submission_count": 0
+        },
+        {
+          "id": "85eebc99-9c0b-4ef8-bb6d-6bb9bd380d06",
+          "name": "Field Health Inspection",
+          "order_index": 1,
+          "requires_approval": true,
+          "form": {
+            "id": "66eebc99-9c0b-4ef8-bb6d-6bb9bd380b07",
+            "name": "Field Inspection Report",
+            "schema": {
+              "type": "object",
+              "required": [
+                "plot_condition",
+                "plant_health",
+                "pest_control",
+                "overall_rating"
+              ],
+              "properties": {
+                "pest_control": {
+                  "type": "number",
+                  "maximum": 10,
+                  "minimum": 1
+                },
+                "plant_health": {
+                  "type": "number",
+                  "maximum": 10,
+                  "minimum": 1
+                },
+                "overall_rating": {
+                  "enum": [
+                    "excellent",
+                    "good",
+                    "satisfactory",
+                    "needs_improvement",
+                    "unsatisfactory"
+                  ],
+                  "type": "string"
+                },
+                "plot_condition": {
+                  "type": "number",
+                  "maximum": 10,
+                  "minimum": 1
+                },
+                "irrigation_status": {
+                  "type": "number",
+                  "maximum": 10,
+                  "minimum": 1
+                },
+                "deficiencies_found": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "submission_count": 0
+        },
+        {
+          "id": "86eebc99-9c0b-4ef8-bb6d-6bb9bd380d07",
+          "name": "Annual Performance Review",
+          "order_index": 2,
+          "requires_approval": false,
+          "form": {
+            "id": "65eebc99-9c0b-4ef8-bb6d-6bb9bd380b06",
+            "name": "Annual Performance Report",
+            "schema": {
+              "type": "object",
+              "required": [
+                "growth_performance",
+                "review_date"
+              ],
+              "properties": {
+                "review_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "recommendations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "fruit_bunch_count": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "growth_performance": {
+                  "enum": [
+                    "excellent",
+                    "good",
+                    "fair",
+                    "poor"
+                  ],
+                  "type": "string"
+                },
+                "oil_yield_estimate": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "submission_count": 0
+        }
+      ],
+      "started_at": "2025-10-07T10:29:49.048311+07:00",
+      "completed_at": "2025-12-01T10:29:49.048311+07:00",
+      "created_at": "2025-10-07T10:29:49.048311+07:00",
+      "updated_at": "2025-12-01T10:29:49.048311+07:00"
+    }
+  ]
 }
 
-The submitted metadata should follow the entity type schema. You can use /entity-types/options endpoint to get all entity types available, and then use /entity-types/{entity_type_id} endpoint to get the schema for the entity type. Both API query should be exists.
 
-What do you think? Are those endpoints sufficient and efficient to create an entity? Please be mindful
+GET /workflow-records/{workflow_record_id}/steps/{step_id}/submissions
+
+Workflow Record ID can be retrieved from the above endpoint
+
+Response body:
+{
+  "success": true,
+  "message": "Workflow details retrieved successfully",
+  "data": [
+  {
+    "id": "submission_uuid", 
+    "workflow_record_id": "record_uuid",
+    "step_id": "step_uuid",
+    "form_name": "Onboarding Form",
+    "data": { /* JSON data */ },
+    "status": "approved",
+    "submitted_by": {
+      "id": "user_uuid",
+      "username": "john.doe"
+    },
+    "reviewed_by": {
+      "id": "user_uuid",
+      "username": "admin"
+    },
+    "submitted_at": "2025-01-01T10:00:00Z",
+    "created_at": "...",
+    "updated_at": "..."
+  }
+]
+}

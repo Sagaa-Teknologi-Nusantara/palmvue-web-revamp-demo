@@ -4,11 +4,12 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
-import { EntityTypeCardList } from "@/components/entity-types";
 import { PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEntityTypesQuery } from "@/hooks/queries";
+
+import { EntityTypeCardList } from "./components";
 
 export default function EntityTypesPage() {
   const [page, setPage] = useState(1);

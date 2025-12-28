@@ -11,9 +11,3 @@ export const STORAGE_KEYS = {
 export const DEFAULT_USER_ID = "user-demo-001";
 
 export const PAGINATION_OPTIONS = [10, 25, 50] as const;
-
-export const STATUS_COLORS = {
-  not_started: "bg-gray-100 text-gray-800",
-  in_progress: "bg-yellow-100 text-yellow-800",
-  completed: "bg-green-100 text-green-800",
-} as const;

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
+
+import { PageHeader } from "@/components/layout";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,12 +15,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PageHeader } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { WorkflowCardList } from "@/components/workflows/WorkflowCardList";
 import { WorkflowFilters } from "@/components/workflows/WorkflowFilters";
-import { useWorkflows, useEntityTypes, useWorkflowRecords } from "@/hooks";
-import { Plus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEntityTypes, useWorkflowRecords, useWorkflows } from "@/hooks";
+import { WORKFLOW_STATUSES } from "@/lib/status";
+
+const [IN_PROGRESS] = WORKFLOW_STATUSES;
 
 export default function WorkflowsPage() {
   const { workflows, isLoaded, remove } = useWorkflows();
@@ -36,13 +40,12 @@ export default function WorkflowsPage() {
   const workflowStats = useMemo(() => {
     const stats: Record<string, { assigned: number; active: number }> = {};
 
-    // Initialize with active counts from records
     workflowRecords.forEach((record) => {
       if (!stats[record.workflow_id]) {
         stats[record.workflow_id] = { assigned: 0, active: 0 };
       }
 
-      if (record.status === "in_progress") {
+      if (record.status === IN_PROGRESS) {
         stats[record.workflow_id].active += 1;
       }
     });

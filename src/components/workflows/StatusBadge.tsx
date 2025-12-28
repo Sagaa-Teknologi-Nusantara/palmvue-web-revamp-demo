@@ -1,7 +1,9 @@
+import { CheckCircle2, Circle, Clock, Loader2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
-import { Circle, Loader2, CheckCircle2 } from "lucide-react";
-import type { WorkflowRecordStatus } from "@/types/workflow-record";
 import { cn } from "@/lib/cn";
+import { WORKFLOW_STATUS_LABELS } from "@/lib/status";
+import type { WorkflowRecordStatus } from "@/types/workflow-record";
 
 interface StatusBadgeProps {
   status: WorkflowRecordStatus;
@@ -11,29 +13,30 @@ interface StatusBadgeProps {
 const statusConfig: Record<
   WorkflowRecordStatus,
   {
-    label: string;
-    variant: "secondary" | "warning" | "success";
+    variant: "secondary" | "warning" | "success" | "default";
     Icon: typeof Circle;
     borderClass: string;
   }
 > = {
   not_started: {
-    label: "Not Started",
     variant: "secondary",
     Icon: Circle,
     borderClass: "border-secondary-foreground/20",
   },
   in_progress: {
-    label: "In Progress",
     variant: "warning",
     Icon: Loader2,
     borderClass: "border-yellow-800/20",
   },
   completed: {
-    label: "Completed",
     variant: "success",
     Icon: CheckCircle2,
     borderClass: "border-green-800/20",
+  },
+  pending_approval: {
+    variant: "default",
+    Icon: Clock,
+    borderClass: "border-blue-800/20",
   },
 };
 
@@ -47,7 +50,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       className={cn("rounded-md", config.borderClass, className)}
     >
       <Icon className="h-3 w-3" />
-      {config.label}
+      {WORKFLOW_STATUS_LABELS[status]}
     </Badge>
   );
 }

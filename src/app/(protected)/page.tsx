@@ -1,15 +1,29 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { PageHeader } from '@/components/layout';
-import { useEntityTypes, useEntities, useWorkflows, useWorkflowRecords } from '@/hooks';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Boxes, Box, GitBranch, Plus, ArrowRight, CheckCircle2, Clock, CircleDot } from 'lucide-react';
-import { formatDate } from '@/lib/date';
-import { STATUS_COLORS } from '@/lib/constants';
+import {
+  ArrowRight,
+  Box,
+  Boxes,
+  CheckCircle2,
+  CircleDot,
+  Clock,
+  GitBranch,
+  Plus,
+} from "lucide-react";
+import Link from "next/link";
+
+import { PageHeader } from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useEntities,
+  useEntityTypes,
+  useWorkflowRecords,
+  useWorkflows,
+} from "@/hooks";
+import { formatDate } from "@/lib/date";
 
 export default function DashboardPage() {
   const { entityTypes, isLoaded: typesLoaded } = useEntityTypes();
@@ -17,16 +31,22 @@ export default function DashboardPage() {
   const { workflows, isLoaded: workflowsLoaded } = useWorkflows();
   const { workflowRecords, isLoaded: recordsLoaded } = useWorkflowRecords();
 
-  const isLoaded = typesLoaded && entitiesLoaded && workflowsLoaded && recordsLoaded;
+  const isLoaded =
+    typesLoaded && entitiesLoaded && workflowsLoaded && recordsLoaded;
 
   const recentEntities = [...entities]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )
     .slice(0, 5);
 
   const workflowStats = {
-    not_started: workflowRecords.filter((r) => r.status === 'not_started').length,
-    in_progress: workflowRecords.filter((r) => r.status === 'in_progress').length,
-    completed: workflowRecords.filter((r) => r.status === 'completed').length,
+    not_started: workflowRecords.filter((r) => r.status === "not_started")
+      .length,
+    in_progress: workflowRecords.filter((r) => r.status === "in_progress")
+      .length,
+    completed: workflowRecords.filter((r) => r.status === "completed").length,
   };
 
   if (!isLoaded) {
@@ -50,7 +70,7 @@ export default function DashboardPage() {
       />
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
+      <div className="mb-8 grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">
@@ -62,7 +82,7 @@ export default function DashboardPage() {
             <div className="text-3xl font-bold">{entityTypes.length}</div>
             <Link
               href="/entity-types"
-              className="text-sm text-primary hover:underline inline-flex items-center mt-2"
+              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
             >
               View all
               <ArrowRight className="ml-1 h-3 w-3" />
@@ -81,7 +101,7 @@ export default function DashboardPage() {
             <div className="text-3xl font-bold">{entities.length}</div>
             <Link
               href="/entities"
-              className="text-sm text-primary hover:underline inline-flex items-center mt-2"
+              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
             >
               View all
               <ArrowRight className="ml-1 h-3 w-3" />
@@ -100,7 +120,7 @@ export default function DashboardPage() {
             <div className="text-3xl font-bold">{workflows.length}</div>
             <Link
               href="/workflows"
-              className="text-sm text-primary hover:underline inline-flex items-center mt-2"
+              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
             >
               View all
               <ArrowRight className="ml-1 h-3 w-3" />
@@ -128,11 +148,11 @@ export default function DashboardPage() {
                   <Link
                     key={entity.id}
                     href={`/entities/${entity.id}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
                   >
                     <div>
                       <p className="font-medium">{entity.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="mt-1 flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
                           {entity.code}
                         </Badge>
@@ -148,8 +168,8 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No entities yet</p>
+              <div className="py-8 text-center">
+                <p className="mb-4 text-gray-500">No entities yet</p>
                 <Button asChild>
                   <Link href="/entities/create">Create your first entity</Link>
                 </Button>
@@ -165,9 +185,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-200 rounded-full">
+                  <div className="rounded-full bg-gray-200 p-2">
                     <CircleDot className="h-4 w-4 text-gray-600" />
                   </div>
                   <div>
@@ -175,14 +195,17 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-500">Awaiting action</p>
                   </div>
                 </div>
-                <Badge className={STATUS_COLORS.not_started} variant="secondary">
+                <Badge
+                  className="bg-gray-100 text-gray-800"
+                  variant="secondary"
+                >
                   {workflowStats.not_started}
                 </Badge>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 rounded-full">
+                  <div className="rounded-full bg-yellow-100 p-2">
                     <Clock className="h-4 w-4 text-yellow-600" />
                   </div>
                   <div>
@@ -190,14 +213,17 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-500">Being worked on</p>
                   </div>
                 </div>
-                <Badge className={STATUS_COLORS.in_progress} variant="secondary">
+                <Badge
+                  className="bg-yellow-100 text-yellow-800"
+                  variant="secondary"
+                >
                   {workflowStats.in_progress}
                 </Badge>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-full">
+                  <div className="rounded-full bg-green-100 p-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                   </div>
                   <div>
@@ -205,7 +231,10 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-500">All steps done</p>
                   </div>
                 </div>
-                <Badge className={STATUS_COLORS.completed} variant="secondary">
+                <Badge
+                  className="bg-green-100 text-green-800"
+                  variant="secondary"
+                >
                   {workflowStats.completed}
                 </Badge>
               </div>

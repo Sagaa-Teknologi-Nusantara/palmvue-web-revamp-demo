@@ -4,4 +4,4 @@ export * from "../../app/(protected)/entities/components/EntityFilters";
 export * from "./EntitySelector";
 export * from "./JsonSchemaForm";
 export * from "./MetadataForm";
-export * from "./StatusBadge";
+export * from "../workflows/StatusBadge";

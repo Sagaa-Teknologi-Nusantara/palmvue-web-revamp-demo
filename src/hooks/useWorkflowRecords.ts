@@ -1,25 +1,32 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { useLocalStorage } from './useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/constants';
-import type { WorkflowRecord, Workflow, StepWithForm } from '@/types';
+import { useCallback } from "react";
+
+import { STORAGE_KEYS } from "@/lib/constants";
+import type {
+  StepSubmission,
+  StepWithForm,
+  Workflow,
+  WorkflowRecord,
+} from "@/types";
+
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useWorkflowRecords() {
-  const [workflowRecords, setWorkflowRecords, isLoaded] = useLocalStorage<WorkflowRecord[]>(
-    STORAGE_KEYS.WORKFLOW_RECORDS,
-    []
-  );
+  const [workflowRecords, setWorkflowRecords, isLoaded] = useLocalStorage<
+    WorkflowRecord[]
+  >(STORAGE_KEYS.WORKFLOW_RECORDS, []);
   const [workflows] = useLocalStorage<Workflow[]>(STORAGE_KEYS.WORKFLOWS, []);
 
   const getByEntityId = useCallback(
-    (entityId: string) => workflowRecords.filter((wr) => wr.entity_id === entityId),
-    [workflowRecords]
+    (entityId: string) =>
+      workflowRecords.filter((wr) => wr.entity_id === entityId),
+    [workflowRecords],
   );
 
   const getById = useCallback(
     (id: string) => workflowRecords.find((wr) => wr.id === id),
-    [workflowRecords]
+    [workflowRecords],
   );
 
   const getCurrentStepWithForm = useCallback(
@@ -40,7 +47,7 @@ export function useWorkflowRecords() {
         form: step.form,
       };
     },
-    [workflowRecords, workflows]
+    [workflowRecords, workflows],
   );
 
   const getWorkflowSteps = useCallback(
@@ -51,7 +58,7 @@ export function useWorkflowRecords() {
       const workflow = workflows.find((w) => w.id === record.workflow_id);
       return workflow?.steps || [];
     },
-    [workflowRecords, workflows]
+    [workflowRecords, workflows],
   );
 
   const submitStep = useCallback(
@@ -67,15 +74,19 @@ export function useWorkflowRecords() {
           if (!currentStep) return wr;
 
           const now = new Date().toISOString();
-          const newSubmission = {
+          const requiresApproval = currentStep.requires_approval;
+          const newSubmission: StepSubmission = {
+            id: crypto.randomUUID(),
             step_id: stepId,
             data,
             submitted_at: now,
+            submitted_by: "Current User", // TODO: Replace with actual user
+            status: requiresApproval ? "pending" : "submitted",
           };
 
           // Find next step
           const nextStep = workflow.steps.find(
-            (s) => s.order_index === currentStep.order_index + 1
+            (s) => s.order_index === currentStep.order_index + 1,
           );
 
           const isCompleted = !nextStep;
@@ -85,17 +96,21 @@ export function useWorkflowRecords() {
             step_submissions: [...wr.step_submissions, newSubmission],
             current_step_id: nextStep?.id || null,
             current_step: nextStep
-              ? { id: nextStep.id, name: nextStep.name, order_index: nextStep.order_index }
+              ? {
+                  id: nextStep.id,
+                  name: nextStep.name,
+                  order_index: nextStep.order_index,
+                }
               : null,
-            status: isCompleted ? 'completed' : 'in_progress',
+            status: isCompleted ? "completed" : "in_progress",
             started_at: wr.started_at || now,
             completed_at: isCompleted ? now : null,
             updated_at: now,
           };
-        })
+        }),
       );
     },
-    [setWorkflowRecords, workflows]
+    [setWorkflowRecords, workflows],
   );
 
   const isStepCompleted = useCallback(
@@ -104,16 +119,22 @@ export function useWorkflowRecords() {
       if (!record) return false;
       return record.step_submissions.some((s) => s.step_id === stepId);
     },
-    [workflowRecords]
+    [workflowRecords],
   );
 
-  const getStepSubmission = useCallback(
-    (recordId: string, stepId: string) => {
+  const getStepSubmissions = useCallback(
+    (recordId: string, stepId: string): StepSubmission[] => {
       const record = workflowRecords.find((wr) => wr.id === recordId);
-      if (!record) return null;
-      return record.step_submissions.find((s) => s.step_id === stepId) || null;
+      if (!record) return [];
+      return record.step_submissions
+        .filter((s) => s.step_id === stepId)
+        .sort(
+          (a, b) =>
+            new Date(b.submitted_at).getTime() -
+            new Date(a.submitted_at).getTime(),
+        );
     },
-    [workflowRecords]
+    [workflowRecords],
   );
 
   return {
@@ -125,6 +146,6 @@ export function useWorkflowRecords() {
     getWorkflowSteps,
     submitStep,
     isStepCompleted,
-    getStepSubmission,
+    getStepSubmissions,
   };
 }

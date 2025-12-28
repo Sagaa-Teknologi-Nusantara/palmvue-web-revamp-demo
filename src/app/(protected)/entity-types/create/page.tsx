@@ -3,13 +3,14 @@
 import { useRouter } from "next/navigation";
 
 import type { CreateEntityTypeRequest } from "@/api/types/entity-type";
-import { EntityTypeForm } from "@/components/entity-types";
 import { PageHeader } from "@/components/layout";
 import {
   useCreateEntityTypeMutation,
   useWorkflowOptionsQuery,
 } from "@/hooks/queries";
 import type { CreateEntityTypeInput } from "@/types";
+
+import { EntityTypeForm } from "./components";
 
 export default function CreateEntityTypePage() {
   const router = useRouter();

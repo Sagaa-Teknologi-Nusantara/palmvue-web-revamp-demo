@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { JsonSchemaForm } from "@/components/entities/JsonSchemaForm";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -13,9 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { StatusBadge } from "@/components/workflows/StatusBadge";
 import { useWorkflowRecords, useWorkflows } from "@/hooks";
 import { cn } from "@/lib/cn";
-import { STATUS_COLORS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/date";
 
 interface WorkflowProgressProps {
@@ -35,7 +34,7 @@ export function WorkflowProgress({
     getCurrentStepWithForm,
     submitStep,
     isStepCompleted,
-    getStepSubmission,
+    getStepSubmissions,
   } = useWorkflowRecords();
   const { getById: getWorkflow } = useWorkflows();
 
@@ -65,9 +64,7 @@ export function WorkflowProgress({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>{workflow.name}</DialogTitle>
-            <Badge className={STATUS_COLORS[record.status]} variant="secondary">
-              {record.status.replace("_", " ")}
-            </Badge>
+            <StatusBadge status={record.status} />
           </div>
         </DialogHeader>
 
@@ -80,7 +77,8 @@ export function WorkflowProgress({
                 .map((step, index) => {
                   const isCompleted = isStepCompleted(recordId, step.id);
                   const isCurrent = record.current_step_id === step.id;
-                  const submission = getStepSubmission(recordId, step.id);
+                  const submissions = getStepSubmissions(recordId, step.id);
+                  const submission = submissions[0]; // Get latest submission
 
                   return (
                     <div

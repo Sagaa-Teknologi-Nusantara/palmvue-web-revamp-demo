@@ -1,4 +1,4 @@
-import type { Entity } from "@/types";
+import type { Entity, EntityWorkflowDetail } from "@/types";
 
 import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
@@ -36,6 +36,13 @@ export const entityService = {
     };
   },
 
+  getById: async (id: string): Promise<Entity> => {
+    const response = await apiClient.get<ApiResponse<Entity>>(
+      ENDPOINTS.ENTITIES.DETAIL(id),
+    );
+    return response.data.data;
+  },
+
   getOptions: async (
     params: EntityOptionsParams = {},
   ): Promise<EntityOption[]> => {
@@ -61,6 +68,15 @@ export const entityService = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(ENDPOINTS.ENTITIES.DELETE(id));
+  },
+
+  getWorkflowDetails: async (
+    entityId: string,
+  ): Promise<EntityWorkflowDetail[]> => {
+    const response = await apiClient.get<ApiResponse<EntityWorkflowDetail[]>>(
+      ENDPOINTS.ENTITIES.WORKFLOW_DETAILS(entityId),
+    );
+    return response.data.data;
   },
 };
 

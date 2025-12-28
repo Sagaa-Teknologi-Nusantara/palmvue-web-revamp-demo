@@ -59,6 +59,7 @@ const STATUS_COLORS = {
   not_started: "#e2e8f0", // Muted gray
   in_progress: "#fbbf24", // Yellow/Amber
   completed: "#22c55e", // Green
+  pending_approval: "#3b82f6", // Blue
 };
 
 // Custom Tooltip Component for consistent Shadcn feel
@@ -157,13 +158,16 @@ export default function AnalyticsPage() {
   }, [entities]);
 
   const workflowStatusData = useMemo(() => {
-    const statusCounts = {
+    const statusCounts: Record<string, number> = {
       not_started: 0,
       in_progress: 0,
       completed: 0,
+      pending_approval: 0,
     };
     workflowRecords.forEach((record) => {
-      statusCounts[record.status] += 1;
+      if (statusCounts[record.status] !== undefined) {
+        statusCounts[record.status] += 1;
+      }
     });
     return [
       {
@@ -175,6 +179,11 @@ export default function AnalyticsPage() {
         name: "In Progress",
         value: statusCounts.in_progress,
         status: "in_progress",
+      },
+      {
+        name: "Pending Approval",
+        value: statusCounts.pending_approval,
+        status: "pending_approval",
       },
       { name: "Completed", value: statusCounts.completed, status: "completed" },
     ];
