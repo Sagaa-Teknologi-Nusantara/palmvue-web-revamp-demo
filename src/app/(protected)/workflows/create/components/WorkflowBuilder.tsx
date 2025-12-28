@@ -31,11 +31,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import type {
-  CreateWorkflowInput,
-  OnCompleteAction,
-  StartWorkflowConfig,
-} from "@/types";
+import type { CreateWorkflowInput, OnCompleteAction } from "@/types";
 
 import { EntityTypePicker } from "./EntityTypePicker";
 import { FormFooter } from "./FormFooter";
@@ -56,16 +52,18 @@ interface WorkflowBuilderProps {
 
 export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
   const [steps, setSteps] = useState<StepData[]>([]);
-  const [editingStep, setEditingStep] = useState<StepData | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteStepId, setDeleteStepId] = useState<string | null>(null);
-  const [selectedEntityTypeIds, setSelectedEntityTypeIds] = useState<string[]>(
-    [],
-  );
   const [onCompleteActions, setOnCompleteActions] = useState<
     OnCompleteAction[]
   >([]);
+  const [selectedEntityTypeIds, setSelectedEntityTypeIds] = useState<string[]>(
+    [],
+  );
+
+  const [editingStep, setEditingStep] = useState<StepData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
+
+  const [deleteStepId, setDeleteStepId] = useState<string | null>(null);
 
   const form = useForm({
     resolver: zodResolver(workflowSchema),
@@ -119,28 +117,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
 
   const handleEntityTypeIdsChange = (newIds: string[]) => {
     setSelectedEntityTypeIds(newIds);
-
-    setOnCompleteActions((prev) =>
-      prev.map((action) => {
-        if (action.type === "start_workflow") {
-          const config = action.config as StartWorkflowConfig;
-          if (
-            config.entity_type_id &&
-            !newIds.includes(config.entity_type_id)
-          ) {
-            return {
-              ...action,
-              config: {
-                ...config,
-                entity_type_id: "",
-                workflow_id: "",
-              },
-            };
-          }
-        }
-        return action;
-      }),
-    );
+    setOnCompleteActions([]);
   };
 
   const handleSubmit = (values: {
@@ -274,6 +251,12 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                 onChange={setOnCompleteActions}
                 assignedEntityTypeIds={selectedEntityTypeIds}
                 steps={steps}
+                disabled={selectedEntityTypeIds.length !== 1}
+                disabledMessage={
+                  selectedEntityTypeIds.length === 0
+                    ? "Assign exactly one entity type to enable on-complete actions."
+                    : "On-complete actions are only available when exactly one entity type is assigned."
+                }
               />
             </div>
 

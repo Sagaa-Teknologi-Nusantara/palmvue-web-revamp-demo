@@ -1,6 +1,6 @@
 "use client";
 
-import { Package, Plus, Trash2, Workflow } from "lucide-react";
+import { Info, Package, Plus, Trash2, Workflow } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useState } from "react";
 
@@ -33,6 +33,8 @@ interface OnCompleteActionsEditorProps {
   onChange: (actions: OnCompleteAction[]) => void;
   assignedEntityTypeIds: string[];
   steps: StepData[];
+  disabled?: boolean;
+  disabledMessage?: string;
 }
 
 export function OnCompleteActionsEditor({
@@ -40,6 +42,8 @@ export function OnCompleteActionsEditor({
   onChange,
   assignedEntityTypeIds,
   steps,
+  disabled,
+  disabledMessage,
 }: OnCompleteActionsEditorProps) {
   const { options: allEntityTypes } = useEntityTypeOptionsQuery();
 
@@ -97,22 +101,37 @@ export function OnCompleteActionsEditor({
             </span>
             On Complete Actions
           </CardTitle>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={handleAddAction}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Action
-          </Button>
+          {!disabled && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={handleAddAction}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Action
+            </Button>
+          )}
         </div>
         <p className="text-muted-foreground text-sm">
           Actions to execute when the workflow completes.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {value.length === 0 ? (
+        {disabled ? (
+          <div className="bg-muted/30 animate-in fade-in-50 flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center">
+            <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+              <Info className="text-primary h-6 w-6" />
+            </div>
+            <p className="text-foreground text-sm font-medium">
+              Feature Unavailable
+            </p>
+            <p className="text-muted-foreground mt-1 max-w-xs text-xs">
+              {disabledMessage ||
+                "This feature requires specific conditions to be met."}
+            </p>
+          </div>
+        ) : value.length === 0 ? (
           <div className="border-border bg-card rounded-lg border-2 border-dashed py-8 text-center">
             <div className="bg-muted/50 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
               <Workflow className="text-muted-foreground h-6 w-6 opacity-50" />
