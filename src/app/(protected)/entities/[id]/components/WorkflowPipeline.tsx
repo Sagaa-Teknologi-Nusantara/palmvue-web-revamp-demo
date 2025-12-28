@@ -66,7 +66,7 @@ export function WorkflowPipeline({ workflowDetail }: WorkflowPipelineProps) {
 
   return (
     <>
-      <div className="scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-muted w-full overflow-x-auto px-1 pt-2 pb-4">
+      <div className="w-full overflow-x-auto scroll-smooth px-6 py-8">
         <div className="flex min-w-max items-center">
           {steps.map((step, index) => {
             const status = getStepStatus(step, index);
@@ -77,7 +77,7 @@ export function WorkflowPipeline({ workflowDetail }: WorkflowPipelineProps) {
                 <button
                   onClick={() => handleStepClick(step, index)}
                   className={cn(
-                    "group focus:ring-ring relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none",
+                    "group focus:ring-ring relative flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none",
                     "min-w-[180px] text-left hover:shadow-md",
                     status === "completed" &&
                       "border-emerald-200 bg-emerald-50/50 hover:border-emerald-300 hover:bg-emerald-50",
@@ -121,11 +121,20 @@ export function WorkflowPipeline({ workflowDetail }: WorkflowPipelineProps) {
                       )}
                     >
                       {status === "completed"
-                        ? `Completed${step.submission_count > 0 ? ` (${step.submission_count})` : ""}`
+                        ? "Completed"
                         : status === "current"
                           ? "In Progress"
                           : "Pending"}
                     </span>
+                    {(status === "completed" || status === "current") &&
+                      step.submission_count > 0 && (
+                        <span className="text-muted-foreground/80 mt-0.5 truncate text-[10px]">
+                          {step.submission_count}{" "}
+                          {step.submission_count === 1
+                            ? "Submission"
+                            : "Submissions"}
+                        </span>
+                      )}
                   </div>
                 </button>
 

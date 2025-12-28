@@ -1,12 +1,6 @@
 import { PlayCircle } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/workflows/StatusBadge";
 import { formatDate } from "@/lib/date";
@@ -44,55 +38,58 @@ export function EntityWorkflowSection({
         <div className="grid gap-6">
           {workflows.map((workflowDetail) => (
             <Card key={workflowDetail.id} className="gap-0 overflow-hidden p-0">
-              <CardHeader className="bg-muted/30 border-b pt-6 pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full">
+              <div className="border-b bg-gray-50/40 p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-primary/10 text-primary mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border shadow-sm">
                       <PlayCircle className="h-5 w-5" />
                     </div>
-                    <div>
-                      <CardTitle className="text-base">
+                    <div className="space-y-1">
+                      <CardTitle className="text-base leading-none font-semibold">
                         {workflowDetail.workflow.name}
                       </CardTitle>
-                      <CardDescription className="mt-0.5 flex items-center gap-2">
-                        <span className="text-xs">
-                          Started{" "}
-                          {formatDate(
-                            workflowDetail.started_at ||
-                              workflowDetail.created_at,
-                          )}
-                        </span>
+                      <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium">Started:</span>
+                          <span>
+                            {formatDate(
+                              workflowDetail.started_at ||
+                                workflowDetail.created_at,
+                            )}
+                          </span>
+                        </div>
                         {workflowDetail.completed_at && (
-                          <>
-                            <span>•</span>
-                            <span className="text-xs">
-                              Completed{" "}
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium">Completed:</span>
+                            <span>
                               {formatDate(workflowDetail.completed_at)}
                             </span>
-                          </>
+                          </div>
                         )}
-                      </CardDescription>
+                      </div>
                     </div>
                   </div>
-                  <StatusBadge status={workflowDetail.status} />
+                  <div className="shrink-0">
+                    <StatusBadge status={workflowDetail.status} />
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="p-6">
+              </div>
+              <div className="p-0">
                 <WorkflowPipeline workflowDetail={workflowDetail} />
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
       ) : (
-        <Card className="border-dashed">
-          <CardContent className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
-            <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-full">
-              <PlayCircle className="text-muted-foreground/50 h-6 w-6" />
+        <Card className="border-dashed shadow-none">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <PlayCircle className="text-muted-foreground h-8 w-8 opacity-50" />
             </div>
-            <p className="font-medium">No workflow records found</p>
-            <p className="mt-1 max-w-sm text-sm">
-              Assign workflows to this entity&apos;s type to automatically
-              create workflow records.
+            <h3 className="text-lg font-medium">No workflows found</h3>
+            <p className="text-muted-foreground mt-2 max-w-sm text-sm">
+              Assign workflows to this entity&apos;s type to automatically start
+              tracking progress here.
             </p>
           </CardContent>
         </Card>

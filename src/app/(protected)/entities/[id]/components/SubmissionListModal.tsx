@@ -18,12 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import {
   SubmissionStatusBadge,
   SubmissionStatusDot,
 } from "@/components/workflows";
 import { useStepSubmissionsQuery } from "@/hooks/queries";
+import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/date";
 import type { EntityWorkflowStep } from "@/types";
 
@@ -53,17 +53,20 @@ export function SubmissionListModal({
     : submissions[0];
 
   const renderLoadingState = () => (
-    <div className="flex flex-col items-center justify-center py-8">
-      <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-      <p className="text-muted-foreground mt-2 text-sm">
+    <div className="flex flex-col items-center justify-center py-12">
+      <Loader2 className="text-primary h-8 w-8 animate-spin opacity-50" />
+      <p className="text-muted-foreground mt-3 text-sm font-medium">
         Loading submissions...
       </p>
     </div>
   );
 
   const renderEmptyState = () => (
-    <div className="text-muted-foreground flex flex-col items-center justify-center py-8 text-center">
-      <p className="text-sm">No submissions yet</p>
+    <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
+      <p className="font-medium">No submissions found</p>
+      <p className="pt-1 text-sm">
+        There are no submission records for this step yet.
+      </p>
     </div>
   );
 
@@ -71,56 +74,57 @@ export function SubmissionListModal({
     if (!selectedSubmission || !selectedSubmission.data) return null;
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         {submissions.length > 1 && (
-          <div className="space-y-2">
-            <label className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              Submission History
-            </label>
-            <Select
-              value={selectedSubmissionId || selectedSubmission.id}
-              onValueChange={setSelectedSubmissionId}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select submission" />
-              </SelectTrigger>
-              <SelectContent>
-                {submissions.map((submission, index) => (
-                  <SelectItem key={submission.id} value={submission.id}>
-                    <div className="flex items-center gap-2">
-                      <SubmissionStatusDot status={submission.status} />
-                      <span className="font-medium">
-                        #{submissions.length - index}
-                      </span>
-                      <span className="text-muted-foreground">-</span>
-                      <span className="text-muted-foreground text-xs">
-                        {submission.submitted_by.username}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        {formatDate(submission.submitted_at)}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="rounded-lg border bg-gray-50/50 p-3">
+            <div className="space-y-2">
+              <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                Submission History
+              </label>
+              <Select
+                value={selectedSubmissionId || selectedSubmission.id}
+                onValueChange={setSelectedSubmissionId}
+              >
+                <SelectTrigger className="w-full bg-white">
+                  <SelectValue placeholder="Select submission" />
+                </SelectTrigger>
+                <SelectContent>
+                  {submissions.map((submission, index) => (
+                    <SelectItem key={submission.id} value={submission.id}>
+                      <div className="flex items-center gap-2">
+                        <SubmissionStatusDot status={submission.status} />
+                        <span className="font-medium">
+                          Version {submissions.length - index}
+                        </span>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">
+                          {formatDate(submission.submitted_at)}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         )}
 
-        {submissions.length > 1 && <Separator />}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">Submission Details</h4>
+              <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <span>
+                  Submitted by {selectedSubmission.submitted_by.username}
+                </span>
+                <span>•</span>
+                <span>{formatDate(selectedSubmission.submitted_at)}</span>
+              </div>
+            </div>
+            <SubmissionStatusBadge status={selectedSubmission.status} />
+          </div>
 
-        {/* Submission Status */}
-        <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-sm">Status</span>
-          <SubmissionStatusBadge status={selectedSubmission.status} />
-        </div>
-
-        {/* Submission Data */}
-        <div className="space-y-3">
-          <h4 className="text-muted-foreground text-sm font-medium tracking-wider uppercase">
-            Submission Data
-          </h4>
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid gap-4">
             {Object.entries(selectedSubmission.data).map(([key, value]) => {
               const prop = step.form.schema.properties?.[key];
               const label = prop?.title || key;
@@ -128,12 +132,12 @@ export function SubmissionListModal({
               return (
                 <div
                   key={key}
-                  className="bg-muted/30 border-border rounded-lg border p-3"
+                  className="group rounded-md border p-3 transition-colors hover:bg-gray-50/50"
                 >
-                  <p className="text-muted-foreground mb-1 text-xs font-medium">
+                  <p className="text-muted-foreground mb-1.5 text-xs font-medium tracking-wider uppercase">
                     {label}
                   </p>
-                  <p className="text-sm font-medium break-all">
+                  <p className="text-sm leading-relaxed font-medium break-all">
                     {typeof value === "boolean"
                       ? value
                         ? "Yes"
@@ -144,14 +148,12 @@ export function SubmissionListModal({
               );
             })}
           </div>
-        </div>
 
-        {/* Submission Metadata */}
-        <div className="text-muted-foreground space-y-1 pt-2 text-xs">
-          <p>Submitted by: {selectedSubmission.submitted_by.username}</p>
-          <p>Submitted at: {formatDate(selectedSubmission.submitted_at)}</p>
           {selectedSubmission.reviewed_by && (
-            <p>Reviewed by: {selectedSubmission.reviewed_by.username}</p>
+            <div className="text-muted-foreground bg-muted/20 mt-4 flex items-center justify-between rounded border-t p-2 pt-4 text-xs">
+              <span className="font-medium">Reviewed by</span>
+              <span>{selectedSubmission.reviewed_by.username}</span>
+            </div>
           )}
         </div>
       </div>
@@ -172,19 +174,32 @@ export function SubmissionListModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{step.name}</DialogTitle>
-          <DialogDescription className="mt-1.5">
-            Step {step.order_index + 1} •{" "}
-            {step.requires_approval ? "Requires approval" : "Auto-approved"}
-          </DialogDescription>
+      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[550px]">
+        <DialogHeader className="border-b bg-gray-50/50 px-6 py-5">
+          <div className="mr-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <DialogTitle className="text-xl leading-none font-semibold">
+                {step.name}
+              </DialogTitle>
+              <DialogDescription className="text-xs font-medium">
+                Step {step.order_index + 1}
+              </DialogDescription>
+            </div>
+            <div
+              className={cn(
+                "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                step.requires_approval
+                  ? "border-yellow-200 bg-yellow-50 text-yellow-700"
+                  : "border-green-200 bg-green-50 text-green-700",
+              )}
+            >
+              {step.requires_approval ? "Requires Approval" : "Auto Approved"}
+            </div>
+          </div>
         </DialogHeader>
 
-        <Separator />
-
-        <ScrollArea className="max-h-[60vh] pr-4">
-          <div className="space-y-6 py-4">{renderContent()}</div>
+        <ScrollArea className="max-h-[60vh]">
+          <div className="p-6">{renderContent()}</div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
