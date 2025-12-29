@@ -122,7 +122,10 @@ export default function WorkflowDetailPage({
         <div className="space-y-6 md:col-span-2">
           <WorkflowInfoCard workflow={workflow} />
           <EntityTypesCard entityTypes={workflow.entity_types} />
-          <CompletionActionsCard actions={workflow.on_complete_actions} />
+          <CompletionActionsCard
+            actions={workflow.on_complete_actions}
+            steps={workflow.steps}
+          />
         </div>
 
         {/* Main Content / Steps */}

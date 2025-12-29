@@ -40,20 +40,7 @@ export function WorkflowInfoCard({ workflow }: WorkflowInfoCardProps) {
             </p>
           </div>
         </div>
-        <Separator />
-        <div>
-          <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">
-            Structure
-          </p>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="font-mono">
-              {workflow.steps.length} Steps
-            </Badge>
-            <Badge variant="outline" className="font-mono">
-              Sequential
-            </Badge>
-          </div>
-        </div>
+
         <Separator />
         <div>
           <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">
