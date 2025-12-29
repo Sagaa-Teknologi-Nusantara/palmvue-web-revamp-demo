@@ -1,6 +1,7 @@
 import type {
   CreateWorkflowInput,
   Workflow,
+  WorkflowDetail,
   WorkflowListItem,
   WorkflowOption,
 } from "@/types";
@@ -36,6 +37,13 @@ export const workflowService = {
         total_pages: 1,
       },
     };
+  },
+
+  getById: async (id: string): Promise<WorkflowDetail> => {
+    const response = await apiClient.get<ApiResponse<WorkflowDetail>>(
+      ENDPOINTS.WORKFLOWS.DETAIL(id),
+    );
+    return response.data.data;
   },
 
   getOptions: async (entityTypeId?: string): Promise<WorkflowOption[]> => {

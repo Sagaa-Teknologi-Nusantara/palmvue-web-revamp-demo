@@ -25,6 +25,18 @@ export interface Workflow {
   updated_at: string;
 }
 
+export interface WorkflowDetail {
+  id: string;
+  name: string;
+  is_loopable: boolean;
+  is_auto_start: boolean;
+  steps: WorkflowStep[];
+  entity_types: EntityTypeRef[];
+  on_complete_actions: CompletionAction[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface WorkflowStepRef {
   id: string;
   name: string;
@@ -64,11 +76,13 @@ export interface CountSource {
 
 export interface CreateEntitiesConfig {
   entity_type_id: string;
+  entity_type_info?: EntityTypeRef; // Present in detail response
   count_source: CountSource;
 }
 
 export interface StartWorkflowConfig {
   workflow_id: string;
+  workflow_name?: string; // Present in detail response
 }
 
 export interface CompletionAction {

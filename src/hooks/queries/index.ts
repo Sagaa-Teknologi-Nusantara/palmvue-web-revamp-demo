@@ -13,5 +13,6 @@ export * from "./useEntityTypesQuery";
 export * from "./useEntityTypeWorkflowsQuery";
 export * from "./useEntityWorkflowsQuery";
 export * from "./useStepSubmissionsQuery";
+export * from "./useWorkflowDetailQuery";
 export * from "./useWorkflowOptionsQuery";
 export * from "./useWorkflowsQuery";
