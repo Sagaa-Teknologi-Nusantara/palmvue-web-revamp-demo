@@ -1,16 +1,4 @@
-export interface PropertySchema {
-  type: "string" | "number" | "boolean" | "integer";
-  enum?: string[];
-  format?: "date" | "date-time" | "email" | "uri";
-  title?: string;
-  description?: string;
-}
-
-export interface JSONSchema {
-  type: "object";
-  properties: Record<string, PropertySchema>;
-  required?: string[];
-}
+import type { JSONSchema } from "./json-schema";
 
 export interface EntityType {
   id: string;
@@ -18,11 +6,18 @@ export interface EntityType {
   description: string;
   prefix: string;
   icon: string;
-  bg_color: string;
-  fg_color: string;
+  color: string;
   metadata_schema: JSONSchema;
   created_at: string;
   updated_at: string;
+}
+
+export interface EntityTypeRef {
+  id: string;
+  name: string;
+  prefix: string;
+  icon: string;
+  color: string;
 }
 
 export interface CreateEntityTypeInput {
@@ -30,9 +25,9 @@ export interface CreateEntityTypeInput {
   description: string;
   prefix: string;
   icon: string;
-  bg_color: string;
-  fg_color: string;
+  color: string;
   metadata_schema: JSONSchema;
+  workflow_ids: string[];
 }
 
 export interface UpdateEntityTypeInput {

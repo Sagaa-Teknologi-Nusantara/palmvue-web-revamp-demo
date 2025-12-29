@@ -1,37 +1,31 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Search } from "lucide-react";
+
+import { PaginationBar } from "@/components/ui/pagination-bar";
+import type { WorkflowListItem } from "@/types";
+
 import { WorkflowCard } from "./WorkflowCard";
-import type { Workflow, EntityType } from "@/types";
 
 interface WorkflowCardListProps {
-  workflows: Workflow[];
-  workflowStats: Record<string, { assigned: number; active: number }>;
-  workflowEntityTypeMap: Record<string, string>;
-  entityTypes: EntityType[];
+  workflows: WorkflowListItem[];
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
 export function WorkflowCardList({
   workflows,
-  workflowStats,
+  currentPage,
+  totalPages,
+  pageSize,
+  totalItems,
+  onPageChange,
+  onPageSizeChange,
 }: WorkflowCardListProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
-
-  const totalPages = Math.ceil(workflows.length / pageSize);
-
-  const paginatedWorkflows = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return workflows.slice(startIndex, startIndex + pageSize);
-  }, [workflows, currentPage, pageSize]);
-
-  const handlePageSizeChange = useCallback((newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1);
-  }, []);
-
   return (
     <div className="space-y-6">
       {workflows.length === 0 ? (
@@ -47,28 +41,21 @@ export function WorkflowCardList({
           </p>
         </div>
       ) : (
-        <div className="grid auto-rows-min grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-          {paginatedWorkflows.map((workflow) => {
-            return (
-              <WorkflowCard
-                key={workflow.id}
-                workflow={workflow}
-                assignedCount={workflowStats[workflow.id]?.assigned || 0}
-                activeCount={workflowStats[workflow.id]?.active || 0}
-              />
-            );
-          })}
+        <div className="grid auto-rows-min grid-cols-1 gap-4">
+          {workflows.map((workflow) => (
+            <WorkflowCard key={workflow.id} workflow={workflow} />
+          ))}
         </div>
       )}
 
-      {workflows.length > 0 && (
+      {totalItems > 0 && (
         <PaginationBar
           currentPage={currentPage}
           totalPages={totalPages}
           pageSize={pageSize}
-          totalItems={workflows.length}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={handlePageSizeChange}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
         />
       )}
     </div>

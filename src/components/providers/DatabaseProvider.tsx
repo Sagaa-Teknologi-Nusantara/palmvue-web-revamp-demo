@@ -1,14 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { seedDatabase } from '@/data/seed';
+import { useEffect, useState } from "react";
+
+import { seedDatabase } from "@/data/seed";
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    seedDatabase();
-    setIsReady(true);
+    const init = () => {
+      seedDatabase();
+      setIsReady(true);
+    };
+
+    init();
   }, []);
 
   if (!isReady) {

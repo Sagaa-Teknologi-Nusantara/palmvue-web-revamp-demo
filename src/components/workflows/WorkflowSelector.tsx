@@ -1,8 +1,10 @@
 "use client";
 
+import { ArrowRight, PlayCircle, Plus, Repeat, Search, X } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -11,15 +13,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, X, Search, PlayCircle, Check } from "lucide-react";
-import type { Workflow } from "@/types";
+import { WorkflowOption } from "@/types";
 
 interface WorkflowSelectorProps {
-  availableWorkflows: Workflow[];
+  availableWorkflows: WorkflowOption[];
   selectedWorkflowIds: string[];
   onChange: (ids: string[]) => void;
 }
@@ -149,9 +149,34 @@ export function WorkflowSelector({
                           >
                             {workflow.name}
                           </label>
-                          <p className="text-muted-foreground mt-1 text-xs">
-                            {workflow.steps.length} steps
-                          </p>
+                          <div className="mt-1.5 flex flex-wrap gap-2">
+                            {workflow.is_auto_start && (
+                              <Badge
+                                variant="outline"
+                                className="flex items-center gap-1 border-blue-200 bg-blue-50 px-1.5 py-0 text-[10px] font-normal text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                              >
+                                <PlayCircle className="h-3 w-3" />
+                                Auto-start
+                              </Badge>
+                            )}
+                            {workflow.is_loopable ? (
+                              <Badge
+                                variant="outline"
+                                className="flex items-center gap-1 border-amber-200 bg-amber-50 px-1.5 py-0 text-[10px] font-normal text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+                              >
+                                <Repeat className="h-3 w-3" />
+                                Loopable
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="outline"
+                                className="flex items-center gap-1 border-slate-200 bg-slate-50 px-1.5 py-0 text-[10px] font-normal text-slate-500 dark:border-slate-800 dark:bg-slate-900/20 dark:text-slate-400"
+                              >
+                                <ArrowRight className="h-3 w-3" />
+                                One-time
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}

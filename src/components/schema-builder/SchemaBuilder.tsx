@@ -1,27 +1,28 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  restrictToVerticalAxis,
-  restrictToParentElement,
-} from "@dnd-kit/modifiers";
-import { v4 as uuidv4 } from "uuid";
-import { Button } from "@/components/ui/button";
+import { LayoutGrid, Plus } from "lucide-react";
+import { useCallback, useState } from "react";
+import { v6 as uuidv6 } from "uuid";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -39,11 +41,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, LayoutGrid } from "lucide-react";
+import type { JSONSchema, PropertySchema } from "@/types";
+
 import { FieldCard } from "./FieldCard";
 import { FieldEditor } from "./FieldEditor";
 import { type FieldConfig, type FieldType } from "./types";
-import type { JSONSchema, PropertySchema } from "@/types";
 
 interface SchemaBuilderProps {
   value: JSONSchema;
@@ -51,7 +53,6 @@ interface SchemaBuilderProps {
   editMode?: "inline" | "modal";
 }
 
-// Convert JSONSchema to FieldConfig array
 function schemaToFields(schema: JSONSchema): FieldConfig[] {
   if (!schema.properties) return [];
 
@@ -73,7 +74,7 @@ function schemaToFields(schema: JSONSchema): FieldConfig[] {
     }
 
     return {
-      id: uuidv4(),
+      id: uuidv6(),
       name,
       label: prop.title || name,
       type,
@@ -84,7 +85,6 @@ function schemaToFields(schema: JSONSchema): FieldConfig[] {
   });
 }
 
-// Convert FieldConfig array to JSONSchema
 function fieldsToSchema(fields: FieldConfig[]): JSONSchema {
   const properties: Record<string, PropertySchema> = {};
   const required: string[] = [];
@@ -141,7 +141,6 @@ export function SchemaBuilder({
     }),
   );
 
-  // Update parent when fields change
   const updateSchema = useCallback(
     (newFields: FieldConfig[]) => {
       setFields(newFields);
@@ -172,15 +171,13 @@ export function SchemaBuilder({
 
   const handleSaveField = (fieldData: Omit<FieldConfig, "id">) => {
     if (editingField) {
-      // Update existing field
       updateSchema(
         fields.map((f) =>
           f.id === editingField.id ? { ...fieldData, id: editingField.id } : f,
         ),
       );
     } else {
-      // Add new field
-      updateSchema([...fields, { ...fieldData, id: uuidv4() }]);
+      updateSchema([...fields, { ...fieldData, id: uuidv6() }]);
     }
     setIsEditing(false);
     setEditingField(null);
@@ -198,7 +195,6 @@ export function SchemaBuilder({
     }
   };
 
-  // Inline mode: Replace view with editor
   if (editMode === "inline" && isEditing) {
     return (
       <div className="h-full">
@@ -274,7 +270,6 @@ export function SchemaBuilder({
         </div>
       )}
 
-      {/* Modal for Edit Mode */}
       {editMode === "modal" && (
         <Dialog
           open={isEditing}

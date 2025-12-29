@@ -1,30 +1,31 @@
-'use client';
+"use client";
 
-import { useFormContext } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { useFormContext } from "react-hook-form";
+
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import type { JSONSchema, PropertySchema } from '@/types';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { JSONSchema, PropertySchema } from "@/types";
 
 interface JsonSchemaFormProps {
   schema: JSONSchema;
   prefix?: string;
 }
 
-export function JsonSchemaForm({ schema, prefix = '' }: JsonSchemaFormProps) {
+export function JsonSchemaForm({ schema, prefix = "" }: JsonSchemaFormProps) {
   const form = useFormContext();
 
   if (!schema.properties) {
@@ -49,11 +50,9 @@ export function JsonSchemaForm({ schema, prefix = '' }: JsonSchemaFormProps) {
               <FormItem>
                 <FormLabel>
                   {prop.title || key}
-                  {isRequired && <span className="text-red-500 ml-1">*</span>}
+                  {isRequired && <span className="ml-1 text-red-500">*</span>}
                 </FormLabel>
-                <FormControl>
-                  {renderField(prop, field)}
-                </FormControl>
+                <FormControl>{renderField(prop, field)}</FormControl>
                 {prop.description && (
                   <p className="text-sm text-gray-500">{prop.description}</p>
                 )}
@@ -74,22 +73,23 @@ function renderField(
     onChange: (value: unknown) => void;
     onBlur: () => void;
     name: string;
-  }
+  },
 ) {
   // Handle enum (dropdown)
   if (prop.enum) {
     return (
       <Select
-        value={field.value as string || ''}
+        value={(field.value as string) || ""}
         onValueChange={field.onChange}
       >
         <SelectTrigger>
-          <SelectValue placeholder={`Select ${prop.title || 'option'}...`} />
+          <SelectValue placeholder={`Select ${prop.title || "option"}...`} />
         </SelectTrigger>
         <SelectContent>
           {prop.enum.map((option) => (
             <SelectItem key={option} value={option}>
-              {option.charAt(0).toUpperCase() + option.slice(1).replace(/_/g, ' ')}
+              {option.charAt(0).toUpperCase() +
+                option.slice(1).replace(/_/g, " ")}
             </SelectItem>
           ))}
         </SelectContent>
@@ -98,7 +98,7 @@ function renderField(
   }
 
   // Handle boolean (checkbox)
-  if (prop.type === 'boolean') {
+  if (prop.type === "boolean") {
     return (
       <div className="flex items-center space-x-2">
         <Checkbox
@@ -111,11 +111,11 @@ function renderField(
   }
 
   // Handle date
-  if (prop.format === 'date') {
+  if (prop.format === "date") {
     return (
       <Input
         type="date"
-        value={field.value as string || ''}
+        value={(field.value as string) || ""}
         onChange={(e) => field.onChange(e.target.value)}
         onBlur={field.onBlur}
       />
@@ -123,15 +123,17 @@ function renderField(
   }
 
   // Handle number
-  if (prop.type === 'number' || prop.type === 'integer') {
+  if (prop.type === "number" || prop.type === "integer") {
     return (
       <Input
         type="number"
-        step={prop.type === 'integer' ? '1' : 'any'}
-        value={field.value as number || ''}
-        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : '')}
+        step={prop.type === "integer" ? "1" : "any"}
+        value={(field.value as number) || ""}
+        onChange={(e) =>
+          field.onChange(e.target.value ? Number(e.target.value) : "")
+        }
         onBlur={field.onBlur}
-        placeholder={prop.title || ''}
+        placeholder={prop.title || ""}
       />
     );
   }
@@ -140,10 +142,10 @@ function renderField(
   return (
     <Input
       type="text"
-      value={field.value as string || ''}
+      value={(field.value as string) || ""}
       onChange={(e) => field.onChange(e.target.value)}
       onBlur={field.onBlur}
-      placeholder={prop.title || ''}
+      placeholder={prop.title || ""}
     />
   );
 }
