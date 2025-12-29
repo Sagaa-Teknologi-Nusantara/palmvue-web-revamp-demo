@@ -31,11 +31,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import type { CreateWorkflowInput, OnCompleteAction } from "@/types";
+import type { CompletionAction, CreateWorkflowInput } from "@/types";
 
+import {
+  CompletionActionEditor,
+  type CompletionActionsErrors,
+  hasCompletionActionErrors,
+  validateCompletionActions,
+} from "./CompletionActionEditor";
 import { EntityTypePicker } from "./EntityTypePicker";
 import { FormFooter } from "./FormFooter";
-import { OnCompleteActionsEditor } from "./OnCompleteActionsEditor";
 import { type StepData, StepEditModal } from "./StepEditModal";
 import { StepsList } from "./StepsList";
 
@@ -52,12 +57,14 @@ interface WorkflowBuilderProps {
 
 export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
   const [steps, setSteps] = useState<StepData[]>([]);
-  const [onCompleteActions, setOnCompleteActions] = useState<
-    OnCompleteAction[]
+  const [completionActions, setCompletionActions] = useState<
+    CompletionAction[]
   >([]);
   const [selectedEntityTypeIds, setSelectedEntityTypeIds] = useState<string[]>(
     [],
   );
+  const [completionActionErrors, setCompletionActionErrors] =
+    useState<CompletionActionsErrors>({});
 
   const [editingStep, setEditingStep] = useState<StepData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,7 +124,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
 
   const handleEntityTypeIdsChange = (newIds: string[]) => {
     setSelectedEntityTypeIds(newIds);
-    setOnCompleteActions([]);
+    setCompletionActions([]);
   };
 
   const handleSubmit = (values: {
@@ -128,6 +135,13 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
     if (steps.length === 0) {
       return;
     }
+
+    const actionErrors = validateCompletionActions(completionActions);
+    if (hasCompletionActionErrors(actionErrors)) {
+      setCompletionActionErrors(actionErrors);
+      return;
+    }
+    setCompletionActionErrors({});
 
     const workflowData: CreateWorkflowInput = {
       name: values.name,
@@ -143,7 +157,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
           schema: step.formSchema,
         },
       })),
-      on_complete: onCompleteActions,
+      on_complete: completionActions,
     };
 
     onSubmit(workflowData);
@@ -245,18 +259,13 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                 </CardContent>
               </Card>
 
-              {/* On Complete Actions */}
-              <OnCompleteActionsEditor
-                value={onCompleteActions}
-                onChange={setOnCompleteActions}
-                assignedEntityTypeIds={selectedEntityTypeIds}
+              {/* Completion Actions */}
+              <CompletionActionEditor
+                value={completionActions}
+                onChange={setCompletionActions}
+                selectedEntityTypeIds={selectedEntityTypeIds}
                 steps={steps}
-                disabled={selectedEntityTypeIds.length !== 1}
-                disabledMessage={
-                  selectedEntityTypeIds.length === 0
-                    ? "Assign exactly one entity type to enable on-complete actions."
-                    : "On-complete actions are only available when exactly one entity type is assigned."
-                }
+                errors={completionActionErrors}
               />
             </div>
 

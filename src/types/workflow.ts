@@ -69,10 +69,9 @@ export interface CreateEntitiesConfig {
 
 export interface StartWorkflowConfig {
   workflow_id: string;
-  entity_type_id: string;
 }
 
-export interface OnCompleteAction {
+export interface CompletionAction {
   type: CompletionActionType;
   config: CreateEntitiesConfig | StartWorkflowConfig;
 }
@@ -93,7 +92,7 @@ export interface CreateWorkflowInput {
   is_auto_start: boolean;
   is_loopable: boolean;
   steps: CreateStepInput[];
-  on_complete: OnCompleteAction[];
+  on_complete: CompletionAction[];
 }
 
 export interface UpdateWorkflowInput {
