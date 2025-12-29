@@ -1,7 +1,4 @@
-"use client";
-
 import { Box, Boxes, GitBranch, TrendingUp } from "lucide-react";
-import { useMemo } from "react";
 import {
   Area,
   AreaChart,
@@ -18,7 +15,7 @@ import {
   YAxis,
 } from "recharts";
 
-import { PageHeader } from "@/components/layout";
+import { PageHeader, UnderDevelopment } from "@/components/layout";
 import {
   Card,
   CardContent,
@@ -26,13 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useEntities,
-  useEntityTypes,
-  useWorkflowRecords,
-  useWorkflows,
-} from "@/hooks";
 
 // Brand-aligned colors derived from CSS variables
 const COLORS = {
@@ -105,7 +95,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-// Custom Legend Component for consistent styling
 const CustomLegend = ({
   payload,
 }: {
@@ -130,123 +119,67 @@ const CustomLegend = ({
   );
 };
 
+// Static data
+const entityTypes = [
+  { id: "1", name: "Company" },
+  { id: "2", name: "Project" },
+  { id: "3", name: "Task" },
+];
+
+const entities = [
+  { id: "1", entity_type_id: "1", entity_type: { name: "Company" } },
+  { id: "2", entity_type_id: "1", entity_type: { name: "Company" } },
+  { id: "3", entity_type_id: "2", entity_type: { name: "Project" } },
+  { id: "4", entity_type_id: "2", entity_type: { name: "Project" } },
+  { id: "5", entity_type_id: "2", entity_type: { name: "Project" } },
+  { id: "6", entity_type_id: "3", entity_type: { name: "Task" } },
+];
+
+const workflows = [
+  { id: "1", name: "Onboarding" },
+  { id: "2", name: "Approval Process" },
+];
+
+const workflowRecords = [
+  { id: "1", status: "completed" },
+  { id: "2", status: "completed" },
+  { id: "3", status: "in_progress" },
+  { id: "4", status: "not_started" },
+  { id: "5", status: "pending_approval" },
+];
+
+const entityDistributionData = [
+  { name: "Project", value: 3 },
+  { name: "Company", value: 2 },
+  { name: "Task", value: 1 },
+];
+
+const workflowStatusData = [
+  { name: "Not Started", value: 1, status: "not_started" },
+  { name: "In Progress", value: 1, status: "in_progress" },
+  { name: "Pending Approval", value: 1, status: "pending_approval" },
+  { name: "Completed", value: 2, status: "completed" },
+];
+
+const entityTimelineData = [
+  { month: "Oct '25", entities: 2 },
+  { month: "Nov '25", entities: 3 },
+  { month: "Dec '25", entities: 1 },
+];
+
+const entityTypeWorkflowData = [
+  { name: "Company", workflows: 1, entities: 2 },
+  { name: "Project", workflows: 2, entities: 3 },
+  { name: "Task", workflows: 1, entities: 1 },
+];
+
+const completionRate = 40;
+
+const isUnderDevelopment = true;
+
 export default function AnalyticsPage() {
-  const {
-    entityTypes,
-    entityTypeWorkflows,
-    isLoaded: typesLoaded,
-  } = useEntityTypes();
-  const { entities, isLoaded: entitiesLoaded } = useEntities();
-  const { workflows, isLoaded: workflowsLoaded } = useWorkflows();
-  const { workflowRecords, isLoaded: recordsLoaded } = useWorkflowRecords();
-
-  const isLoaded =
-    typesLoaded && entitiesLoaded && workflowsLoaded && recordsLoaded;
-
-  const entityDistributionData = useMemo(() => {
-    const distribution: Record<string, number> = {};
-    entities.forEach((entity) => {
-      const typeName = entity.entity_type.name;
-      distribution[typeName] = (distribution[typeName] || 0) + 1;
-    });
-    return Object.entries(distribution)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }))
-      .sort((a, b) => b.value - a.value); // Sort by magnitude
-  }, [entities]);
-
-  const workflowStatusData = useMemo(() => {
-    const statusCounts: Record<string, number> = {
-      not_started: 0,
-      in_progress: 0,
-      completed: 0,
-      pending_approval: 0,
-    };
-    workflowRecords.forEach((record) => {
-      if (statusCounts[record.status] !== undefined) {
-        statusCounts[record.status] += 1;
-      }
-    });
-    return [
-      {
-        name: "Not Started",
-        value: statusCounts.not_started,
-        status: "not_started",
-      },
-      {
-        name: "In Progress",
-        value: statusCounts.in_progress,
-        status: "in_progress",
-      },
-      {
-        name: "Pending Approval",
-        value: statusCounts.pending_approval,
-        status: "pending_approval",
-      },
-      { name: "Completed", value: statusCounts.completed, status: "completed" },
-    ];
-  }, [workflowRecords]);
-
-  const entityTimelineData = useMemo(() => {
-    const months: Record<string, number> = {};
-    entities.forEach((entity) => {
-      const date = new Date(entity.created_at);
-      const monthKey = date.toLocaleDateString("en-US", {
-        month: "short",
-        year: "2-digit",
-      });
-      months[monthKey] = (months[monthKey] || 0) + 1;
-    });
-    // Ensure we have at least some data points for the visual
-    if (Object.keys(months).length === 0) {
-      return [{ month: "No Data", entities: 0 }];
-    }
-
-    return Object.entries(months)
-      .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
-      .map(([month, count]) => ({
-        month,
-        entities: count,
-      }));
-  }, [entities]);
-
-  const entityTypeWorkflowData = useMemo(() => {
-    return entityTypes.map((et) => ({
-      name: et.name.length > 15 ? et.name.substring(0, 15) + "..." : et.name,
-      workflows: entityTypeWorkflows[et.id]?.length || 0,
-      entities: entities.filter((e) => e.entity_type_id === et.id).length,
-    }));
-  }, [entityTypes, entityTypeWorkflows, entities]);
-
-  const completionRate = useMemo(() => {
-    if (workflowRecords.length === 0) return 0;
-    const completed = workflowRecords.filter(
-      (r) => r.status === "completed",
-    ).length;
-    return Math.round((completed / workflowRecords.length) * 100);
-  }, [workflowRecords]);
-
-  if (!isLoaded) {
-    return (
-      <div className="space-y-6">
-        <PageHeader
-          title="Analytics"
-          description="Insights across your platform"
-        />
-        <div className="grid gap-6 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
-          ))}
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-[400px] rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
+  if (isUnderDevelopment) {
+    return <UnderDevelopment />;
   }
 
   // Chart configuration defaults
@@ -334,38 +267,32 @@ export default function AnalyticsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-0">
-            {entityDistributionData.length > 0 ? (
-              <div className="h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={entityDistributionData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={80}
-                      outerRadius={110}
-                      paddingAngle={2}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {entityDistributionData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CHART_PALETTE[index % CHART_PALETTE.length]}
-                          className="transition-opacity hover:opacity-80"
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} cursor={false} />
-                    <Legend content={<CustomLegend />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="text-muted-foreground flex h-[350px] items-center justify-center text-sm">
-                No entities available to display
-              </div>
-            )}
+            <div className="h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={entityDistributionData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={110}
+                    paddingAngle={2}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {entityDistributionData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_PALETTE[index % CHART_PALETTE.length]}
+                        className="transition-opacity hover:opacity-80"
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} cursor={false} />
+                  <Legend content={<CustomLegend />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
@@ -431,67 +358,61 @@ export default function AnalyticsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-0">
-            {entityTimelineData.length > 0 ? (
-              <div className="h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={entityTimelineData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <defs>
-                      <linearGradient
-                        id="entityGradient"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor={COLORS.primary}
-                          stopOpacity={0.2}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor={COLORS.primary}
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke={COLORS.grid}
-                    />
-                    <XAxis
-                      dataKey="month"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: COLORS.text, ...chartProps }}
-                      dy={10}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: COLORS.text, ...chartProps }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="entities"
-                      stroke={COLORS.primary}
-                      strokeWidth={2}
-                      fill="url(#entityGradient)"
-                      activeDot={{ r: 6, fill: COLORS.primary, strokeWidth: 0 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="text-muted-foreground flex h-[350px] items-center justify-center text-sm">
-                No timeline data available
-              </div>
-            )}
+            <div className="h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={entityTimelineData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="entityGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor={COLORS.primary}
+                        stopOpacity={0.2}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={COLORS.primary}
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke={COLORS.grid}
+                  />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: COLORS.text, ...chartProps }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: COLORS.text, ...chartProps }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="entities"
+                    stroke={COLORS.primary}
+                    strokeWidth={2}
+                    fill="url(#entityGradient)"
+                    activeDot={{ r: 6, fill: COLORS.primary, strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 

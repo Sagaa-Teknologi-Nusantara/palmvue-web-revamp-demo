@@ -1,5 +1,3 @@
-"use client";
-
 import {
   ArrowRight,
   Box,
@@ -12,54 +10,57 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { PageHeader } from "@/components/layout";
+import { PageHeader, UnderDevelopment } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useEntities,
-  useEntityTypes,
-  useWorkflowRecords,
-  useWorkflows,
-} from "@/hooks";
-import { formatDate } from "@/lib/date";
+
+const entityTypes = [
+  { id: "1", name: "Company" },
+  { id: "2", name: "Project" },
+  { id: "3", name: "Task" },
+];
+
+const entities = [
+  {
+    id: "1",
+    name: "Acme Corporation",
+    code: "ACME-001",
+    entity_type: { name: "Company" },
+    created_at: "2025-12-20T10:00:00Z",
+  },
+  {
+    id: "2",
+    name: "Website Redesign",
+    code: "PROJ-001",
+    entity_type: { name: "Project" },
+    created_at: "2025-12-22T14:30:00Z",
+  },
+  {
+    id: "3",
+    name: "Initial Setup",
+    code: "TASK-001",
+    entity_type: { name: "Task" },
+    created_at: "2025-12-25T09:00:00Z",
+  },
+];
+
+const workflows = [
+  { id: "1", name: "Onboarding" },
+  { id: "2", name: "Approval Process" },
+];
+
+const workflowStats = {
+  not_started: 3,
+  in_progress: 5,
+  completed: 12,
+};
+
+const isUnderDevelopment = true;
 
 export default function DashboardPage() {
-  const { entityTypes, isLoaded: typesLoaded } = useEntityTypes();
-  const { entities, isLoaded: entitiesLoaded } = useEntities();
-  const { workflows, isLoaded: workflowsLoaded } = useWorkflows();
-  const { workflowRecords, isLoaded: recordsLoaded } = useWorkflowRecords();
-
-  const isLoaded =
-    typesLoaded && entitiesLoaded && workflowsLoaded && recordsLoaded;
-
-  const recentEntities = [...entities]
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )
-    .slice(0, 5);
-
-  const workflowStats = {
-    not_started: workflowRecords.filter((r) => r.status === "not_started")
-      .length,
-    in_progress: workflowRecords.filter((r) => r.status === "in_progress")
-      .length,
-    completed: workflowRecords.filter((r) => r.status === "completed").length,
-  };
-
-  if (!isLoaded) {
-    return (
-      <div>
-        <PageHeader title="Dashboard" description="Overview of your data" />
-        <div className="grid gap-6 md:grid-cols-3">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-        </div>
-      </div>
-    );
+  if (isUnderDevelopment) {
+    return <UnderDevelopment />;
   }
 
   return (
@@ -142,39 +143,27 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            {recentEntities.length > 0 ? (
-              <div className="space-y-3">
-                {recentEntities.map((entity) => (
-                  <Link
-                    key={entity.id}
-                    href={`/entities/${entity.id}`}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
-                  >
-                    <div>
-                      <p className="font-medium">{entity.name}</p>
-                      <div className="mt-1 flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {entity.code}
-                        </Badge>
-                        <span className="text-xs text-gray-500">
-                          {entity.entity_type.name}
-                        </span>
-                      </div>
+            <div className="space-y-3">
+              {entities.map((entity) => (
+                <Link
+                  key={entity.id}
+                  href={`/entities/${entity.id}`}
+                  className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
+                >
+                  <div>
+                    <p className="font-medium">{entity.name}</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {entity.code}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        {entity.entity_type.name}
+                      </span>
                     </div>
-                    <span className="text-xs text-gray-400">
-                      {formatDate(entity.created_at)}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="py-8 text-center">
-                <p className="mb-4 text-gray-500">No entities yet</p>
-                <Button asChild>
-                  <Link href="/entities/create">Create your first entity</Link>
-                </Button>
-              </div>
-            )}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
