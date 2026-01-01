@@ -15,11 +15,12 @@ export const entityService = {
   getList: async (
     params: EntityListParams = {},
   ): Promise<EntityListResponse> => {
-    const { page = 1, size = 12, search, entity_type_id } = params;
+    const { page = 1, size = 12, search, entity_type_id, parent_id } = params;
     const queryParams: Record<string, string | number> = { page, size };
     if (search) queryParams.search = search;
     if (entity_type_id && entity_type_id !== "all")
       queryParams.entity_type_id = entity_type_id;
+    if (parent_id) queryParams.parent_id = parent_id;
 
     const response = await apiClient.get<ApiResponse<Entity[]>>(
       ENDPOINTS.ENTITIES.LIST,

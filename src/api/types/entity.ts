@@ -7,6 +7,7 @@ export interface EntityListParams {
   size?: number;
   search?: string;
   entity_type_id?: string;
+  parent_id?: string;
 }
 
 export interface EntityListResponse {
