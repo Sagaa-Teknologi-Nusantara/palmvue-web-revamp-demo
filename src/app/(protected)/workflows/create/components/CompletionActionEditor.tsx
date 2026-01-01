@@ -34,14 +34,24 @@ export interface ActionErrors {
   step?: string;
   field?: string;
   workflow?: string;
+  countSource?: string;
 }
 
 export type CompletionActionsErrors = Record<number, ActionErrors>;
 
 export function validateCompletionActions(
   actions: CompletionAction[],
+  steps: StepData[],
 ): CompletionActionsErrors {
   const errors: CompletionActionsErrors = {};
+
+  const hasIntegerFields = steps.some((step) => {
+    if (!step?.formSchema?.properties) return false;
+    return Object.values(step.formSchema.properties).some((schema) => {
+      const fieldSchema = schema as { type?: string };
+      return fieldSchema.type === "integer" || fieldSchema.type === "number";
+    });
+  });
 
   actions.forEach((action, index) => {
     const actionErrors: ActionErrors = {};
@@ -54,16 +64,24 @@ export function validateCompletionActions(
       }
 
       if (config.count_source.type === "submission_field") {
-        if (config.count_source.step_order === undefined) {
-          actionErrors.step = "Step is required";
-        }
-        if (!config.count_source.field_path) {
-          actionErrors.field = "Field is required";
+        if (!hasIntegerFields) {
+          actionErrors.countSource =
+            "No integer/number fields available. Add a step with a number field or use fixed count.";
+        } else {
+          if (config.count_source.step_order === undefined) {
+            actionErrors.step = "Step is required";
+          }
+          if (!config.count_source.field_path) {
+            actionErrors.field = "Field is required";
+          }
         }
       }
     } else if (action.type === "start_workflow") {
       const config = action.config as StartWorkflowConfig;
 
+      if (!config.entity_type_id) {
+        actionErrors.entityType = "Entity type is required";
+      }
       if (!config.workflow_id) {
         actionErrors.workflow = "Workflow is required";
       }
@@ -100,13 +118,9 @@ export function CompletionActionEditor({
 }: CompletionActionEditorProps) {
   const { options: allEntityTypes } = useEntityTypeOptionsQuery();
 
-  const isDisabled = selectedEntityTypeIds.length !== 1;
-  const assignedEntityTypeId =
-    selectedEntityTypeIds.length === 1 ? selectedEntityTypeIds[0] : null;
+  const isDisabled = selectedEntityTypeIds.length === 0;
   const disabledMessage =
-    selectedEntityTypeIds.length === 0
-      ? "Assign exactly one entity type to enable on-complete actions."
-      : "On-complete actions are only available when exactly one entity type is assigned.";
+    "Assign at least one entity type to enable on-complete actions.";
 
   const handleAddAction = () => {
     const newAction: CompletionAction = {
@@ -142,6 +156,7 @@ export function CompletionActionEditor({
           } as CreateEntitiesConfig)
         : ({
             workflow_id: "",
+            entity_type_id: "",
           } as StartWorkflowConfig);
 
     handleUpdateAction(index, { type, config: newConfig });
@@ -206,7 +221,7 @@ export function CompletionActionEditor({
               action={action}
               index={index}
               allEntityTypes={allEntityTypes}
-              entityTypeId={assignedEntityTypeId}
+              selectedEntityTypeIds={selectedEntityTypeIds}
               steps={steps}
               errors={errors[index]}
               onUpdate={(updated) => handleUpdateAction(index, updated)}
@@ -229,7 +244,7 @@ interface ActionCardProps {
     color: string;
     icon: string;
   }>;
-  entityTypeId: string | null;
+  selectedEntityTypeIds: string[];
   steps: StepData[];
   errors?: ActionErrors;
   onUpdate: (action: CompletionAction) => void;
@@ -241,7 +256,7 @@ function ActionCard({
   action,
   index,
   allEntityTypes,
-  entityTypeId,
+  selectedEntityTypeIds,
   steps,
   errors,
   onUpdate,
@@ -298,7 +313,8 @@ function ActionCard({
         ) : (
           <StartWorkflowForm
             config={action.config as StartWorkflowConfig}
-            entityTypeId={entityTypeId}
+            allEntityTypes={allEntityTypes}
+            selectedEntityTypeIds={selectedEntityTypeIds}
             errors={errors}
             onUpdate={(config) => onUpdate({ ...action, config })}
           />
@@ -483,7 +499,14 @@ function CreateEntitiesForm({
               first.
             </p>
           ) : stepsWithIntegerFields.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
+            <p
+              className={cn(
+                "text-sm",
+                errors?.countSource
+                  ? "text-destructive font-medium"
+                  : "text-muted-foreground",
+              )}
+            >
               No steps with integer/number fields available. Please add a step
               with a number field first.
             </p>
@@ -582,49 +605,150 @@ function CreateEntitiesForm({
 
 interface StartWorkflowFormProps {
   config: StartWorkflowConfig;
-  entityTypeId: string | null;
+  allEntityTypes: Array<{
+    id: string;
+    name: string;
+    color: string;
+    icon: string;
+  }>;
+  selectedEntityTypeIds: string[];
   errors?: ActionErrors;
   onUpdate: (config: StartWorkflowConfig) => void;
 }
 
 function StartWorkflowForm({
   config,
-  entityTypeId,
+  allEntityTypes,
+  selectedEntityTypeIds,
   errors,
   onUpdate,
 }: StartWorkflowFormProps) {
+  const assignedEntityTypes = allEntityTypes.filter((et) =>
+    selectedEntityTypeIds.includes(et.id),
+  );
+
   const { workflowOptions, isLoading: isLoadingWorkflows } =
-    useWorkflowOptionsQuery(entityTypeId);
+    useWorkflowOptionsQuery(config.entity_type_id || null);
+
+  const selectedEntityType = allEntityTypes.find(
+    (et) => et.id === config.entity_type_id,
+  );
+
+  const handleEntityTypeChange = (entityTypeId: string) => {
+    onUpdate({
+      ...config,
+      entity_type_id: entityTypeId,
+      workflow_id: "",
+    });
+  };
 
   return (
-    <div className="space-y-2">
-      <Label>Workflow</Label>
-      <Select
-        value={config.workflow_id}
-        onValueChange={(id) => onUpdate({ ...config, workflow_id: id })}
-        disabled={isLoadingWorkflows}
-      >
-        <SelectTrigger
-          className={cn(
-            "w-full",
-            errors?.workflow && "border-destructive ring-destructive",
-          )}
+    <div className="grid grid-cols-1 gap-4">
+      {/* Entity Type Selector */}
+      <div className="space-y-2">
+        <Label>Entity Type</Label>
+        <Select
+          value={config.entity_type_id}
+          onValueChange={handleEntityTypeChange}
         >
-          <SelectValue
-            placeholder={isLoadingWorkflows ? "Loading..." : "Select workflow"}
-          />
-        </SelectTrigger>
-        <SelectContent>
-          {workflowOptions.map((wf) => (
-            <SelectItem key={wf.id} value={wf.id}>
-              {wf.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {errors?.workflow && (
-        <p className="text-destructive text-sm">{errors.workflow}</p>
-      )}
+          <SelectTrigger
+            className={cn(
+              "w-full",
+              errors?.entityType && "border-destructive ring-destructive",
+            )}
+          >
+            <SelectValue placeholder="Select entity type">
+              {selectedEntityType && (
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex h-5 w-5 items-center justify-center rounded"
+                    style={{
+                      backgroundColor: getColorByLabel(selectedEntityType.color)
+                        .bg,
+                    }}
+                  >
+                    <DynamicIcon
+                      // @ts-expect-error - dynamic icon name
+                      name={selectedEntityType.icon}
+                      className="h-3 w-3"
+                      style={{
+                        color: getColorByLabel(selectedEntityType.color).fg,
+                      }}
+                    />
+                  </div>
+                  {selectedEntityType.name}
+                </div>
+              )}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {assignedEntityTypes.map((et) => {
+              const color = getColorByLabel(et.color);
+              return (
+                <SelectItem key={et.id} value={et.id}>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="flex h-5 w-5 items-center justify-center rounded"
+                      style={{ backgroundColor: color.bg }}
+                    >
+                      <DynamicIcon
+                        // @ts-expect-error - dynamic icon name
+                        name={et.icon}
+                        className="h-3 w-3"
+                        style={{ color: color.fg }}
+                      />
+                    </div>
+                    {et.name}
+                  </div>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+        {errors?.entityType && (
+          <p className="text-destructive text-sm">{errors.entityType}</p>
+        )}
+        <p className="text-muted-foreground text-xs">
+          Only entities of this type will trigger the workflow on completion.
+        </p>
+      </div>
+
+      {/* Workflow Selector */}
+      <div className="space-y-2">
+        <Label>Workflow</Label>
+        <Select
+          value={config.workflow_id}
+          onValueChange={(id) => onUpdate({ ...config, workflow_id: id })}
+          disabled={isLoadingWorkflows || !config.entity_type_id}
+        >
+          <SelectTrigger
+            className={cn(
+              "w-full",
+              errors?.workflow && "border-destructive ring-destructive",
+            )}
+          >
+            <SelectValue
+              placeholder={
+                !config.entity_type_id
+                  ? "Select entity type first"
+                  : isLoadingWorkflows
+                    ? "Loading..."
+                    : "Select workflow"
+              }
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {workflowOptions.map((wf) => (
+              <SelectItem key={wf.id} value={wf.id}>
+                {wf.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors?.workflow && (
+          <p className="text-destructive text-sm">{errors.workflow}</p>
+        )}
+      </div>
     </div>
   );
 }
