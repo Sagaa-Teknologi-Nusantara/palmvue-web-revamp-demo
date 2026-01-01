@@ -1,78 +1,47 @@
-I want to integrate workflow details page. This is the API endpoint:
+I want to implement entity type update page. This is the API endpoint:
 
-GET /workflows/{workflow_id}
+PATCH /entity-types/{id}
 
+Request body:
+{
+  "add_workflow_ids": [
+    "string"
+  ],
+  "color": "blue",
+  "description": "Updated description",
+  "icon": "chevron-right",
+  "include_existing": false,
+  "name": "Updated Tree"
+}
+
+Request struct in backend:
+type UpdateEntityTypeRequest struct {
+	Name            *string
+	Description     *string
+	Color           *string
+	Icon            *string
+	AddWorkflowIDs  []uuid.UUID
+	IncludeExisting *bool
+}
+
+Response body:
 {
   "success": true,
-  "message": "Workflow retrieved successfully",
+  "message": "Entity type updated successfully",
   "data": {
-    "id": "9b400e60-4fea-488c-823d-e26f3f7cdba0",
-    "name": "Ini Marshal Baru",
-    "is_loopable": false,
-    "is_auto_start": false,
-    "steps": [
-      {
-        "id": "8842c940-a8ee-4ab9-9a3e-9ad3b03a9983",
-        "name": "Intgeerr",
-        "order_index": 0,
-        "requires_approval": true,
-        "form": {
-          "id": "6ecf501a-3deb-4242-b6c8-56d66d76ee29",
-          "name": "adawdad",
-          "schema": {
-            "type": "object",
-            "properties": {
-              "Integer": {
-                "type": "integer",
-                "title": "integer"
-              }
-            }
-          }
-        }
-      }
-    ],
-    "entity_types": [
-      {
-        "id": "10eebc99-9c0b-4ef8-bb6d-6bb9bd380a40",
-        "name": "Oil Palm Tree",
-        "prefix": "TREE",
-        "color": "red",
-        "icon": "trees"
-      }
-    ],
-    "on_complete_actions": [
-      {
-        "type": "start_workflow",
-        "config": {
-          "workflow_id": "d9817ddf-badc-46c5-b565-65e1992060ea",
-          "workflow_name": "Halo"
-        }
-      },
-      {
-        "type": "create_entities",
-        "config": {
-          "entity_type_id": "11eebc99-9c0b-4ef8-bb6d-6bb9bd380a41",
-          "entity_type_info": {
-            "id": "11eebc99-9c0b-4ef8-bb6d-6bb9bd380a41",
-            "name": "Palm Inflorescence",
-            "prefix": "INFL",
-            "color": "blue",
-            "icon": "trees"
-          },
-          "count_source": {
-            "type": "submission_field",
-            "step_order": 0,
-            "field_path": "Integer",
-            "value": 14
-          }
-        }
-      }
-    ],
-    "created_at": "2025-12-29T11:33:45.816173+07:00",
-    "updated_at": "2025-12-29T11:33:45.816173+07:00"
+    "id": "13eebc99-9c0b-4ef8-bb6d-6bb9bd380a43",
+    "name": "Updated Palm Seed",
+    "description": "Palm seeds for germination studies and seed bank storage",
+    "prefix": "SEED",
+    "metadata_schema": {...},
+    "color": "yellow",
+    "icon": "trees",
+    "workflow_ids": null, // should be only added workflow if exists
+    "created_at": "2025-07-19T10:29:49.048311+07:00",
+    "updated_at": "2026-01-01T17:07:48.269707+07:00"
   }
 }
 
-You can adjust the appearance especially including is auto start and loopable options. You also need to add completion actions to be shown in the page. Refer to the existing integrated page such as entity details page. Also you can see in the workflow creation page to see the configuration of completion actions.
+Make sure in the new page /entity-types/{id}/edit, it show the existing data of the entity type. You can use the GET /entity-types/{id} and GET /entity-types/{id}/workflows to get the existing data. The added workflows should be from GET /workflows/options, exclude the assigned workflows
 
-Please be concise and mindful. Focus on necessary code changes only for integration
+Please be concise and focus on necessary code changes

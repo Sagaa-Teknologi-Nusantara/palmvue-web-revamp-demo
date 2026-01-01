@@ -6,6 +6,8 @@ import { entityTypeService } from "@/api/services/entityTypeService";
 
 import { ENTITY_TYPES_QUERY_KEY } from "./useEntityTypesQuery";
 
+export const ENTITY_TYPE_DETAIL_QUERY_KEY = "entityTypeDetail";
+
 export function useEntityTypeDetailQuery(id: string) {
   const query = useQuery({
     queryKey: [ENTITY_TYPES_QUERY_KEY, id],
