@@ -41,3 +41,9 @@ export interface CreateEntityRequest {
   name: string;
   metadata: Record<string, unknown>;
 }
+
+export interface UpdateEntityRequest {
+  name?: string;
+  parent_id?: string | null;
+  metadata?: Record<string, unknown>;
+}

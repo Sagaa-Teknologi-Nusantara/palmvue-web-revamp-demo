@@ -15,6 +15,7 @@ export const ENDPOINTS = {
     LIST: "/entities",
     CREATE: "/entities",
     DETAIL: (id: string) => `/entities/${id}`,
+    UPDATE: (id: string) => `/entities/${id}`,
     DELETE: (id: string) => `/entities/${id}`,
     OPTIONS: "/entities/options",
     WORKFLOW_DETAILS: (id: string) => `/entities/${id}/workflows`,

@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  useEntityDetailQuery,
   useEntityOptionsQuery,
   useEntityTypeOptionsQuery,
 } from "@/hooks/queries";
@@ -52,12 +53,12 @@ export function EntitySelector({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedFilterTypeId, setSelectedFilterTypeId] = useState<string>("");
-  const [selectedEntity, setSelectedEntity] = useState<EntityOption | null>(
-    null,
-  );
-  const [selectedEntityTypeId, setSelectedEntityTypeId] = useState<
-    string | null
-  >(null);
+
+  // Track manually selected entity (from user interaction in the popover)
+  const [manuallySelectedEntity, setManuallySelectedEntity] =
+    useState<EntityOption | null>(null);
+  const [manuallySelectedEntityTypeId, setManuallySelectedEntityTypeId] =
+    useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,6 +66,50 @@ export function EntitySelector({
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
+
+  // Fetch entity details when value is provided (for initial load with existing value)
+  const { entity: fetchedEntity } = useEntityDetailQuery(value ?? "");
+
+  // Derive display entity: prefer manual selection, fallback to fetched data
+  const displayEntity = useMemo<EntityOption | null>(() => {
+    if (!value) return null;
+
+    // If manually selected matches value, use it
+    if (manuallySelectedEntity?.id === value) {
+      return manuallySelectedEntity;
+    }
+
+    // Otherwise, use fetched entity data
+    if (fetchedEntity && fetchedEntity.id === value) {
+      return {
+        id: fetchedEntity.id,
+        code: fetchedEntity.code,
+        name: fetchedEntity.name,
+      };
+    }
+
+    return null;
+  }, [value, manuallySelectedEntity, fetchedEntity]);
+
+  // Derive entity type ID for display styling
+  const displayEntityTypeId = useMemo<string | null>(() => {
+    if (!value) return null;
+
+    if (manuallySelectedEntity?.id === value) {
+      return manuallySelectedEntityTypeId;
+    }
+
+    if (fetchedEntity && fetchedEntity.id === value) {
+      return fetchedEntity.entity_type_id;
+    }
+
+    return null;
+  }, [
+    value,
+    manuallySelectedEntity,
+    manuallySelectedEntityTypeId,
+    fetchedEntity,
+  ]);
 
   const { options: entityTypeOptions } = useEntityTypeOptionsQuery();
 
@@ -95,8 +140,8 @@ export function EntitySelector({
   );
 
   const entityType = useMemo(
-    () => entityTypeOptions.find((t) => t.id === selectedEntityTypeId),
-    [entityTypeOptions, selectedEntityTypeId],
+    () => entityTypeOptions.find((t) => t.id === displayEntityTypeId),
+    [entityTypeOptions, displayEntityTypeId],
   );
 
   const entityTypeColors = useMemo(
@@ -109,8 +154,8 @@ export function EntitySelector({
 
   const handleSelect = useCallback(
     (entity: EntityOption) => {
-      setSelectedEntity(entity);
-      setSelectedEntityTypeId(selectedFilterTypeId);
+      setManuallySelectedEntity(entity);
+      setManuallySelectedEntityTypeId(selectedFilterTypeId);
       onChange(entity.id);
       setOpen(false);
       setSearch("");
@@ -119,8 +164,8 @@ export function EntitySelector({
   );
 
   const handleClear = useCallback(() => {
-    setSelectedEntity(null);
-    setSelectedEntityTypeId(null);
+    setManuallySelectedEntity(null);
+    setManuallySelectedEntityTypeId(null);
     onChange(null);
   }, [onChange]);
 
@@ -134,10 +179,10 @@ export function EntitySelector({
           disabled={disabled}
           className={cn(
             "w-full justify-between px-3 font-normal hover:bg-transparent",
-            !selectedEntity && "text-muted-foreground",
+            !displayEntity && "text-muted-foreground",
           )}
         >
-          {selectedEntity ? (
+          {displayEntity ? (
             <div className="flex items-center gap-2 truncate">
               <span
                 className="rounded-[4px] px-1.5 py-0.5 font-mono text-[10px] font-medium"
@@ -146,10 +191,10 @@ export function EntitySelector({
                   color: entityTypeColors.fg,
                 }}
               >
-                {selectedEntity.code}
+                {displayEntity.code}
               </span>
               <span className="truncate text-sm font-medium">
-                {selectedEntity.name}
+                {displayEntity.name}
               </span>
             </div>
           ) : (
@@ -159,7 +204,7 @@ export function EntitySelector({
             </div>
           )}
           <div className="flex items-center gap-1 opacity-50 transition-opacity hover:opacity-100">
-            {selectedEntity && (
+            {displayEntity && (
               <div
                 role="button"
                 tabIndex={0}

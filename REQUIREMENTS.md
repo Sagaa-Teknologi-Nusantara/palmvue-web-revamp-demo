@@ -1,47 +1,56 @@
-I want to implement entity type update page. This is the API endpoint:
+I want to implement entity update page. The API provided:
+PATCH /entities/{id}
 
-PATCH /entity-types/{id}
-
-Request body:
+Request Body:
 {
-  "add_workflow_ids": [
-    "string"
-  ],
-  "color": "blue",
-  "description": "Updated description",
-  "icon": "chevron-right",
-  "include_existing": false,
-  "name": "Updated Tree"
+  "metadata": {},
+  "name": "string",
+  "parent_id": "string"
 }
 
-Request struct in backend:
-type UpdateEntityTypeRequest struct {
-	Name            *string
-	Description     *string
-	Color           *string
-	Icon            *string
-	AddWorkflowIDs  []uuid.UUID
-	IncludeExisting *bool
+Request Struct:
+
+type UpdateEntityRequest struct {
+	ParentID *uuid.UUID       `json:"parent_id,omitempty"`
+	Name     *string          `json:"name,omitempty"`
+	Metadata *json.RawMessage `json:"metadata,omitempty" swaggertype:"primitive,object"`
 }
 
 Response body:
 {
   "success": true,
-  "message": "Entity type updated successfully",
+  "message": "Entity updated successfully",
   "data": {
-    "id": "13eebc99-9c0b-4ef8-bb6d-6bb9bd380a43",
-    "name": "Updated Palm Seed",
-    "description": "Palm seeds for germination studies and seed bank storage",
-    "prefix": "SEED",
-    "metadata_schema": {...},
-    "color": "yellow",
-    "icon": "trees",
-    "workflow_ids": null, // should be only added workflow if exists
-    "created_at": "2025-07-19T10:29:49.048311+07:00",
-    "updated_at": "2026-01-01T17:07:48.269707+07:00"
+    "id": "8de73af2-a1ce-43a4-babb-0427ccca341d",
+    "entity_type_id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
+    "entity_type": {
+      "id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
+      "name": "Pollen Sample",
+      "prefix": "POLN",
+      "color": "green",
+      "icon": "trees"
+    },
+    "parent_id": "45eebc99-9c0b-4ef8-bb6d-6bb9bd380a75",
+    "parent": {
+      "id": "45eebc99-9c0b-4ef8-bb6d-6bb9bd380a75",
+      "code": "SEED-0003",
+      "name": "Germination Trial Seeds GT-2024-A"
+    },
+    "name": "Pollen New Old",
+    "code": "POLN-0011",
+    "metadata": {
+      "batch_number": "A-002",
+      "quantity_grams": 100,
+      "collection_date": "2025-12-27",
+      "collection_method": "DOM",
+      "source_tree_variety": "a",
+      "viability_percentage": 8,
+      "storage_temperature_celsius": 120
+    },
+    "created_by": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+    "created_at": "2025-12-26T10:31:11.922278+07:00",
+    "updated_at": "2026-01-01T21:04:34.197152+07:00"
   }
 }
 
-Make sure in the new page /entity-types/{id}/edit, it show the existing data of the entity type. You can use the GET /entity-types/{id} and GET /entity-types/{id}/workflows to get the existing data. The added workflows should be from GET /workflows/options, exclude the assigned workflows
-
-Please be concise and focus on necessary code changes
+Please implement in the new page /entities/{id}/edit. Ensure to load the existing data of the entity. You can use Entity Selector to select the parent entity. Refer to the entity type edit page for the implementation of update entity type.

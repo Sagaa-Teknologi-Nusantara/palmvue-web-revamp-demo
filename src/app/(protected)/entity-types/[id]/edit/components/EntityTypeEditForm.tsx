@@ -71,7 +71,9 @@ export function EntityTypeEditForm({
 
         <MetadataSchemaCard schema={entityType.metadata_schema as JSONSchema} />
 
-        <div className="flex justify-end gap-4">
+        <div className="h-20" />
+
+        <div className="bg-background fixed right-0 bottom-0 left-64 z-50 flex items-center justify-end gap-3 border-t p-4 shadow-sm transition-all duration-300">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>

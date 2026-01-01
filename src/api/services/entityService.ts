@@ -9,6 +9,7 @@ import type {
   EntityListResponse,
   EntityOption,
   EntityOptionsParams,
+  UpdateEntityRequest,
 } from "../types/entity";
 
 export const entityService = {
@@ -62,6 +63,14 @@ export const entityService = {
   create: async (data: CreateEntityRequest): Promise<Entity> => {
     const response = await apiClient.post<ApiResponse<Entity>>(
       ENDPOINTS.ENTITIES.CREATE,
+      data,
+    );
+    return response.data.data;
+  },
+
+  update: async (id: string, data: UpdateEntityRequest): Promise<Entity> => {
+    const response = await apiClient.patch<ApiResponse<Entity>>(
+      ENDPOINTS.ENTITIES.UPDATE(id),
       data,
     );
     return response.data.data;
