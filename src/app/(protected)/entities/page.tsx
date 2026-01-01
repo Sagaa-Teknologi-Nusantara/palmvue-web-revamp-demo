@@ -26,7 +26,7 @@ export default function EntitiesPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const selectedType = searchParams.get("type") || "all";
-  const selectedParent = searchParams.get("parent") || null;
+  const [selectedParent, setSelectedParent] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
@@ -65,21 +65,10 @@ export default function EntitiesPage() {
     [router, searchParams],
   );
 
-  const handleParentChange = useCallback(
-    (parentId: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (!parentId) {
-        params.delete("parent");
-      } else {
-        params.set("parent", parentId);
-      }
-      router.push(
-        `/entities${params.toString() ? `?${params.toString()}` : ""}`,
-      );
-      setPage(1);
-    },
-    [router, searchParams],
-  );
+  const handleParentChange = useCallback((parentId: string | null) => {
+    setSelectedParent(parentId);
+    setPage(1);
+  }, []);
 
   const handlePageSizeChange = useCallback((newPageSize: number) => {
     setPageSize(newPageSize);
