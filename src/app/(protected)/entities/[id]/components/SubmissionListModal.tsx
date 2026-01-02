@@ -1,8 +1,19 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { useState } from "react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +33,11 @@ import {
   SubmissionStatusBadge,
   SubmissionStatusDot,
 } from "@/components/workflows";
-import { useStepSubmissionsQuery } from "@/hooks/queries";
+import {
+  useApproveSubmissionMutation,
+  useRejectSubmissionMutation,
+  useStepSubmissionsQuery,
+} from "@/hooks/queries";
 import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/date";
 import type { EntityWorkflowStep } from "@/types";
@@ -47,10 +62,32 @@ export function SubmissionListModal({
   );
 
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string>("");
+  const [confirmAction, setConfirmAction] = useState<
+    "approve" | "reject" | null
+  >(null);
+
+  const approveMutation = useApproveSubmissionMutation();
+  const rejectMutation = useRejectSubmissionMutation();
 
   const selectedSubmission = selectedSubmissionId
     ? submissions.find((s) => s.id === selectedSubmissionId)
     : submissions[0];
+
+  const handleApprove = () => {
+    if (!selectedSubmission) return;
+    approveMutation.mutate(selectedSubmission.id, {
+      onSuccess: () => setConfirmAction(null),
+    });
+  };
+
+  const handleReject = () => {
+    if (!selectedSubmission) return;
+    rejectMutation.mutate(selectedSubmission.id, {
+      onSuccess: () => setConfirmAction(null),
+    });
+  };
+
+  const isPending = approveMutation.isPending || rejectMutation.isPending;
 
   const renderLoadingState = () => (
     <div className="flex flex-col items-center justify-center py-12">
@@ -173,35 +210,99 @@ export function SubmissionListModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[550px]">
-        <DialogHeader className="border-b bg-gray-50/50 px-6 py-5">
-          <div className="mr-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <DialogTitle className="text-xl leading-none font-semibold">
-                {step.name}
-              </DialogTitle>
-              <DialogDescription className="text-xs font-medium">
-                Step {step.order_index + 1}
-              </DialogDescription>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[550px]">
+          <DialogHeader className="border-b bg-gray-50/50 px-6 py-5">
+            <div className="mr-6 flex items-center justify-between">
+              <div className="space-y-1">
+                <DialogTitle className="text-xl leading-none font-semibold">
+                  {step.name}
+                </DialogTitle>
+                <DialogDescription className="text-xs font-medium">
+                  Step {step.order_index + 1}
+                </DialogDescription>
+              </div>
+              <div
+                className={cn(
+                  "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                  step.requires_approval
+                    ? "border-yellow-200 bg-yellow-50 text-yellow-700"
+                    : "border-green-200 bg-green-50 text-green-700",
+                )}
+              >
+                {step.requires_approval ? "Requires Approval" : "Auto Approved"}
+              </div>
             </div>
-            <div
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
-                step.requires_approval
-                  ? "border-yellow-200 bg-yellow-50 text-yellow-700"
-                  : "border-green-200 bg-green-50 text-green-700",
-              )}
-            >
-              {step.requires_approval ? "Requires Approval" : "Auto Approved"}
-            </div>
-          </div>
-        </DialogHeader>
+          </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh]">
-          <div className="p-6">{renderContent()}</div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="p-6">{renderContent()}</div>
+          </ScrollArea>
+
+          {true &&
+            true && (
+              <div className="border-t bg-gray-50/50 p-4">
+                <div className="flex gap-2">
+                  <Button
+                    className="flex-1"
+                    onClick={() => setConfirmAction("approve")}
+                    disabled={isPending}
+                  >
+                    <Check className="mr-1.5 h-4 w-4" />
+                    Approve
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => setConfirmAction("reject")}
+                    disabled={isPending}
+                  >
+                    <X className="mr-1.5 h-4 w-4" />
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={confirmAction !== null}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction === "approve"
+                ? "Approve Submission"
+                : "Reject Submission"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction === "approve"
+                ? "Are you sure you want to approve this submission? The workflow will advance to the next step."
+                : "Are you sure you want to reject this submission? The user will need to re-submit."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={
+                confirmAction === "approve" ? handleApprove : handleReject
+              }
+              disabled={isPending}
+              className={
+                confirmAction === "reject"
+                  ? "bg-destructive hover:bg-destructive/90"
+                  : ""
+              }
+            >
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {confirmAction === "approve" ? "Approve" : "Reject"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

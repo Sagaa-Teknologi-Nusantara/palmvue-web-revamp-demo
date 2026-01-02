@@ -1,3 +1,4 @@
+export * from "./useApproveSubmissionMutation";
 export * from "./useCreateEntityMutation";
 export * from "./useCreateEntityTypeMutation";
 export * from "./useCreateWorkflowMutation";
@@ -12,6 +13,7 @@ export * from "./useEntityTypeOptionsQuery";
 export * from "./useEntityTypesQuery";
 export * from "./useEntityTypeWorkflowsQuery";
 export * from "./useEntityWorkflowsQuery";
+export * from "./useRejectSubmissionMutation";
 export * from "./useStartWorkflowRecordMutation";
 export * from "./useStepSubmissionsQuery";
 export * from "./useUpdateEntityMutation";
