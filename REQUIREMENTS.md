@@ -1,56 +1,67 @@
-I want to implement entity update page. The API provided:
-PATCH /entities/{id}
+Create an edit workflow page at /workflows/[id]/edit that allows updating an existing workflow using the PATCH /workflows/{id} endpoint.
+
+API Details
+Endpoint: `PATCH /api/workflows/{id}`
 
 Request Body:
-{
-  "metadata": {},
-  "name": "string",
-  "parent_id": "string"
+
+```typescript
+interface UpdateWorkflowRequest {
+  name?: string;
+  is_loopable?: boolean;
+  is_auto_start?: boolean;
+  add_entity_type_ids?: string[]; // Only add, cannot remove
+  include_existing?: boolean; // Backfill workflow records for new entity types
+  on_complete?: CompletionAction[]; // Full replacement when provided
 }
-
-Request Struct:
-
-type UpdateEntityRequest struct {
-	ParentID *uuid.UUID       `json:"parent_id,omitempty"`
-	Name     *string          `json:"name,omitempty"`
-	Metadata *json.RawMessage `json:"metadata,omitempty" swaggertype:"primitive,object"`
+interface CompletionAction {
+  type: "create_entities" | "start_workflow";
+  config: CreateEntitiesConfig | StartWorkflowConfig;
 }
-
-Response body:
-{
-  "success": true,
-  "message": "Entity updated successfully",
-  "data": {
-    "id": "8de73af2-a1ce-43a4-babb-0427ccca341d",
-    "entity_type_id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
-    "entity_type": {
-      "id": "12eebc99-9c0b-4ef8-bb6d-6bb9bd380a42",
-      "name": "Pollen Sample",
-      "prefix": "POLN",
-      "color": "green",
-      "icon": "trees"
-    },
-    "parent_id": "45eebc99-9c0b-4ef8-bb6d-6bb9bd380a75",
-    "parent": {
-      "id": "45eebc99-9c0b-4ef8-bb6d-6bb9bd380a75",
-      "code": "SEED-0003",
-      "name": "Germination Trial Seeds GT-2024-A"
-    },
-    "name": "Pollen New Old",
-    "code": "POLN-0011",
-    "metadata": {
-      "batch_number": "A-002",
-      "quantity_grams": 100,
-      "collection_date": "2025-12-27",
-      "collection_method": "DOM",
-      "source_tree_variety": "a",
-      "viability_percentage": 8,
-      "storage_temperature_celsius": 120
-    },
-    "created_by": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-    "created_at": "2025-12-26T10:31:11.922278+07:00",
-    "updated_at": "2026-01-01T21:04:34.197152+07:00"
-  }
+interface CreateEntitiesConfig {
+  entity_type_id: string;
+  count_source: {
+    type: "fixed" | "submission_field";
+    value?: number; // For fixed
+    step_order?: number; // For submission_field
+    field_path?: string; // For submission_field
+  };
 }
+interface StartWorkflowConfig {
+  workflow_id: string;
+  entity_type_id: string; // Must be assigned to this workflow
+}
+```
 
-Please implement in the new page /entities/{id}/edit. Ensure to load the existing data of the entity. You can use Entity Selector to select the parent entity. Refer to the entity type edit page for the implementation of update entity type.
+Page Requirements
+
+- Fetch existing workflow via GET /api/workflows/{id} to pre-populate the form
+
+Editable Fields:
+
+- Name - Text input
+- Behaviour section:
+  - is_loopable - Toggle/checkbox
+  - is_auto_start - Toggle/checkbox
+- Entity Types section:
+  - Show currently assigned entity types (read-only display)
+  - Combobox/multi-select to add NEW entity types (fetch from /api/entity-types/options)
+  - Checkbox for "Include existing entities" (backfill) - only shown when adding new entity types
+- Completion Actions section:
+  - Display current actions
+  - Allow full replacement (add/remove/edit actions)
+
+For create_entities: select entity type, configure count source
+For start_workflow: select workflow (must be assigned to the entity type)
+
+Validation Rules:
+
+- For start_workflow completion action:
+  - Entity type must be in the workflow's assigned entity types (current + newly added)
+  - Target workflow must be assigned to that entity type
+    UX Considerations:
+- Only send changed fields in the PATCH request
+- Show confirmation before replacing completion actions
+- Warn user about backfill consequences when "Include existing" is checked
+
+Reference: Check the existing workflow detail page at /workflows/[id] and entity type edit page at /entity-types/[id]/edit for design patterns.

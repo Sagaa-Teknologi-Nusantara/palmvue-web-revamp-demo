@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, GitBranch, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit2, GitBranch, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useState } from "react";
@@ -103,15 +103,23 @@ export default function WorkflowDetailPage({
               </div>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 h-9"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Workflow
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-9" asChild>
+                <Link href={`/workflows/${id}/edit`}>
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 h-9"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            </div>
           </div>
           <Separator />
         </div>

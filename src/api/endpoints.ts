@@ -26,6 +26,7 @@ export const ENDPOINTS = {
     OPTIONS: "/workflows/options",
     DETAIL: (id: string) => `/workflows/${id}`,
     DELETE: (id: string) => `/workflows/${id}`,
+    UPDATE: (id: string) => `/workflows/${id}`,
   },
   WORKFLOW_RECORDS: {
     STEP_SUBMISSIONS: (recordId: string, stepId: string) =>
