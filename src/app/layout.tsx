@@ -5,7 +5,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import { DatabaseProvider } from "@/components/providers/DatabaseProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 
 const geistSans = Geist({
@@ -35,10 +34,8 @@ export default function RootLayout({
       >
         <QueryProvider>
           <AuthProvider>
-            <DatabaseProvider>
-              {children}
-              <Toaster />
-            </DatabaseProvider>
+            {children}
+            <Toaster />
           </AuthProvider>
         </QueryProvider>
       </body>
