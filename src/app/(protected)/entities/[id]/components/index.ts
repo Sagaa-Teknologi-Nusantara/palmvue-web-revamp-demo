@@ -4,5 +4,6 @@ export { EntityDetailsCard } from "./EntityDetailsCard";
 export { EntityMetadataCard } from "./EntityMetadataCard";
 export { EntityWorkflowSection } from "./EntityWorkflowSection";
 export { FormSchemaModal } from "./FormSchemaModal";
+export { QRCodeDrawer } from "./QRCodeDrawer";
 export { SubmissionListModal } from "./SubmissionListModal";
 export { WorkflowPipeline } from "./WorkflowPipeline";
