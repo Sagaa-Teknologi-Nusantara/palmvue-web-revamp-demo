@@ -105,6 +105,7 @@ export interface CreateStepInput {
 export interface CreateWorkflowInput {
   name: string;
   entity_type_ids: string[];
+  include_existing?: boolean;
   is_auto_start: boolean;
   is_loopable: boolean;
   steps: CreateStepInput[];
