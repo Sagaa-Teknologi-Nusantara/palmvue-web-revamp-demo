@@ -14,6 +14,16 @@ export const workflowRecordService = {
     );
     return response.data.data;
   },
+
+  start: async (
+    recordId: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+    }>(ENDPOINTS.WORKFLOW_RECORDS.START(recordId));
+    return response.data;
+  },
 };
 
 export default workflowRecordService;

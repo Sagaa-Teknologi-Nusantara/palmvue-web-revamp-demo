@@ -31,5 +31,6 @@ export const ENDPOINTS = {
   WORKFLOW_RECORDS: {
     STEP_SUBMISSIONS: (recordId: string, stepId: string) =>
       `/workflow-records/${recordId}/steps/${stepId}/submissions`,
+    START: (recordId: string) => `/workflow-records/${recordId}/start`,
   },
 } as const;
