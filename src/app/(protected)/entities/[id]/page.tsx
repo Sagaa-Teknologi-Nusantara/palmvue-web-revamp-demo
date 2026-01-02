@@ -24,6 +24,7 @@ import {
   EntityDetailsCard,
   EntityMetadataCard,
   EntityWorkflowSection,
+  QRCodeDrawer,
 } from "./components";
 
 const [NOT_STARTED, IN_PROGRESS, PENDING_APPROVAL, COMPLETED] =
@@ -51,6 +52,7 @@ export default function EntityDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showQRCodeDrawer, setShowQRCodeDrawer] = useState(false);
 
   const { entity, isLoading, isError, error } = useEntityDetailQuery(id);
   const { entityType, isLoading: isLoadingEntityType } =
@@ -132,6 +134,7 @@ export default function EntityDetailPage({
         entity={entity}
         entityStatus={entityStatus}
         onDeleteClick={() => setShowDeleteDialog(true)}
+        onQRCodeClick={() => setShowQRCodeDrawer(true)}
       />
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -154,6 +157,12 @@ export default function EntityDetailPage({
         entityName={entity.name}
         onConfirm={handleDelete}
         isPending={deleteMutation.isPending}
+      />
+
+      <QRCodeDrawer
+        entity={entity}
+        open={showQRCodeDrawer}
+        onOpenChange={setShowQRCodeDrawer}
       />
     </div>
   );

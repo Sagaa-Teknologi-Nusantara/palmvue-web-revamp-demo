@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, QrCode, Trash2 } from "lucide-react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import Link from "next/link";
 
@@ -13,12 +13,14 @@ interface EntityDetailHeaderProps {
   entity: Entity;
   entityStatus: WorkflowRecordStatus;
   onDeleteClick: () => void;
+  onQRCodeClick: () => void;
 }
 
 export function EntityDetailHeader({
   entity,
   entityStatus,
   onDeleteClick,
+  onQRCodeClick,
 }: EntityDetailHeaderProps) {
   const typeInfo = entity.entity_type;
   const { bg: typeBgColor, fg: typeColor } = getColorByLabel(
@@ -69,6 +71,15 @@ export function EntityDetailHeader({
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9"
+              onClick={onQRCodeClick}
+            >
+              <QrCode className="mr-2 h-4 w-4" />
+              QR Code
+            </Button>
             <Button variant="outline" size="sm" className="h-9" asChild>
               <Link href={`/entities/${entity.id}/edit`}>
                 <Pencil className="mr-2 h-4 w-4" />
