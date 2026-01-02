@@ -62,6 +62,11 @@ function CompletionActionCard({
 }) {
   if (action.type === "start_workflow") {
     const config = action.config as StartWorkflowConfig;
+    const entityInfo = config.entity_type_info;
+    const { bg, fg } = entityInfo
+      ? getColorByLabel(entityInfo.color)
+      : { bg: "#f3f4f6", fg: "#6b7280" };
+
     return (
       <div className="bg-card flex flex-col gap-3 rounded-lg border p-3 shadow-sm transition-all">
         <div className="flex items-center gap-3">
@@ -78,18 +83,42 @@ function CompletionActionCard({
 
         <div className="bg-border h-px w-full" />
 
-        <div className="flex flex-1 items-center gap-2">
-          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-            Target:
-          </span>
-          <Link href={`/workflows/${config.workflow_id}`}>
-            <Badge
-              variant="outline"
-              className="hover:bg-accent font-medium transition-colors"
-            >
-              {config.workflow_name || config.workflow_id}
-            </Badge>
-          </Link>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {/* Entity Type Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+              For:
+            </span>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="flex h-5 w-5 items-center justify-center rounded border-[0.5px]"
+                style={{ backgroundColor: bg, color: fg, borderColor: fg }}
+              >
+                <DynamicIcon
+                  name={(entityInfo?.icon as IconName) || "box"}
+                  className="h-3 w-3"
+                />
+              </div>
+              <span className="text-sm font-medium">
+                {entityInfo?.name || config.entity_type_id}
+              </span>
+            </div>
+          </div>
+
+          {/* Target Workflow */}
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+              Target:
+            </span>
+            <Link href={`/workflows/${config.workflow_id}`}>
+              <Badge
+                variant="outline"
+                className="hover:bg-accent font-medium transition-colors"
+              >
+                {config.workflow_name || config.workflow_id}
+              </Badge>
+            </Link>
+          </div>
         </div>
       </div>
     );

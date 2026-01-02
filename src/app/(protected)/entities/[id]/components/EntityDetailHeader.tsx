@@ -1,4 +1,4 @@
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import Link from "next/link";
 
@@ -68,15 +68,23 @@ export function EntityDetailHeader({
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 h-9"
-            onClick={onDeleteClick}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Entity
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-9" asChild>
+              <Link href={`/entities/${entity.id}/edit`}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 h-9"
+              onClick={onDeleteClick}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </div>
         </div>
         <Separator />
       </div>

@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 
 import type { EntityTypeOption } from "@/api/types/entity";
+import { EntitySelector } from "@/components/entities/EntitySelector";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,6 +19,8 @@ interface EntityFiltersProps {
   selectedType: string;
   onTypeChange: (typeId: string) => void;
   entityTypeOptions: EntityTypeOption[];
+  selectedParent: string | null;
+  onParentChange: (parentId: string | null) => void;
 }
 
 export function EntityFilters({
@@ -26,6 +29,8 @@ export function EntityFilters({
   selectedType,
   onTypeChange,
   entityTypeOptions,
+  selectedParent,
+  onParentChange,
 }: EntityFiltersProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row">
@@ -52,6 +57,14 @@ export function EntityFilters({
           ))}
         </SelectContent>
       </Select>
+
+      <div className="w-full sm:w-[220px]">
+        <EntitySelector
+          value={selectedParent}
+          onChange={onParentChange}
+          placeholder="Filter by parent..."
+        />
+      </div>
     </div>
   );
 }

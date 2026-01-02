@@ -10,6 +10,7 @@ import apiClient from "../client";
 import { ENDPOINTS } from "../endpoints";
 import type { ApiResponse } from "../types";
 import type {
+  UpdateWorkflowRequest,
   WorkflowListParams,
   WorkflowListResponse,
 } from "../types/workflow";
@@ -58,6 +59,17 @@ export const workflowService = {
   create: async (data: CreateWorkflowInput): Promise<Workflow> => {
     const response = await apiClient.post<ApiResponse<Workflow>>(
       ENDPOINTS.WORKFLOWS.CREATE,
+      data,
+    );
+    return response.data.data;
+  },
+
+  update: async (
+    id: string,
+    data: UpdateWorkflowRequest,
+  ): Promise<WorkflowDetail> => {
+    const response = await apiClient.patch<ApiResponse<WorkflowDetail>>(
+      ENDPOINTS.WORKFLOWS.UPDATE(id),
       data,
     );
     return response.data.data;

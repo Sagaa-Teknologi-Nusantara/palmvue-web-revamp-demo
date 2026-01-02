@@ -7,6 +7,7 @@ export interface EntityListParams {
   size?: number;
   search?: string;
   entity_type_id?: string;
+  parent_id?: string;
 }
 
 export interface EntityListResponse {
@@ -39,4 +40,10 @@ export interface CreateEntityRequest {
   parent_id?: string;
   name: string;
   metadata: Record<string, unknown>;
+}
+
+export interface UpdateEntityRequest {
+  name?: string;
+  parent_id?: string | null;
+  metadata?: Record<string, unknown>;
 }

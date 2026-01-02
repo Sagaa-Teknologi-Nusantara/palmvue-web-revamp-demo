@@ -1,8 +1,12 @@
-import { PlayCircle } from "lucide-react";
+"use client";
 
+import { Play, PlayCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/workflows/StatusBadge";
+import { useStartWorkflowRecordMutation } from "@/hooks/queries";
 import { formatDate } from "@/lib/date";
 import type { EntityWorkflowDetail } from "@/types/workflow-record";
 
@@ -17,6 +21,12 @@ export function EntityWorkflowSection({
   workflows,
   isLoading,
 }: EntityWorkflowSectionProps) {
+  const startMutation = useStartWorkflowRecordMutation();
+
+  const handleStart = (recordId: string) => {
+    startMutation.mutate(recordId);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -39,8 +49,8 @@ export function EntityWorkflowSection({
           {workflows.map((workflowDetail) => (
             <Card key={workflowDetail.id} className="gap-0 overflow-hidden p-0">
               <div className="border-b bg-gray-50/40 p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
                     <div className="bg-primary/10 text-primary mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border shadow-sm">
                       <PlayCircle className="h-5 w-5" />
                     </div>
@@ -49,28 +59,51 @@ export function EntityWorkflowSection({
                         {workflowDetail.workflow.name}
                       </CardTitle>
                       <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium">Started:</span>
-                          <span>
-                            {formatDate(
-                              workflowDetail.started_at ||
-                                workflowDetail.created_at,
-                            )}
-                          </span>
-                        </div>
-                        {workflowDetail.completed_at && (
+                        {workflowDetail.status === "not_started" ? (
                           <div className="flex items-center gap-1.5">
-                            <span className="font-medium">Completed:</span>
-                            <span>
-                              {formatDate(workflowDetail.completed_at)}
-                            </span>
+                            <span className="font-medium">Not Started</span>
                           </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-medium">Started:</span>
+                              <span>
+                                {formatDate(
+                                  workflowDetail.started_at ||
+                                    workflowDetail.created_at,
+                                )}
+                              </span>
+                            </div>
+                            {workflowDetail.completed_at && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-medium">Completed:</span>
+                                <span>
+                                  {formatDate(workflowDetail.completed_at)}
+                                </span>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="shrink-0">
-                    <StatusBadge status={workflowDetail.status} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    {workflowDetail.status === "not_started" ? (
+                      <Button
+                        size="sm"
+                        onClick={() => handleStart(workflowDetail.id)}
+                        disabled={startMutation.isPending}
+                        className="opacity-85"
+                      >
+                        <Play className="mr-1.5 h-3.5 w-3.5" />
+                        {startMutation.isPending &&
+                        startMutation.variables === workflowDetail.id
+                          ? "Starting..."
+                          : "Start Workflow"}
+                      </Button>
+                    ) : (
+                      <StatusBadge status={workflowDetail.status} />
+                    )}
                   </div>
                 </div>
               </div>

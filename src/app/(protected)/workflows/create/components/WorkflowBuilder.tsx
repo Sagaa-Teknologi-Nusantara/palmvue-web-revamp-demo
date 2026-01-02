@@ -31,7 +31,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import type { CompletionAction, CreateWorkflowInput } from "@/types";
+import type {
+  CompletionAction,
+  CreateWorkflowInput,
+  StartWorkflowConfig,
+} from "@/types";
 
 import {
   CompletionActionEditor,
@@ -63,6 +67,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
   const [selectedEntityTypeIds, setSelectedEntityTypeIds] = useState<string[]>(
     [],
   );
+  const [includeExisting, setIncludeExisting] = useState(false);
   const [completionActionErrors, setCompletionActionErrors] =
     useState<CompletionActionsErrors>({});
 
@@ -124,7 +129,27 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
 
   const handleEntityTypeIdsChange = (newIds: string[]) => {
     setSelectedEntityTypeIds(newIds);
-    setCompletionActions([]);
+
+    if (newIds.length === 0) {
+      setCompletionActions([]);
+      setIncludeExisting(false);
+      return;
+    }
+
+    setCompletionActions((prev) =>
+      prev.filter((action) => {
+        if (action.type === "create_entities") {
+          return true;
+        }
+        if (action.type === "start_workflow") {
+          const config = action.config as StartWorkflowConfig;
+          return (
+            !config.entity_type_id || newIds.includes(config.entity_type_id)
+          );
+        }
+        return true;
+      }),
+    );
   };
 
   const handleSubmit = (values: {
@@ -136,7 +161,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
       return;
     }
 
-    const actionErrors = validateCompletionActions(completionActions);
+    const actionErrors = validateCompletionActions(completionActions, steps);
     if (hasCompletionActionErrors(actionErrors)) {
       setCompletionActionErrors(actionErrors);
       return;
@@ -146,6 +171,7 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
     const workflowData: CreateWorkflowInput = {
       name: values.name,
       entity_type_ids: selectedEntityTypeIds,
+      include_existing: includeExisting,
       is_auto_start: values.isAutoStart,
       is_loopable: values.isLoopable,
       steps: steps.map((step, index) => ({
@@ -204,6 +230,8 @@ export function WorkflowBuilder({ onSubmit, onCancel }: WorkflowBuilderProps) {
                   <EntityTypePicker
                     selectedIds={selectedEntityTypeIds}
                     onChange={handleEntityTypeIdsChange}
+                    includeExisting={includeExisting}
+                    onIncludeExistingChange={setIncludeExisting}
                   />
 
                   {/* Toggles */}

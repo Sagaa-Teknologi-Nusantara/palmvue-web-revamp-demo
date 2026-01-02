@@ -76,13 +76,15 @@ export interface CountSource {
 
 export interface CreateEntitiesConfig {
   entity_type_id: string;
-  entity_type_info?: EntityTypeRef; // Present in detail response
+  entity_type_info?: EntityTypeRef;
   count_source: CountSource;
 }
 
 export interface StartWorkflowConfig {
   workflow_id: string;
-  workflow_name?: string; // Present in detail response
+  workflow_name?: string;
+  entity_type_id: string;
+  entity_type_info?: EntityTypeRef;
 }
 
 export interface CompletionAction {
@@ -103,6 +105,7 @@ export interface CreateStepInput {
 export interface CreateWorkflowInput {
   name: string;
   entity_type_ids: string[];
+  include_existing?: boolean;
   is_auto_start: boolean;
   is_loopable: boolean;
   steps: CreateStepInput[];

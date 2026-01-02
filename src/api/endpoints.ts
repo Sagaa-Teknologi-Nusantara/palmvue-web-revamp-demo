@@ -7,6 +7,7 @@ export const ENDPOINTS = {
     CREATE: "/entity-types",
     DETAIL: (id: string) => `/entity-types/${id}`,
     DELETE: (id: string) => `/entity-types/${id}`,
+    UPDATE: (id: string) => `/entity-types/${id}`,
     WORKFLOWS: (id: string) => `/entity-types/${id}/workflows`,
     OPTIONS: "/entity-types/options",
   },
@@ -14,6 +15,7 @@ export const ENDPOINTS = {
     LIST: "/entities",
     CREATE: "/entities",
     DETAIL: (id: string) => `/entities/${id}`,
+    UPDATE: (id: string) => `/entities/${id}`,
     DELETE: (id: string) => `/entities/${id}`,
     OPTIONS: "/entities/options",
     WORKFLOW_DETAILS: (id: string) => `/entities/${id}/workflows`,
@@ -24,9 +26,15 @@ export const ENDPOINTS = {
     OPTIONS: "/workflows/options",
     DETAIL: (id: string) => `/workflows/${id}`,
     DELETE: (id: string) => `/workflows/${id}`,
+    UPDATE: (id: string) => `/workflows/${id}`,
   },
   WORKFLOW_RECORDS: {
     STEP_SUBMISSIONS: (recordId: string, stepId: string) =>
       `/workflow-records/${recordId}/steps/${stepId}/submissions`,
+    START: (recordId: string) => `/workflow-records/${recordId}/start`,
+  },
+  FORM_SUBMISSIONS: {
+    APPROVE: (id: string) => `/form-submissions/${id}/approve`,
+    REJECT: (id: string) => `/form-submissions/${id}/reject`,
   },
 } as const;

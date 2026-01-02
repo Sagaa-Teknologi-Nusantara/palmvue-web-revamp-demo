@@ -16,3 +16,12 @@ export interface CreateEntityTypeRequest {
   icon: string;
   color: string;
 }
+
+export interface UpdateEntityTypeRequest {
+  name?: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  add_workflow_ids?: string[];
+  include_existing?: boolean;
+}

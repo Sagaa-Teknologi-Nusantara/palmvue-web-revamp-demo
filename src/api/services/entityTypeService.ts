@@ -7,6 +7,7 @@ import type { EntityTypeOption } from "../types/entity";
 import type {
   CreateEntityTypeRequest,
   EntityTypeListResponse,
+  UpdateEntityTypeRequest,
 } from "../types/entity-type";
 
 export const entityTypeService = {
@@ -59,6 +60,17 @@ export const entityTypeService = {
   getOptions: async (): Promise<EntityTypeOption[]> => {
     const response = await apiClient.get<ApiResponse<EntityTypeOption[]>>(
       ENDPOINTS.ENTITY_TYPES.OPTIONS,
+    );
+    return response.data.data;
+  },
+
+  update: async (
+    id: string,
+    data: UpdateEntityTypeRequest,
+  ): Promise<EntityType> => {
+    const response = await apiClient.patch<ApiResponse<EntityType>>(
+      ENDPOINTS.ENTITY_TYPES.UPDATE(id),
+      data,
     );
     return response.data.data;
   },

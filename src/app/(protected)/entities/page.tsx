@@ -26,6 +26,7 @@ export default function EntitiesPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const selectedType = searchParams.get("type") || "all";
+  const [selectedParent, setSelectedParent] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
@@ -43,6 +44,7 @@ export default function EntitiesPage() {
     size: pageSize,
     search: debouncedSearch || undefined,
     entity_type_id: selectedType !== "all" ? selectedType : undefined,
+    parent_id: selectedParent || undefined,
   });
   const { options: entityTypeOptions } = useEntityTypeOptionsQuery();
   const deleteMutation = useDeleteEntityMutation();
@@ -62,6 +64,11 @@ export default function EntitiesPage() {
     },
     [router, searchParams],
   );
+
+  const handleParentChange = useCallback((parentId: string | null) => {
+    setSelectedParent(parentId);
+    setPage(1);
+  }, []);
 
   const handlePageSizeChange = useCallback((newPageSize: number) => {
     setPageSize(newPageSize);
@@ -97,6 +104,8 @@ export default function EntitiesPage() {
         selectedType={selectedType}
         onTypeChange={handleTypeChange}
         entityTypeOptions={entityTypeOptions}
+        selectedParent={selectedParent}
+        onParentChange={handleParentChange}
       />
 
       {isLoading ? (
