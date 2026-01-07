@@ -1,7 +1,8 @@
 "use client";
 
-import { Play, PlayCircle } from "lucide-react";
+import { Play, PlayCircle, Repeat, Zap } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,9 +56,29 @@ export function EntityWorkflowSection({
                       <PlayCircle className="h-5 w-5" />
                     </div>
                     <div className="space-y-1">
-                      <CardTitle className="text-base leading-none font-semibold">
-                        {workflowDetail.workflow.name}
-                      </CardTitle>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <CardTitle className="text-base leading-none font-semibold">
+                          {workflowDetail.workflow.name}
+                        </CardTitle>
+                        {workflowDetail.workflow.is_loopable && (
+                          <Badge
+                            variant="outline"
+                            className="text-muted-foreground gap-1 px-1.5 py-0 text-[10px] font-normal"
+                          >
+                            <Repeat className="h-2.5 w-2.5" />
+                            Loopable
+                          </Badge>
+                        )}
+                        {workflowDetail.workflow.is_auto_start && (
+                          <Badge
+                            variant="secondary"
+                            className="text-muted-foreground gap-1 px-1.5 py-0 text-[10px] font-normal"
+                          >
+                            <Zap className="h-2.5 w-2.5" />
+                            Auto Start
+                          </Badge>
+                        )}
+                      </div>
                       <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                         {workflowDetail.status === "not_started" ? (
                           <div className="flex items-center gap-1.5">

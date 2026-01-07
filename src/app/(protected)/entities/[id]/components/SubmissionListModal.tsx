@@ -240,8 +240,8 @@ export function SubmissionListModal({
             <div className="p-6">{renderContent()}</div>
           </ScrollArea>
 
-          {true &&
-            true && (
+          {step.requires_approval &&
+            selectedSubmission?.status === "pending" && (
               <div className="border-t bg-gray-50/50 p-4">
                 <div className="flex gap-2">
                   <Button

@@ -9,6 +9,9 @@ export type WorkflowRecordStatus =
 export interface WorkflowRef {
   id: string;
   name: string;
+  is_loopable: boolean;
+  is_auto_start: boolean;
+  step_count: number;
 }
 
 export interface StepRef {
