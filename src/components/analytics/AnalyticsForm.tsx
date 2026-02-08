@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   Select,
   SelectContent,
@@ -85,6 +86,7 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
 
   const form = useForm<CreateAnalyticsDefinitionFormValues>({
     resolver: zodResolver(createAnalyticsDefinitionSchema),
+    mode: "onChange",
     defaultValues: {
       name: definition?.name ?? "",
       description: definition?.description ?? "",
@@ -109,6 +111,15 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
 
   const createMutation = useCreateAnalyticsDefinitionMutation();
   const updateMutation = useUpdateAnalyticsDefinitionMutation();
+
+  const prevSourceRef = useRef(watchedSource);
+
+  useEffect(() => {
+    if (prevSourceRef.current !== watchedSource) {
+      form.setValue("definition.filters", []);
+      prevSourceRef.current = watchedSource;
+    }
+  }, [watchedSource, form]);
 
   useEffect(() => {
     if (fieldOptions?.aggregation_fields?.length) {
@@ -142,12 +153,20 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
         toast.success("Analytics created");
       }
       onSuccess();
-    } catch {
-      toast.error(isEditing ? "Failed to update analytics" : "Failed to create analytics");
+    } catch (error: unknown) {
+      const fallback = isEditing ? "Failed to update analytics" : "Failed to create analytics";
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === "object" && error !== null && "error" in error
+            ? (error as { error: { message: string } }).error.message
+            : fallback;
+      toast.error(message || fallback);
     }
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const { isValid } = form.formState;
 
   return (
     <Form {...form}>
@@ -240,24 +259,18 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Field</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={fieldOptionsLoading}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select field" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {(fieldOptions?.aggregation_fields ?? []).map((f) => (
-                    <SelectItem key={f.field} value={f.field}>
-                      {f.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <SearchableSelect
+                  options={(fieldOptions?.aggregation_fields ?? []).map((f) => ({
+                    value: f.field,
+                    label: f.label,
+                  }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select field"
+                  disabled={fieldOptionsLoading}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -380,7 +393,7 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
           filterFields={fieldOptions?.filter_fields ?? []}
         />
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending || !isValid}>
           {isPending
             ? isEditing
               ? "Updating..."
