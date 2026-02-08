@@ -11,7 +11,8 @@ export function useEntityOptionsQuery(params: EntityOptionsParams = {}) {
   const query = useQuery({
     queryKey: [ENTITY_OPTIONS_QUERY_KEY, params],
     queryFn: () => entityService.getOptions(params),
-    enabled: !!params.search || !!params.entity_type_id,
+    enabled: params.search !== undefined || params.entity_type_id !== undefined || Object.keys(params).length === 0,
+    staleTime: 1000 * 60 * 5,
   });
 
   return {

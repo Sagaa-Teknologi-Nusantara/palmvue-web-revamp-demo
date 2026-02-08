@@ -1,265 +1,151 @@
+"use client";
+
+import { AlertCircle, Boxes, GitBranch, RefreshCw } from "lucide-react";
+
 import {
-  ArrowRight,
-  Box,
-  Boxes,
-  CheckCircle2,
-  CircleDot,
-  Clock,
-  GitBranch,
-  Plus,
-} from "lucide-react";
-import Link from "next/link";
-
-import { PageHeader, UnderDevelopment } from "@/components/layout";
-import { Badge } from "@/components/ui/badge";
+  KPICard,
+  PendingApprovalsList,
+  RecentEntitiesList,
+  RecentSubmissionsList,
+} from "@/components/dashboard";
+import { PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardCountsQuery } from "@/hooks/queries/useDashboardCountsQuery";
+import { useEntitiesQuery } from "@/hooks/queries/useEntitiesQuery";
+import { useFormSubmissionsQuery } from "@/hooks/queries/useFormSubmissionsQuery";
+import { useWorkflowRecordsQuery } from "@/hooks/queries/useWorkflowRecordsQuery";
 
-const entityTypes = [
-  { id: "1", name: "Company" },
-  { id: "2", name: "Project" },
-  { id: "3", name: "Task" },
-];
+function WidgetError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+        <AlertCircle className="h-6 w-6 text-destructive mb-2" />
+        <p className="text-sm text-destructive font-medium">{message}</p>
+        <Button variant="outline" size="sm" onClick={onRetry} className="mt-3">
+          <RefreshCw className="h-3 w-3 mr-1" />
+          Retry
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
-const entities = [
-  {
-    id: "1",
-    name: "Acme Corporation",
-    code: "ACME-001",
-    entity_type: { name: "Company" },
-    created_at: "2025-12-20T10:00:00Z",
-  },
-  {
-    id: "2",
-    name: "Website Redesign",
-    code: "PROJ-001",
-    entity_type: { name: "Project" },
-    created_at: "2025-12-22T14:30:00Z",
-  },
-  {
-    id: "3",
-    name: "Initial Setup",
-    code: "TASK-001",
-    entity_type: { name: "Task" },
-    created_at: "2025-12-25T09:00:00Z",
-  },
-];
+function KPISkeleton() {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <Skeleton className="h-4 w-24 mb-3" />
+        <Skeleton className="h-8 w-16 mb-2" />
+        <Skeleton className="h-3 w-20" />
+      </CardContent>
+    </Card>
+  );
+}
 
-const workflows = [
-  { id: "1", name: "Onboarding" },
-  { id: "2", name: "Approval Process" },
-];
-
-const workflowStats = {
-  not_started: 3,
-  in_progress: 5,
-  completed: 12,
-};
-
-const isUnderDevelopment = true;
+function ListSkeleton() {
+  return (
+    <Card>
+      <CardContent className="p-6 space-y-3">
+        <Skeleton className="h-5 w-32 mb-4" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full" />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function DashboardPage() {
-  if (isUnderDevelopment) {
-    return <UnderDevelopment />;
-  }
+  const {
+    workflowsCount,
+    entitiesCount,
+    entityTypesCount,
+    isLoading: countsLoading,
+    isError: countsError,
+    refetch: refetchCounts,
+  } = useDashboardCountsQuery();
+
+  const { entities, isLoading: entitiesLoading, isError: entitiesError, refetch: refetchEntities } =
+    useEntitiesQuery({ sort_by: "created_at", sort_order: "desc", size: 5 });
+  const { records, isLoading: recordsLoading, isError: recordsError, refetch: refetchRecords } =
+    useWorkflowRecordsQuery(5, "pending_approval");
+  const { submissions, isLoading: submissionsLoading, isError: submissionsError, refetch: refetchSubmissions } =
+    useFormSubmissionsQuery(5);
 
   return (
-    <div>
+    <div className="animate-in fade-in-50 space-y-8 duration-500">
       <PageHeader
         title="Dashboard"
-        description="Overview of your PalmVue demo data"
+        description="Overview of your PalmVue data"
       />
 
-      {/* Stats Cards */}
-      <div className="mb-8 grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Entity Types
-            </CardTitle>
-            <Boxes className="h-5 w-5 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{entityTypes.length}</div>
-            <Link
+      <div className="grid gap-6 md:grid-cols-3">
+        {countsLoading ? (
+          <>
+            <KPISkeleton />
+            <KPISkeleton />
+            <KPISkeleton />
+          </>
+        ) : countsError ? (
+          <>
+            <WidgetError message="Failed to load counts" onRetry={refetchCounts} />
+            <WidgetError message="Failed to load counts" onRetry={refetchCounts} />
+            <WidgetError message="Failed to load counts" onRetry={refetchCounts} />
+          </>
+        ) : (
+          <>
+            <KPICard
+              title="Entity Types"
+              value={entityTypesCount}
+              description="Defined schemas"
+              icon={Boxes}
               href="/entity-types"
-              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
-            >
-              View all
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Entities
-            </CardTitle>
-            <Box className="h-5 w-5 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{entities.length}</div>
-            <Link
+            />
+            <KPICard
+              title="Entities"
+              value={entitiesCount}
+              description="Active instances"
+              icon={Boxes}
               href="/entities"
-              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
-            >
-              View all
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Workflows
-            </CardTitle>
-            <GitBranch className="h-5 w-5 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{workflows.length}</div>
-            <Link
+            />
+            <KPICard
+              title="Workflows"
+              value={workflowsCount}
+              description="Configured processes"
+              icon={GitBranch}
               href="/workflows"
-              className="text-primary mt-2 inline-flex items-center text-sm hover:underline"
-            >
-              View all
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </CardContent>
-        </Card>
+            />
+          </>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent Entities */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Entities</CardTitle>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/entities/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Create
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {entities.map((entity) => (
-                <Link
-                  key={entity.id}
-                  href={`/entities/${entity.id}`}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
-                >
-                  <div>
-                    <p className="font-medium">{entity.name}</p>
-                    <div className="mt-1 flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">
-                        {entity.code}
-                      </Badge>
-                      <span className="text-xs text-gray-500">
-                        {entity.entity_type.name}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {entitiesLoading ? (
+          <ListSkeleton />
+        ) : entitiesError ? (
+          <WidgetError message="Failed to load entities" onRetry={() => refetchEntities()} />
+        ) : (
+          <RecentEntitiesList entities={entities.slice(0, 5)} />
+        )}
 
-        {/* Workflow Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Workflow Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-gray-200 p-2">
-                    <CircleDot className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Not Started</p>
-                    <p className="text-sm text-gray-500">Awaiting action</p>
-                  </div>
-                </div>
-                <Badge
-                  className="bg-gray-100 text-gray-800"
-                  variant="secondary"
-                >
-                  {workflowStats.not_started}
-                </Badge>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-yellow-100 p-2">
-                    <Clock className="h-4 w-4 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium">In Progress</p>
-                    <p className="text-sm text-gray-500">Being worked on</p>
-                  </div>
-                </div>
-                <Badge
-                  className="bg-yellow-100 text-yellow-800"
-                  variant="secondary"
-                >
-                  {workflowStats.in_progress}
-                </Badge>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-green-100 p-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Completed</p>
-                    <p className="text-sm text-gray-500">All steps done</p>
-                  </div>
-                </div>
-                <Badge
-                  className="bg-green-100 text-green-800"
-                  variant="secondary"
-                >
-                  {workflowStats.completed}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {recordsLoading ? (
+          <ListSkeleton />
+        ) : recordsError ? (
+          <WidgetError message="Failed to load approvals" onRetry={() => refetchRecords()} />
+        ) : (
+          <PendingApprovalsList records={records} />
+        )}
       </div>
 
-      {/* Quick Actions */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild>
-              <Link href="/entity-types/create">
-                <Plus className="mr-2 h-4 w-4" />
-                New Entity Type
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/entities/create">
-                <Plus className="mr-2 h-4 w-4" />
-                New Entity
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/workflows/create">
-                <Plus className="mr-2 h-4 w-4" />
-                New Workflow
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {submissionsLoading ? (
+        <ListSkeleton />
+      ) : submissionsError ? (
+        <WidgetError message="Failed to load submissions" onRetry={() => refetchSubmissions()} />
+      ) : (
+        <RecentSubmissionsList submissions={submissions} />
+      )}
     </div>
   );
 }

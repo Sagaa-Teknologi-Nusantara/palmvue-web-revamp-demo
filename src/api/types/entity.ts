@@ -8,6 +8,8 @@ export interface EntityListParams {
   search?: string;
   entity_type_id?: string;
   parent_id?: string;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
 }
 
 export interface EntityListResponse {
