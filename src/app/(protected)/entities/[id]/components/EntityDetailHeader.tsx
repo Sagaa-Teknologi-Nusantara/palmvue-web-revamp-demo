@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil, QrCode, Trash2 } from "lucide-react";
+import { ArrowLeft, History, Pencil, QrCode, Trash2 } from "lucide-react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import Link from "next/link";
 
@@ -71,6 +71,12 @@ export function EntityDetailHeader({
           </div>
 
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-9" asChild>
+              <Link href={`/entities/${entity.id}/workflow-history`}>
+                <History className="mr-2 h-4 w-4" />
+                View History
+              </Link>
+            </Button>
             <Button
               variant="outline"
               size="sm"

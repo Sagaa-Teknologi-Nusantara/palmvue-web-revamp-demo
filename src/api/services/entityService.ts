@@ -11,6 +11,7 @@ import type {
   EntityOptionsParams,
   UpdateEntityRequest,
 } from "../types/entity";
+import type { EntityWorkflowHistoryItem } from "../types/workflow-history";
 
 export const entityService = {
   getList: async (
@@ -86,6 +87,15 @@ export const entityService = {
     const response = await apiClient.get<ApiResponse<EntityWorkflowDetail[]>>(
       ENDPOINTS.ENTITIES.WORKFLOW_DETAILS(entityId),
     );
+    return response.data.data;
+  },
+
+  getWorkflowHistory: async (
+    entityId: string,
+  ): Promise<EntityWorkflowHistoryItem[]> => {
+    const response = await apiClient.get<
+      ApiResponse<EntityWorkflowHistoryItem[]>
+    >(ENDPOINTS.ENTITIES.WORKFLOW_HISTORY(entityId));
     return response.data.data;
   },
 };
