@@ -33,12 +33,37 @@ interface AnalyticsCardProps {
   definition: AnalyticsDefinition;
 }
 
+function getChartHeight(chartType: string): string {
+  switch (chartType) {
+    case "number":
+      return "h-16";
+    case "bar":
+    case "line":
+      return "h-72";
+    case "pie":
+      return "h-64";
+    default:
+      return "h-64";
+  }
+}
+
 export function AnalyticsCard({ definition }: AnalyticsCardProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const { result, isLoading, isFetching, refetch } = useAnalyticsQueryQuery(definition.id);
+  const isKpi = definition.definition.chart_type === "number";
+
+  const { result, isLoading, isError, isFetching, refetch } = useAnalyticsQueryQuery(definition.id);
   const deleteMutation = useDeleteAnalyticsDefinitionMutation();
+
+  const handleRefresh = async () => {
+    const queryResult = await refetch();
+    if (queryResult.isError) {
+      toast.error("Failed to refresh chart");
+    } else {
+      toast.success("Chart refreshed");
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -53,29 +78,30 @@ export function AnalyticsCard({ definition }: AnalyticsCardProps) {
   return (
     <>
       <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="text-base font-semibold">
+        <CardHeader className={`flex flex-row items-center justify-between space-y-0 ${isKpi ? "pb-1 pt-3 px-4" : "pb-2"}`}>
+          <div className="min-w-0 flex-1">
+            <CardTitle className={isKpi ? "text-sm font-medium truncate" : "text-base font-semibold"}>
               {definition.name}
             </CardTitle>
-            {definition.description && (
+            {!isKpi && definition.description && (
               <p className="text-sm text-muted-foreground mt-1">
                 {definition.description}
               </p>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => refetch()}
+              className={isKpi ? "h-7 w-7" : ""}
+              onClick={handleRefresh}
               disabled={isFetching}
             >
               <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className={isKpi ? "h-7 w-7" : ""}>
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -95,11 +121,18 @@ export function AnalyticsCard({ definition }: AnalyticsCardProps) {
             </DropdownMenu>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="h-64">
+        <CardContent className={isKpi ? "px-4 pb-3 pt-0" : ""}>
+          <div className={getChartHeight(definition.definition.chart_type)}>
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : isError ? (
+              <div className="flex flex-col items-center justify-center h-full text-destructive">
+                <p className="text-sm font-medium">Failed to load chart</p>
+                <Button variant="link" size="sm" onClick={() => refetch()}>
+                  Retry
+                </Button>
               </div>
             ) : result ? (
               <AnalyticsChart chartType={result.chart_type} data={result.data} />
