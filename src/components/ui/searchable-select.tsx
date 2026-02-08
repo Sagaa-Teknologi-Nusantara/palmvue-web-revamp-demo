@@ -44,7 +44,10 @@ export function SearchableSelect({
   const [open, setOpen] = React.useState(false);
 
   const sortedOptions = React.useMemo(
-    () => [...options].sort((a, b) => a.label.localeCompare(b.label)),
+    () =>
+      [...options].sort((a, b) =>
+        (a.label ?? "").localeCompare(b.label ?? "")
+      ),
     [options]
   );
 
