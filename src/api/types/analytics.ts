@@ -55,16 +55,31 @@ export const filterConfigSchema = z.object({
   value: z.string().min(1),
 });
 
-export const analyticsDefinitionConfigSchema = z.object({
-  source: z.enum(AnalyticsSources),
-  aggregation: z.enum(AnalyticsAggregations),
-  field: z.string().min(1),
-  filters: z.array(filterConfigSchema).optional(),
-  time_range: z.enum(AnalyticsTimeRanges),
-  group_by: z.enum(AnalyticsGroupBys).nullable().optional(),
-  sort: z.enum(AnalyticsSortOrders).nullable().optional(),
-  chart_type: z.enum(AnalyticsChartTypes),
-});
+export const analyticsDefinitionConfigSchema = z
+  .object({
+    source: z.enum(AnalyticsSources),
+    aggregation: z.enum(AnalyticsAggregations),
+    field: z.string().min(1),
+    filters: z.array(filterConfigSchema).optional(),
+    time_range: z.enum(AnalyticsTimeRanges),
+    group_by: z.enum(AnalyticsGroupBys).nullable().optional(),
+    sort: z.enum(AnalyticsSortOrders).nullable().optional(),
+    chart_type: z.enum(AnalyticsChartTypes),
+  })
+  .refine(
+    (data) => {
+      if (data.chart_type === "number") return !data.group_by;
+      return true;
+    },
+    { message: "KPI number chart requires no grouping", path: ["chart_type"] }
+  )
+  .refine(
+    (data) => {
+      if (data.group_by && data.chart_type === "number") return false;
+      return true;
+    },
+    { message: "Grouped analytics requires a chart type other than number", path: ["group_by"] }
+  );
 
 export const createAnalyticsDefinitionSchema = z.object({
   name: z.string().min(2).max(255),
