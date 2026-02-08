@@ -1,5 +1,7 @@
 "use client";
 
+import { X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -72,7 +74,7 @@ function PieTooltipContent({
 }) {
   if (!active || !payload || payload.length === 0) return null;
   const entry = payload[0];
-  const breakdown = entry.payload.othersBreakdown;
+  const isOthers = !!entry.payload.othersBreakdown;
   return (
     <div
       style={{
@@ -81,26 +83,166 @@ function PieTooltipContent({
         border: "1px solid var(--border)",
         borderRadius: "6px",
         padding: "8px 12px",
-        maxHeight: "200px",
-        overflowY: "auto",
+        pointerEvents: "none",
       }}
     >
       <p style={{ fontWeight: 600, marginBottom: 4 }}>{entry.payload.name}</p>
-      <p style={{ marginBottom: breakdown ? 6 : 0 }}>{entry.value.toLocaleString()}</p>
-      {breakdown && (
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 4 }}>
+      <p style={{ marginBottom: isOthers ? 4 : 0 }}>{entry.value.toLocaleString()}</p>
+      {isOthers && (
+        <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>Click for breakdown</p>
+      )}
+    </div>
+  );
+}
+
+function OthersPopover({
+  breakdown,
+  total,
+  position,
+  onClose,
+}: {
+  breakdown: { name: string; value: number }[];
+  total: number;
+  position: { x: number; y: number };
+  onClose: () => void;
+}) {
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  return (
+    <>
+      <div
+        style={{ position: "fixed", inset: 0, zIndex: 49 }}
+        onClick={onClose}
+      />
+      <div
+        ref={popoverRef}
+        style={{
+          position: "fixed",
+          left: position.x,
+          top: position.y,
+          zIndex: 50,
+          backgroundColor: "var(--popover)",
+          color: "var(--popover-foreground)",
+          border: "1px solid var(--border)",
+          borderRadius: "8px",
+          padding: "12px 16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          maxHeight: "240px",
+          minWidth: "180px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <p style={{ fontWeight: 600, fontSize: "13px" }}>Others</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <p style={{ fontWeight: 600, fontSize: "13px" }}>{total.toLocaleString()}</p>
+            <button
+              onClick={onClose}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 2,
+                display: "flex",
+                alignItems: "center",
+                color: "var(--muted-foreground)",
+              }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+        <div
+          style={{
+            overflowY: "auto",
+            flex: 1,
+            borderTop: "1px solid var(--border)",
+            paddingTop: 6,
+          }}
+        >
           {breakdown.map((item) => (
             <div
               key={item.name}
-              style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: "12px" }}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+                fontSize: "12px",
+                padding: "2px 0",
+              }}
             >
-              <span>{item.name}</span>
-              <span style={{ fontWeight: 500 }}>{item.value.toLocaleString()}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</span>
+              <span style={{ fontWeight: 500, flexShrink: 0 }}>{item.value.toLocaleString()}</span>
             </div>
           ))}
         </div>
+      </div>
+    </>
+  );
+}
+
+function PieChartWithPopover({ pieData }: { pieData: PieDataEntry[] }) {
+  const [popover, setPopover] = useState<{
+    breakdown: { name: string; value: number }[];
+    total: number;
+    position: { x: number; y: number };
+  } | null>(null);
+
+  const handlePieClick = useCallback(
+    (data: PieDataEntry, _index: number, e: React.MouseEvent) => {
+      if (data.othersBreakdown) {
+        setPopover({
+          breakdown: data.othersBreakdown,
+          total: data.value,
+          position: { x: e.clientX + 8, y: e.clientY - 20 },
+        });
+      }
+    },
+    []
+  );
+
+  return (
+    <>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="35%"
+            cy="50%"
+            outerRadius="75%"
+            onClick={handlePieClick}
+            style={{ cursor: "pointer" }}
+          >
+            {pieData.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip content={<PieTooltipContent />} />
+          <Legend
+            layout="vertical"
+            align="right"
+            verticalAlign="middle"
+            content={<PieLegendContent />}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      {popover && (
+        <OthersPopover
+          breakdown={popover.breakdown}
+          total={popover.total}
+          position={popover.position}
+          onClose={() => setPopover(null)}
+        />
       )}
-    </div>
+    </>
   );
 }
 
@@ -110,6 +252,11 @@ function PieLegendContent({
   payload?: { value: string; color: string }[];
 }) {
   if (!payload) return null;
+  const sorted = [...payload].sort((a, b) => {
+    if (a.value === "Others") return 1;
+    if (b.value === "Others") return -1;
+    return a.value.localeCompare(b.value);
+  });
   return (
     <ul
       style={{
@@ -121,7 +268,7 @@ function PieLegendContent({
         fontSize: "12px",
       }}
     >
-      {payload.map((entry) => (
+      {sorted.map((entry) => (
         <li
           key={entry.value}
           style={{
@@ -229,31 +376,7 @@ export function AnalyticsChart({ chartType, data }: AnalyticsChartProps) {
 
     if (chartType === "pie") {
       const pieData = preparePieData(chartData);
-      return (
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              dataKey="value"
-              nameKey="name"
-              cx="35%"
-              cy="50%"
-              outerRadius="75%"
-            >
-              {pieData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip content={<PieTooltipContent />} />
-            <Legend
-              layout="vertical"
-              align="right"
-              verticalAlign="middle"
-              content={<PieLegendContent />}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      );
+      return <PieChartWithPopover pieData={pieData} />;
     }
   }
 
@@ -298,31 +421,7 @@ export function AnalyticsChart({ chartType, data }: AnalyticsChartProps) {
 
     if (chartType === "pie") {
       const pieData = preparePieData(chartData);
-      return (
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              dataKey="value"
-              nameKey="name"
-              cx="35%"
-              cy="50%"
-              outerRadius="75%"
-            >
-              {pieData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip content={<PieTooltipContent />} />
-            <Legend
-              layout="vertical"
-              align="right"
-              verticalAlign="middle"
-              content={<PieLegendContent />}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      );
+      return <PieChartWithPopover pieData={pieData} />;
     }
 
     if (chartType === "line") {
