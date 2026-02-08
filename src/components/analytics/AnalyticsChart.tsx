@@ -39,6 +39,31 @@ const COLORS = [
 ];
 
 const MAX_PIE_SLICES = 5;
+const MAX_LABEL_LENGTH = 20;
+
+function truncateLabel(label: string, max = MAX_LABEL_LENGTH): string {
+  return label.length > max ? `${label.slice(0, max)}...` : label;
+}
+
+function BarXAxisTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={4}
+        textAnchor="end"
+        fill="currentColor"
+        fontSize={11}
+        transform="rotate(-45)"
+        className="text-muted-foreground"
+      >
+        <title>{payload.value}</title>
+        {truncateLabel(payload.value)}
+      </text>
+    </g>
+  );
+}
 
 interface PieDataEntry {
   [key: string]: unknown;
@@ -352,9 +377,9 @@ export function AnalyticsChart({ chartType, data }: AnalyticsChartProps) {
     if (chartType === "bar") {
       return (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
+          <BarChart data={chartData} margin={{ bottom: 60, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-            <XAxis dataKey="name" className="text-xs" />
+            <XAxis dataKey="name" interval={0} tick={BarXAxisTick} height={80} />
             <YAxis className="text-xs" />
             <Tooltip
               contentStyle={{
@@ -397,9 +422,9 @@ export function AnalyticsChart({ chartType, data }: AnalyticsChartProps) {
     if (chartType === "bar") {
       return (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
+          <BarChart data={chartData} margin={{ bottom: 60, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-            <XAxis dataKey="name" className="text-xs" />
+            <XAxis dataKey="name" interval={0} tick={BarXAxisTick} height={80} />
             <YAxis className="text-xs" />
             <Tooltip
               contentStyle={{

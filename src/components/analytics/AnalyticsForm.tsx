@@ -133,12 +133,12 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
 
   useEffect(() => {
     if (!watchedGroupBy) {
-      form.setValue("definition.chart_type", "number");
+      form.setValue("definition.chart_type", "number", { shouldValidate: true });
       form.setValue("definition.sort", null);
     } else {
       const currentChartType = form.getValues("definition.chart_type");
       if (currentChartType === "number") {
-        form.setValue("definition.chart_type", "bar");
+        form.setValue("definition.chart_type", "bar", { shouldValidate: true });
       }
     }
   }, [watchedGroupBy, form]);

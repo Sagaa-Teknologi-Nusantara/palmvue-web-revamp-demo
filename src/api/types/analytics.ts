@@ -67,18 +67,8 @@ export const analyticsDefinitionConfigSchema = z
     chart_type: z.enum(AnalyticsChartTypes),
   })
   .refine(
-    (data) => {
-      if (data.chart_type === "number") return !data.group_by;
-      return true;
-    },
-    { message: "KPI number chart requires no grouping", path: ["chart_type"] }
-  )
-  .refine(
-    (data) => {
-      if (data.group_by && data.chart_type === "number") return false;
-      return true;
-    },
-    { message: "Grouped analytics requires a chart type other than number", path: ["group_by"] }
+    (data) => !(data.group_by && data.chart_type === "number"),
+    { message: "Grouped analytics requires a chart type other than number", path: ["chart_type"] }
   );
 
 export const createAnalyticsDefinitionSchema = z.object({
