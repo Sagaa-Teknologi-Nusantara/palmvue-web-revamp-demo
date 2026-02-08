@@ -10,6 +10,7 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/entity-types/${id}`,
     WORKFLOWS: (id: string) => `/entity-types/${id}/workflows`,
     OPTIONS: "/entity-types/options",
+    COUNT: "/entity-types/count",
   },
   ENTITIES: {
     LIST: "/entities",
@@ -20,6 +21,7 @@ export const ENDPOINTS = {
     OPTIONS: "/entities/options",
     WORKFLOW_DETAILS: (id: string) => `/entities/${id}/workflows`,
     WORKFLOW_HISTORY: (id: string) => `/entities/${id}/workflow-history`,
+    COUNT: "/entities/count",
   },
   WORKFLOWS: {
     LIST: "/workflows",
@@ -28,14 +30,29 @@ export const ENDPOINTS = {
     DETAIL: (id: string) => `/workflows/${id}`,
     DELETE: (id: string) => `/workflows/${id}`,
     UPDATE: (id: string) => `/workflows/${id}`,
+    COUNT: "/workflows/count",
   },
   WORKFLOW_RECORDS: {
+    LIST: "/workflow-records",
     STEP_SUBMISSIONS: (recordId: string, stepId: string) =>
       `/workflow-records/${recordId}/steps/${stepId}/submissions`,
     START: (recordId: string) => `/workflow-records/${recordId}/start`,
   },
   FORM_SUBMISSIONS: {
+    LIST: "/form-submissions",
     APPROVE: (id: string) => `/form-submissions/${id}/approve`,
     REJECT: (id: string) => `/form-submissions/${id}/reject`,
+  },
+  ANALYTICS: {
+    DEFINITIONS: "/analytics/definitions",
+    DEFINITION_DETAIL: (id: string) => `/analytics/definitions/${id}`,
+    QUERY: (id: string) => `/analytics/query/${id}`,
+    FIELD_OPTIONS: "/analytics/field-options",
+  },
+  USERS: {
+    OPTIONS: "/users/options",
+  },
+  WORKFLOW_STEPS: {
+    OPTIONS: "/workflow-steps/options",
   },
 } as const;

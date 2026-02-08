@@ -35,3 +35,8 @@ export interface BaseEntity {
   created_at: string;
   updated_at: string;
 }
+
+export interface OptionItem {
+  id: string;
+  name: string;
+}
