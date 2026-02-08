@@ -17,10 +17,6 @@ interface PendingApprovalsListProps {
 }
 
 export function PendingApprovalsList({ records }: PendingApprovalsListProps) {
-  const pendingRecords = records.filter(
-    (r) => r.status === "pending" || r.status === "in_progress"
-  );
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -30,13 +26,13 @@ export function PendingApprovalsList({ records }: PendingApprovalsListProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {pendingRecords.length === 0 ? (
+        {records.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             No pending approvals
           </p>
         ) : (
           <div className="space-y-3">
-            {pendingRecords.slice(0, 5).map((record) => (
+            {records.slice(0, 5).map((record) => (
               <div
                 key={record.id}
                 className="flex items-center justify-between rounded-lg bg-muted/50 p-3"

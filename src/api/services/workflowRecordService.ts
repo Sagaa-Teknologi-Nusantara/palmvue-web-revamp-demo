@@ -14,10 +14,12 @@ export interface WorkflowRecord {
 }
 
 export const workflowRecordService = {
-  getList: async (limit = 10): Promise<WorkflowRecord[]> => {
+  getList: async (limit = 10, status?: string): Promise<WorkflowRecord[]> => {
+    const params: Record<string, unknown> = { size: limit };
+    if (status) params.status = status;
     const response = await apiClient.get<ApiResponse<WorkflowRecord[]>>(
       ENDPOINTS.WORKFLOW_RECORDS.LIST,
-      { params: { size: limit } }
+      { params }
     );
     return response.data.data;
   },

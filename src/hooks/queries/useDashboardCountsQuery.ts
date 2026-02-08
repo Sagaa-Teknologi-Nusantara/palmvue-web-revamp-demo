@@ -38,5 +38,10 @@ export function useDashboardCountsQuery() {
       workflowsQuery.isError ||
       entitiesQuery.isError ||
       entityTypesQuery.isError,
+    refetch: () => {
+      workflowsQuery.refetch();
+      entitiesQuery.refetch();
+      entityTypesQuery.refetch();
+    },
   };
 }
