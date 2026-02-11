@@ -117,9 +117,13 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
   useEffect(() => {
     if (prevSourceRef.current !== watchedSource) {
       form.setValue("definition.filters", []);
+      const currentGroupBy = form.getValues("definition.group_by");
+      if (currentGroupBy && !fieldOptions?.group_by_fields?.includes(currentGroupBy)) {
+        form.setValue("definition.group_by", null, { shouldValidate: true });
+      }
       prevSourceRef.current = watchedSource;
     }
-  }, [watchedSource, form]);
+  }, [watchedSource, fieldOptions, form]);
 
   useEffect(() => {
     if (fieldOptions?.aggregation_fields?.length) {
@@ -318,7 +322,9 @@ export function AnalyticsForm({ definition, onSuccess }: AnalyticsFormProps) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="__none__">No grouping (KPI)</SelectItem>
-                  {AnalyticsGroupBys.map((groupBy) => (
+                  {AnalyticsGroupBys.filter(
+                    (g) => fieldOptions?.group_by_fields?.includes(g)
+                  ).map((groupBy) => (
                     <SelectItem key={groupBy} value={groupBy}>
                       {groupByLabels[groupBy]}
                     </SelectItem>

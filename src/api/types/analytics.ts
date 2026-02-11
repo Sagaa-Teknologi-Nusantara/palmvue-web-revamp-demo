@@ -121,6 +121,7 @@ export interface FieldOption {
 export interface FieldOptionsResponse {
   aggregation_fields: FieldOption[];
   filter_fields: FieldOption[];
+  group_by_fields: string[];
   time_field: string;
 }
 
