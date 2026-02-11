@@ -26,7 +26,7 @@ export function CreateAnalyticsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-lg">
+      <SheetContent className="overflow-y-auto sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle>
             {isEditing ? "Edit Analytics" : "Create Analytics"}
