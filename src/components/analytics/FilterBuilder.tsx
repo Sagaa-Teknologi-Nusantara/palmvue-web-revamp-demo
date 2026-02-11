@@ -10,6 +10,7 @@ import type {
   FilterOperator,
 } from "@/api/types/analytics";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   FormControl,
   FormField,
@@ -56,6 +57,8 @@ const operatorLabels: Record<FilterOperator, string> = {
 const operatorsByFieldType: Record<string, FilterOperator[]> = {
   uuid: ["=", "!=", "in"],
   enum: ["=", "!=", "in"],
+  string: ["=", "!=", "in"],
+  date: ["=", "!=", ">", "<", ">=", "<="],
   number: ["=", "!=", ">", "<", ">=", "<="],
   calculated: ["=", "!=", ">", "<", ">=", "<="],
   count: ["=", "!=", ">", "<", ">=", "<="],
@@ -177,14 +180,8 @@ function DynamicValueSelect({
     );
   }
 
-  if (fieldType === "datetime") {
-    return (
-      <Input
-        type="datetime-local"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    );
+  if (fieldType === "datetime" || fieldType === "date") {
+    return <DatePicker value={value} onChange={onChange} />;
   }
 
   return (
@@ -266,6 +263,7 @@ export function FilterBuilder({ control, filterFields }: FilterBuilderProps) {
         <p className="text-sm text-muted-foreground">No filters applied</p>
       )}
 
+      <div className={fields.length > 3 ? "max-h-[320px] overflow-y-auto space-y-2 pr-1" : "space-y-2"}>
       {fields.map((item, index) => {
         const selectedFieldName = watchedFilters?.[index]?.field;
         const selectedOperator = watchedFilters?.[index]?.operator;
@@ -273,7 +271,7 @@ export function FilterBuilder({ control, filterFields }: FilterBuilderProps) {
         const validOperators = getValidOperators(selectedField?.type);
 
         return (
-          <div key={item.id} className="flex items-start gap-2">
+          <div key={item.id} className="flex items-start gap-2 rounded-lg border border-border/50 p-2">
             <FormField
               control={control}
               name={`definition.filters.${index}.field`}
@@ -299,7 +297,7 @@ export function FilterBuilder({ control, filterFields }: FilterBuilderProps) {
               control={control}
               name={`definition.filters.${index}.operator`}
               render={({ field }) => (
-                <FormItem className="w-32">
+                <FormItem className="w-40">
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -351,6 +349,7 @@ export function FilterBuilder({ control, filterFields }: FilterBuilderProps) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
