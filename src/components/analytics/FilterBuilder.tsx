@@ -56,6 +56,7 @@ const operatorLabels: Record<FilterOperator, string> = {
 const operatorsByFieldType: Record<string, FilterOperator[]> = {
   uuid: ["=", "!=", "in"],
   enum: ["=", "!=", "in"],
+  string: ["=", "!=", "in"],
   number: ["=", "!=", ">", "<", ">=", "<="],
   calculated: ["=", "!=", ">", "<", ">=", "<="],
   count: ["=", "!=", ">", "<", ">=", "<="],

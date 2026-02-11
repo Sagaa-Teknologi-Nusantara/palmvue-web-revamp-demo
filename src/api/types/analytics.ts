@@ -113,7 +113,7 @@ export interface UpdateAnalyticsDefinitionRequest {
 export interface FieldOption {
   field: string;
   label: string;
-  type: "count" | "calculated" | "number" | "uuid" | "enum" | "datetime";
+  type: "count" | "calculated" | "number" | "uuid" | "enum" | "datetime" | "string";
   options?: string[];
   options_endpoint?: string;
 }
